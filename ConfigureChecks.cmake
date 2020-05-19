@@ -29,6 +29,10 @@ else(WIN32)
 endif(WIN32)
 
 # library checks
+message(STATUS "*** {fmt} ***")
+add_subdirectory(fmt)
+message(STATUS "*** {fmt} ***")
+
 if(WITH_BNETD)
 	cmake_policy(SET CMP0074 NEW)
 	if (NOT DEFINED ZLIB_ROOT)
