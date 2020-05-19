@@ -43,8 +43,8 @@ By default, tracking is enabled and is only used for the purpose of sending info
 - **Dune 2000**: 1.06
 - **Emperor: Battle for Dune**: 1.09
 
-\* WarCraft 3 clients are unable to connect to PvPGN servers without a client-side modification, through tools such as [W3L](https://github.com/w3lh/w3l), to disable server signature verification.
-\* StarCraft clients beginning with patch 1.18 will not be supported by PvPGN-PRO due to protocol changes. A 1.18.0 versioncheck entry is included for compatibility with bot software.
+* WarCraft 3 clients are unable to connect to PvPGN servers without a client-side modification, through tools such as [W3L](https://github.com/w3lh/w3l), to disable server signature verification.
+* StarCraft clients beginning with patch 1.18 will not be supported by PvPGN-PRO due to protocol changes. A 1.18.0 versioncheck entry is included for compatibility with bot software.
 
 ## Support
 [Create an issue](https://github.com/pvpgn/pvpgn-server/issues) if you have any questions, suggestions, or anything else to say about PvPGN-PRO. Please note that D2GS is not part of the PvPGN project and is therefore unsupported here.
