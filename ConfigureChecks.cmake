@@ -30,6 +30,10 @@ endif(WIN32)
 
 # library checks
 if(WITH_BNETD)
+	cmake_policy(SET CMP0074 NEW)
+	if (NOT DEFINED ZLIB_ROOT)
+		set(ZLIB_ROOT ${CMAKE_SOURCE_DIR}/include/zlib/1.2.11 ${CMAKE_SOURCE_DIR}/lib/zlib/1.2.11)
+	endif()
 	find_package(ZLIB REQUIRED)
 endif(WITH_BNETD)
 
