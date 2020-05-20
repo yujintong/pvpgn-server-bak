@@ -286,7 +286,7 @@ namespace pvpgn
 		{
 			if (!account) {
 				eventlog(eventlog_level_error, __FUNCTION__, "got NULL account");
-				return 0;
+				return -1;
 			}
 
 			if (!key) {
