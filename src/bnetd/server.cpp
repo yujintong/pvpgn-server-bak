@@ -87,6 +87,8 @@
 #include "anongame_infos.h"
 #include "topic.h"
 #include "i18n.h"
+#include "smtp.h"
+#include "account_email_verification.h"
 
 #ifdef HAVE_ARPA_INET_H
 # include <arpa/inet.h>
@@ -1505,6 +1507,32 @@ namespace pvpgn
 						lua_load(prefs_get_scriptdir());
 					}
 #endif
+
+					if (prefs_get_verify_account_email() == 1)
+					{
+						if (do_restart == restart_mode_all || do_restart == restart_mode_smtp)
+						{
+							smtp_cleanup();
+
+							if (!smtp_init(prefs_get_smtp_ca_cert_store(), prefs_get_smtp_server_url(), prefs_get_smtp_port(), prefs_get_smtp_username(), prefs_get_smtp_password()))
+							{
+								eventlog(eventlog_level_error, __FUNCTION__, "Failed to initialize SMTP client");
+								eventlog(eventlog_level_error, __FUNCTION__, "Disabling account email verification");
+								prefs_set_verify_account_email(false);
+							}
+						}
+
+						if (do_restart == restart_mode_all || do_restart == restart_mode_accountemailverification)
+						{
+							account_email_verification_unload();
+							if (!account_email_verification_load(prefs_get_email_verification_file(), prefs_get_servername(), prefs_get_verify_account_email_from_address()))
+							{
+								eventlog(eventlog_level_error, __FUNCTION__, "Failed to load email verification message");
+								eventlog(eventlog_level_error, __FUNCTION__, "Disabling account email verification");
+								prefs_set_verify_account_email(false);
+							}
+						}
+					}
 
 					eventlog(eventlog_level_info, __FUNCTION__, "done reconfiguring");
 

@@ -264,6 +264,12 @@ namespace pvpgn
 
 		extern int account_set_email(t_account * account, std::string email);
 		extern char const * account_get_email(t_account * account);
+		extern int account_get_email_verified(t_account* account);
+		extern int account_set_email_verified(t_account* account, bool is_verified);
+		extern char const* account_get_email_verification_code(t_account* account);
+		extern int account_set_email_verification_code(t_account* account, char const * expiration_date);
+		extern unsigned int account_get_email_verification_expiration(t_account* account);
+		extern int account_set_email_verification_expiration(t_account* account, unsigned int expiration_date);
 
 		extern int account_set_userlang(t_account * account, const char * lang);
 		extern int account_set_userlang(t_account * account, std::string lang);

@@ -1,5 +1,6 @@
 set(BNETD_SOURCES
-	account.cpp account.h account_wrap.cpp account_wrap.h adbanner.cpp
+	account.cpp account.h account_email_verification.cpp account_email_verification.h
+	account_wrap.cpp account_wrap.h adbanner.cpp
 	adbanner.h alias_command.cpp alias_command.h anongame.cpp
 	anongame_gameresult.cpp anongame_gameresult.h anongame.h 
 	anongame_infos.cpp anongame_infos.h anongame_maplists.cpp 
@@ -7,8 +8,8 @@ set(BNETD_SOURCES
 	attrlayer.h autoupdate.cpp autoupdate.h channel_conv.cpp channel_conv.h 
 	channel.cpp channel.h character.cpp character.h clan.cpp clan.h 
 	cmdline.cpp cmdline.h command.cpp command_groups.cpp command_groups.h 
-	command.h connection.cpp connection.h file.cpp file.h file_plain.cpp 
-	file_plain.h friends.cpp friends.h game_conv.cpp 
+	command.h connection.cpp connection.h file.cpp file.h
+	file_plain.cpp file_plain.h friends.cpp friends.h game_conv.cpp 
 	game_conv.h game.cpp game.h handle_anongame.cpp handle_anongame.h 
 	handle_apireg.cpp handle_apireg.h handle_bnet.cpp handle_bnet.h 
 	handle_bot.cpp handle_bot.h handle_d2cs.cpp handle_d2cs.h 
@@ -20,9 +21,9 @@ set(BNETD_SOURCES
 	ipban.cpp ipban.h irc.cpp irc.h ladder_calc.cpp ladder_calc.h ladder.cpp 
 	ladder.h mail.cpp mail.h main.cpp message.cpp message.h news.cpp news.h
 	output.cpp output.h prefs.cpp prefs.h quota.h realm.cpp realm.h 
-	runprog.cpp runprog.h server.cpp server.h sql_common.cpp sql_common.h
-	sql_dbcreator.cpp sql_dbcreator.h sql_mysql.cpp sql_mysql.h sql_odbc.cpp
-	sql_odbc.h sql_pgsql.cpp sql_pgsql.h sql_sqlite3.cpp sql_sqlite3.h 
+	runprog.cpp runprog.h server.cpp server.h smtp.cpp smtp.h sql_common.cpp
+	sql_common.h sql_dbcreator.cpp sql_dbcreator.h sql_mysql.cpp sql_mysql.h
+	sql_odbc.cpp sql_odbc.h sql_pgsql.cpp sql_pgsql.h sql_sqlite3.cpp sql_sqlite3.h 
 	storage.cpp storage_file.cpp storage_file.h storage.h
 	storage_sql.cpp storage_sql.h support.cpp support.h
 	team.cpp team.h tick.cpp tick.h timer.cpp timer.h topic.cpp topic.h 
@@ -51,6 +52,7 @@ endif(WITH_WIN32_GUI)
 target_include_directories(bnetd
     PRIVATE
 		${ZLIB_INCLUDE_DIRS}
+		${CURL_INCLUDE_DIRS}
 		${LUA_INCLUDE_DIR}
 		${MYSQL_INCLUDE_DIR}
 		${SQLITE3_INCLUDE_DIR}
@@ -58,7 +60,7 @@ target_include_directories(bnetd
 		${ODBC_INCLUDE_DIR}
 )
 
-target_link_libraries(bnetd PRIVATE common compat fmt::fmt win32 ${NETWORK_LIBRARIES} ZLIB::ZLIB ${MYSQL_CLIENT_LIBS} ${SQLITE3_LIBRARIES} ${PGSQL_LIBRARIES} ${ODBC_LIBRARIES} ${LUA_LIBRARIES})
+target_link_libraries(bnetd PRIVATE common compat fmt::fmt win32 ${NETWORK_LIBRARIES} ZLIB::ZLIB ${CURL_LIBRARIES} ${MYSQL_CLIENT_LIBS} ${SQLITE3_LIBRARIES} ${PGSQL_LIBRARIES} ${ODBC_LIBRARIES} ${LUA_LIBRARIES})
 
 install(TARGETS bnetd DESTINATION ${SBINDIR})
 if(WIN32 AND MSVC)
