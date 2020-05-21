@@ -2068,5 +2068,33 @@
       <original>User "{}" is offline</original>
       <translate></translate>
     </item>
+	<item id="516" file="command.cpp" function="_handle_email_command">
+      <original>An error has occurred.</original>
+      <translate></translate>
+    </item>
+	<item id="517" file="command.cpp" function="_handle_email_command">
+      <original>Your email address is: {}</original>
+      <translate></translate>
+    </item>
+	<item id="518" file="command.cpp" function="_handle_email_command">
+      <original>Email address successfully set to {}.</original>
+      <translate></translate>
+    </item>
+	<item id="519" file="command.cpp" function="_handle_email_command">
+      <original>Successfully verified email address.</original>
+      <translate></translate>
+    </item>
+	<item id="520" file="command.cpp" function="_handle_email_command">
+      <original>The code has already expired.</original>
+      <translate></translate>
+    </item>
+	<item id="516" file="command.cpp" function="_handle_email_command">
+      <original>The code is incorrect.</original>
+      <translate></translate>
+    </item>
+	<item id="516" file="command.cpp" function="_handle_email_command">
+      <original>Regenerated verification code. Check your email.</original>
+      <translate></translate>
+    </item>
   </items>
 </root>

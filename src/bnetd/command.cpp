@@ -82,6 +82,7 @@
 #include "icons.h"
 #include "userlog.h"
 #include "i18n.h"
+#include "account_email_verification.h"
 
 #include "attrlayer.h"
 
@@ -421,6 +422,7 @@ namespace pvpgn
 		static int _handle_clearstats_command(t_connection * c, char const * text);
 		static int _handle_tos_command(t_connection * c, char const * text);
 		static int _handle_alert_command(t_connection * c, char const * text);
+		static int _handle_email_command(t_connection * c, char const * text);
 
 		static const t_command_table_row standard_command_table[] =
 		{
@@ -541,6 +543,7 @@ namespace pvpgn
 			{ "/language", handle_language_command },
 			{ "/lang", handle_language_command },
 			{ "/log", handle_log_command },
+			{ "/email", _handle_email_command},
 
 			{ NULL, NULL }
 
@@ -3876,6 +3879,10 @@ namespace pvpgn
 				mode = restart_mode_anongame;
 			else if (mode_str == "lua")
 				mode = restart_mode_lua;
+			else if (mode_str == "smtp")
+				mode = restart_mode_smtp;
+			else if (mode_str == "accountemailverification")
+				mode = restart_mode_accountemailverification;
 			else
 			{
 				message_send_text(c, message_type_info, c, localize(c, "Invalid mode."));
@@ -5233,6 +5240,96 @@ namespace pvpgn
 					messagebox_show(conn, goodtext.c_str(), msgtemp.c_str());
 				}
 			}
+
+			return 0;
+		}
+
+		static int _handle_email_command(t_connection* c, char const* text)
+		{
+			std::vector<std::string> args = split_command(text, 2);
+			if (args[1].empty())
+			{
+				describe_command(c, args[0].c_str());
+				return -1;
+			}
+
+			t_account* account = conn_get_account(c);
+
+			if (args[1] == "get")
+			{
+				const char* email = account_get_email(account);
+				if (email == nullptr)
+				{
+					message_send_text(c, message_type_error, c, localize(c, "An error has occurred."));
+					return -1;
+				}
+
+				message_send_text(c, message_type_info, c, localize(c, "Your email address is: {}", email));
+			}
+			else if (args[1] == "set")
+			{
+				if (args[2].empty())
+				{
+					describe_command(c, args[0].c_str());
+					return -1;
+				}
+
+				// FIXME: check format of email address
+				int set_email_result = account_set_email(account, args[2]);
+				if (set_email_result != 0)
+				{
+					message_send_text(c, message_type_error, c, localize(c, "An error has occurred."));
+					return -1;
+				}
+				
+				message_send_text(c, message_type_info, c, localize(c, "Email address successfully set to {}.", args[2]));
+			}
+			else if (args[1] == "verify")
+			{
+				if (args[2].empty())
+				{
+					describe_command(c, args[0].c_str());
+					return -1;
+				}
+
+				AccountVerifyEmailStatus verify_email_status = account_verify_email(account, args[2]);
+				switch (verify_email_status)
+				{
+				case AccountVerifyEmailStatus::Success:
+					message_send_text(c, message_type_info, c, localize(c, "Successfully verified email address."));
+					break;
+				case AccountVerifyEmailStatus::FailureCodeExpired:
+					message_send_text(c, message_type_error, c, localize(c, "The code has already expired."));
+					return -1;
+				case AccountVerifyEmailStatus::FailureCodeIncorrect:
+					message_send_text(c, message_type_error, c, localize(c, "The code is incorrect."));
+					return -1;
+				case AccountVerifyEmailStatus::FailureOther:
+					message_send_text(c, message_type_error, c, localize(c, "An error has occurred."));
+				default:
+					return -1;
+				}
+			}
+			else if (args[1] == "resendverification")
+			{
+				bool resend_verification_code_successful = account_generate_email_verification_code(account);
+				if (resend_verification_code_successful)
+				{
+					message_send_text(c, message_type_info, c, localize(c, "Regenerated verification code. Check your email."));
+				}
+				else
+				{
+					message_send_text(c, message_type_error, c, localize(c, "An error has occurred."));
+					return -1;
+				}
+				
+			}
+			else
+			{
+				describe_command(c, args[0].c_str());
+				return -1;
+			}
+
 
 			return 0;
 		}
