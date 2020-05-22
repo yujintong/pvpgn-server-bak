@@ -19,7 +19,7 @@
 #include <ctime>
 #include <string>
 
-#include <curl.h>
+#include <curl/curl.h>
 #include <fmt/core.h>
 #include <fmt/chrono.h>
 

@@ -22,7 +22,7 @@
 #include <random>
 #include <string>
 
-#include <curl.h>
+#include <curl/curl.h>
 
 #include "common/eventlog.h"
 
