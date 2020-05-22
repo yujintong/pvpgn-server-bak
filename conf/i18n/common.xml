@@ -2088,11 +2088,11 @@
       <original>The code has already expired.</original>
       <translate></translate>
     </item>
-	<item id="516" file="command.cpp" function="_handle_email_command">
+	<item id="521" file="command.cpp" function="_handle_email_command">
       <original>The code is incorrect.</original>
       <translate></translate>
     </item>
-	<item id="516" file="command.cpp" function="_handle_email_command">
+	<item id="522" file="command.cpp" function="_handle_email_command">
       <original>Regenerated verification code. Check your email.</original>
       <translate></translate>
     </item>
