@@ -132,13 +132,13 @@ namespace pvpgn
 			}
 
 			int verified = account_set_email_verified(account, true);
-			if (verified != 1)
+			if (verified != 0)
 			{
 				eventlog(eventlog_level_error, __FUNCTION__, "Could not verify email code for account uid {}", account_get_uid(account));
 				return AccountVerifyEmailStatus::FailureOther;
 			}
 
-			account_set_email_verification_code(account, 0);
+			account_set_email_verification_code(account, "");
 			account_set_email_verification_expiration(account, 0);
 
 			eventlog(eventlog_level_info, __FUNCTION__, "Succesfully verified email address ({}) account uid {}", account_get_email(account), account_get_uid(account));
