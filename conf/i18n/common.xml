@@ -2096,5 +2096,17 @@
       <original>Regenerated verification code. Check your email.</original>
       <translate></translate>
     </item>
+	<item id="523" file="command.cpp" function="_handle_email_command">
+      <original>Your email address is already set to {}.</original>
+      <translate></translate>
+    </item>
+	<item id="524" file="command.cpp" function="_handle_email_command">
+      <original>Email address verification is disabled.</original>
+      <translate></translate>
+    </item>
+	<item id="525" file="command.cpp" function="_handle_email_command">
+      <original>The email address is too long, please use another one.</original>
+      <translate></translate>
+    </item>
   </items>
 </root>

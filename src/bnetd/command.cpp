@@ -5275,20 +5275,49 @@ namespace pvpgn
 				}
 
 				// FIXME: check format of email address
+
+				const char* current_email = account_get_email(account);
+				if (current_email != nullptr && args[2].compare(current_email) == 0)
+				{
+					message_send_text(c, message_type_error, c, localize(c, "Your email address is already set to {}.", args[2]));
+					return 0;
+				}
+
+				if ((args[2].length() + 1) > MAX_EMAIL_STR)
+				{
+					message_send_text(c, message_type_error, c, localize(c, "The email address is too long, please use another one.", args[2]));
+					return -1;
+				}
+
 				int set_email_result = account_set_email(account, args[2]);
 				if (set_email_result != 0)
 				{
 					message_send_text(c, message_type_error, c, localize(c, "An error has occurred."));
 					return -1;
 				}
+
+				account_set_email_verified(account, false);
 				
 				message_send_text(c, message_type_info, c, localize(c, "Email address successfully set to {}.", args[2]));
 			}
 			else if (args[1] == "verify")
 			{
+				if (prefs_get_verify_account_email() == 0)
+				{
+					message_send_text(c, message_type_info, c, localize(c, "Email address verification is disabled."));
+					return -1;
+				}
+
 				if (args[2].empty())
 				{
 					describe_command(c, args[0].c_str());
+					return -1;
+				}
+
+				int is_verified = account_get_email_verified(account);
+				if (is_verified == 1)
+				{
+					message_send_text(c, message_type_info, c, localize(c, "Your email address has already been verified."));
 					return -1;
 				}
 
@@ -5305,13 +5334,26 @@ namespace pvpgn
 					message_send_text(c, message_type_error, c, localize(c, "The code is incorrect."));
 					return -1;
 				case AccountVerifyEmailStatus::FailureOther:
-					message_send_text(c, message_type_error, c, localize(c, "An error has occurred."));
 				default:
+					message_send_text(c, message_type_error, c, localize(c, "An error has occurred."));
 					return -1;
 				}
 			}
 			else if (args[1] == "resendverification")
 			{
+				if (prefs_get_verify_account_email() == 0)
+				{
+					message_send_text(c, message_type_info, c, localize(c, "Email address verification is disabled."));
+					return -1;
+				}
+
+				int is_verified = account_get_email_verified(account);
+				if (is_verified == 1)
+				{
+					message_send_text(c, message_type_info, c, localize(c, "Your email address has already been verified."));
+					return -1;
+				}
+
 				bool resend_verification_code_successful = account_generate_email_verification_code(account);
 				if (resend_verification_code_successful)
 				{
