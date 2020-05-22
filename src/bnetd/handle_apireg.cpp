@@ -874,7 +874,10 @@ namespace pvpgn
 							eventlog(eventlog_level_debug, __FUNCTION__, "WOLHASH: {}", wol_pass_hash);
 							account_set_wol_apgar(tempacct, wol_pass_hash);
 							if (apiregmember_get_email(apiregmember))
+							{
+								account_set_email_verified(account, false);
 								account_set_email(tempacct, apiregmember_get_email(apiregmember));
+							}
 							std::snprintf(message, sizeof(message), "Welcome in the amazing world of PvPGN! Your login can be used for all PvPGN Supported games!");
 							std::snprintf(hresult, sizeof(hresult), "0");
 						}

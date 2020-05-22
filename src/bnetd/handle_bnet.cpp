@@ -5442,7 +5442,10 @@ namespace pvpgn
 				return 0;
 			}
 			else
+			{
+				account_set_email_verified(account, false);
 				eventlog(eventlog_level_info, __FUNCTION__, "[{}] init account \"{}\" email to \"{}\"", conn_get_socket(c), account_get_name(account), email);
+			}
 			return 0;
 		}
 
@@ -5487,7 +5490,10 @@ namespace pvpgn
 				return 0;
 			}
 			else
+			{
+				account_set_email_verified(account, false);
 				eventlog(eventlog_level_info, __FUNCTION__, "[{}] change account \"{}\" email to \"{}\"", conn_get_socket(c), account_get_name(account), newaddr);
+			}
 			return 0;
 		}
 
