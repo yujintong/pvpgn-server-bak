@@ -2684,7 +2684,13 @@ namespace pvpgn
 				return -1;
 			}
 
-			return account_set_strattr(account, "email_verification\\code", fmt::to_string(expiration_date).c_str());
+			if (expiration_date == nullptr)
+			{
+				eventlog(eventlog_level_error, __FUNCTION__, "got NULL expiration_date");
+				return -1;
+			}
+
+			return account_set_strattr(account, "email_verification\\code", expiration_date);
 		}
 
 		extern unsigned int account_get_email_verification_expiration(t_account* account)
