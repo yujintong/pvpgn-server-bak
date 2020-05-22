@@ -42,34 +42,21 @@ namespace pvpgn
 		static std::string smtp_username;
 		static std::string smtp_password;
 
-		static int debug_callback(CURL* handle, curl_infotype type, char* data, size_t size, void* userptr)
+		typedef struct
 		{
-			char* info = (char*)std::malloc(size + 1);
-			info[size] = '\0';
-			std::memcpy(info, data, size);
-			
-
-			eventlog(eventlog_level_debug, __FUNCTION__, "DEBUG: {}", info);
-
-			return 0;
-		}
+			std::string message;
+			std::size_t bytes_remaining;
+		} read_callback_message;
 
 		static std::size_t read_callback(char* buffer, std::size_t size, std::size_t nitems, void* message)
 		{
+			read_callback_message* rcbmessage = reinterpret_cast<read_callback_message*>(message);
 			std::size_t buffer_size = size * nitems;
-			std::size_t message_size = std::strlen(reinterpret_cast<const char*>(message)) + 1;
+			std::size_t copy_size = rcbmessage->bytes_remaining <= buffer_size ? rcbmessage->bytes_remaining : buffer_size;
 
-			if (message_size <= buffer_size)
-			{
-				std::memcpy(buffer, message, message_size);
-				eventlog(eventlog_level_trace, __FUNCTION__, "buffer: {}", buffer);
-				return 0;
-			}
-			else
-			{
-				std::memcpy(buffer, message, buffer_size);
-				return buffer_size;
-			}
+			std::memcpy(buffer, rcbmessage->message.c_str(), copy_size);
+			rcbmessage->bytes_remaining -= copy_size;
+			return copy_size;
 		}
 
 		/**
@@ -153,15 +140,13 @@ namespace pvpgn
 
 			curl_easy_setopt(curl, CURLOPT_READFUNCTION, read_callback);
 
-			// \r\nContent-Type: text/plain; charset=\"UTF-8\"
-			message.insert(0, fmt::format("Date: {:%a, %d %b %Y %T %z}\r\nFrom: <{}>\r\nTo: <{}>\r\nSubject: {}\r\n\r\n", *std::localtime(&now), from_address, to_address, subject));
-			message.append("\r\n.\r\n");
-			curl_easy_setopt(curl, CURLOPT_READDATA, reinterpret_cast<void *>(const_cast<char*>(message.c_str())));
+			message.insert(0, fmt::format("MIME-Version: 1.0\r\nContent-Type: text/plain; charset=\"UTF-8\"\r\nDate: {:%a, %d %b %Y %T %z}\r\nFrom: <{}>\r\nTo: <{}>\r\nSubject: {}\r\n\r\n", *std::localtime(&now), from_address, to_address, subject));
+			read_callback_message rcbmessage = {};
+			rcbmessage.message = message;
+			rcbmessage.bytes_remaining = message.length() + 1;
+			curl_easy_setopt(curl, CURLOPT_READDATA, reinterpret_cast<void *>(&rcbmessage));
 
 			curl_easy_setopt(curl, CURLOPT_UPLOAD, 1L);
-
-			curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
-			curl_easy_setopt(curl, CURLOPT_DEBUGFUNCTION, debug_callback);
 
 			CURLcode result = curl_easy_perform(curl);
 			if (result != CURLE_OK)
