@@ -174,7 +174,7 @@ namespace pvpgn
 				return false;
 			}
 
-			std::string personalized_message = fmt::format(message, fmt::arg("account_name", account_get_name(account)), fmt::arg("account_email_verification_code", code), fmt::arg("account_email_verification_expiration", expiration));
+			std::string personalized_message = fmt::format(message, fmt::arg("account_name", account_get_name(account)), fmt::arg("account_email_verification_code", code), fmt::arg("account_email_verification_expiration", prefs_get_verify_account_email_expiration()));
 
 			eventlog(eventlog_level_debug, __FUNCTION__, "Sending email verification code to {} for account uid {}", account_get_email(account), account_get_uid(account));
 			smtp_send_email(account_get_email(account), verify_account_email_from_address, "Email Verification", personalized_message);
