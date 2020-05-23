@@ -22,7 +22,8 @@ namespace pvpgn
 	namespace bnetd
 	{
 
-		bool smtp_init(const char* prefs_smtp_ca_cert_store, const char* prefs_smtp_server_url, unsigned int prefs_smtp_port, const char* prefs_smtp_username, const char* prefs_smtp_password);
+		bool smtp_init();
+		bool smtp_config(const char* prefs_smtp_ca_cert_store, const char* prefs_smtp_server_url, unsigned int prefs_smtp_port, const char* prefs_smtp_username, const char* prefs_smtp_password);
 		void smtp_cleanup();
 		void smtp_send_email(const std::string& to_address, const std::string& from_address, const std::string& subject, std::string message);
 

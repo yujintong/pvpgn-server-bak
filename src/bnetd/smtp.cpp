@@ -61,27 +61,36 @@ namespace pvpgn
 
 		/**
 		* Initializes libcurl's global context if it hasn't already been initialized. 
-		* Initializes smtp_server_url, smtp_port, smtp_username, and smtp_password from the four function parameters.
 		*
 		* On success, returns true.
-		* On failure, returns false. Will fail if libcurl couldn't initialize global context or if prefs_smtp_port is greater than 65535.
+		* On failure, returns false. Will fail if libcurl couldn't initialize global context.
 		*/
-		bool smtp_init(const char* prefs_smtp_ca_cert_store, const char* prefs_smtp_server_url, unsigned int prefs_smtp_port, const char* prefs_smtp_username, const char* prefs_smtp_password)
+		bool smtp_init()
 		{
-			if (!is_curl_initialized)
+			if (is_curl_initialized)
 			{
-				if (curl_global_init(CURL_GLOBAL_NOTHING) != 0)
-				{
-					eventlog(eventlog_level_error, __FUNCTION__, "Failed to initialize libcurl");
-					return false;
-				}
-				else
-				{
-					eventlog(eventlog_level_debug, __FUNCTION__, "Succesfully initialized libcurl");
-					is_curl_initialized = true;
-				}
+				eventlog(eventlog_level_error, __FUNCTION__, "libcurl has already been initialized");
+				return false;
 			}
 
+			if (curl_global_init(CURL_GLOBAL_NOTHING) == 0)
+			{
+				is_curl_initialized = true;
+
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+
+		/**
+		* Initializes smtp_server_url, smtp_port, smtp_username, and smtp_password from the four function parameters.
+		* Will return false if prefs_smtp_port is greater than 65535.
+		*/
+		bool smtp_config(const char* prefs_smtp_ca_cert_store, const char* prefs_smtp_server_url, unsigned int prefs_smtp_port, const char* prefs_smtp_username, const char* prefs_smtp_password)
+		{
 			smtp_ca_cert_store = prefs_smtp_ca_cert_store;
 			std::snprintf(smtp_server_url, sizeof(smtp_server_url), "smtps://%s", prefs_smtp_server_url);
 			if (prefs_smtp_port > 65535)
@@ -92,10 +101,6 @@ namespace pvpgn
 			smtp_port = prefs_smtp_port;
 			smtp_username = prefs_smtp_username;
 			smtp_password = prefs_smtp_password;
-
-			eventlog(eventlog_level_info, __FUNCTION__, "Succesfully initialized SMTP client");
-
-			return true;
 		}
 
 		void smtp_cleanup()
@@ -109,6 +114,12 @@ namespace pvpgn
 
 		void smtp_send_email(const std::string& to_address, const std::string& from_address, const std::string& subject, std::string message)
 		{
+			if (!is_curl_initialized)
+			{
+				eventlog(eventlog_level_debug, __FUNCTION__, "libcurl not initialized, returning without attempting to send email");
+				return;
+			}
+
 			CURL* curl = curl_easy_init();
 			if (curl == nullptr)
 			{
