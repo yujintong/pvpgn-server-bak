@@ -435,7 +435,7 @@ int pre_server_startup(void)
 			prefs_set_verify_account_email(false);
 		}
 
-		if (!account_email_verification_load(prefs_get_email_verification_file(), prefs_get_servername(), prefs_get_verify_account_email_from_address()))
+		if (!account_email_verification_load(prefs_get_email_verification_file(), prefs_get_servername(), prefs_get_verify_account_email_from_address(), prefs_get_verify_account_email_from_name()))
 		{
 			eventlog(eventlog_level_error, __FUNCTION__, "Failed to load email verification message");
 			eventlog(eventlog_level_error, __FUNCTION__, "Disabling account email verification");

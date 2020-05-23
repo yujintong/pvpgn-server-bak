@@ -114,7 +114,7 @@ namespace pvpgn
 			}
 		}
 
-		void smtp_send_email(const std::string& to_address, const std::string& from_address, const std::string& subject, std::string message)
+		void smtp_send_email(const std::string& to_address, const std::string& from_address, const std::string& from_name, const std::string& subject, std::string message)
 		{
 			if (!is_curl_initialized)
 			{
@@ -153,7 +153,7 @@ namespace pvpgn
 
 			curl_easy_setopt(curl, CURLOPT_READFUNCTION, read_callback);
 
-			message.insert(0, fmt::format("MIME-Version: 1.0\r\nContent-Type: text/plain; charset=\"UTF-8\"\r\nDate: {:%a, %d %b %Y %T %z}\r\nFrom: <{}>\r\nTo: <{}>\r\nSubject: {}\r\n\r\n", *std::localtime(&now), from_address, to_address, subject));
+			message.insert(0, fmt::format("MIME-Version: 1.0\r\nContent-Type: text/plain; charset=\"UTF-8\"\r\nDate: {:%a, %d %b %Y %T %z}\r\nFrom: {} <{}>\r\nTo: <{}>\r\nSubject: {}\r\n\r\n", *std::localtime(&now), from_name, from_address, to_address, subject));
 			read_callback_message rcbmessage = {};
 			rcbmessage.message = message;
 			rcbmessage.bytes_remaining = message.length() + 1;

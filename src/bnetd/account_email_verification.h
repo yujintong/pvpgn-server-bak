@@ -42,7 +42,7 @@ namespace pvpgn
             FailureOther
         };
 
-        bool account_email_verification_load(const char* filepath, const char* prefs_servername, const char* prefs_verify_account_email_from_address);
+        bool account_email_verification_load(const char* filepath, const char* prefs_servername, const char* prefs_verify_account_email_from_address, const char* prefs_verify_account_email_from_name);
         void account_email_verification_unload();
         AccountVerifyEmailStatus account_verify_email(t_account* account, const std::string& code);
         bool account_generate_email_verification_code(t_account* account);

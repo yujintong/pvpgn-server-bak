@@ -41,8 +41,9 @@ namespace pvpgn
 
 		static std::string message;
 		static std::string verify_account_email_from_address;
+		static std::string verify_account_email_from_name;
 
-		bool account_email_verification_load(const char* filepath, const char* prefs_servername, const char* prefs_verify_account_email_from_address)
+		bool account_email_verification_load(const char* filepath, const char* prefs_servername, const char* prefs_verify_account_email_from_address, const char* prefs_verify_account_email_from_name)
 		{
 			if (filepath == nullptr)
 			{
@@ -59,6 +60,12 @@ namespace pvpgn
 			if (prefs_verify_account_email_from_address == nullptr)
 			{
 				eventlog(eventlog_level_error, __FUNCTION__, "got NULL prefs_verify_account_email_from_address");
+				return false;
+			}
+
+			if (prefs_verify_account_email_from_name == nullptr)
+			{
+				eventlog(eventlog_level_error, __FUNCTION__, "got NULL prefs_verify_account_email_from_name");
 				return false;
 			}
 
@@ -83,6 +90,7 @@ namespace pvpgn
 			}
 
 			verify_account_email_from_address = prefs_verify_account_email_from_address;
+			verify_account_email_from_name = prefs_verify_account_email_from_name;
 
 			return true;
 		}
@@ -177,7 +185,7 @@ namespace pvpgn
 			std::string personalized_message = fmt::format(message, fmt::arg("account_name", account_get_name(account)), fmt::arg("account_email_verification_code", code), fmt::arg("account_email_verification_expiration", prefs_get_verify_account_email_expiration()));
 
 			eventlog(eventlog_level_debug, __FUNCTION__, "Sending email verification code to {} for account uid {}", account_get_email(account), account_get_uid(account));
-			smtp_send_email(account_get_email(account), verify_account_email_from_address, "Email Verification", personalized_message);
+			smtp_send_email(account_get_email(account), verify_account_email_from_address, verify_account_email_from_name, "Email Verification", personalized_message);
 
 			return true;
 		}

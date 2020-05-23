@@ -175,6 +175,7 @@ namespace pvpgn
 		extern void prefs_set_verify_account_email(bool enable);
 		extern unsigned int prefs_get_verify_account_email_expiration(void);
 		extern char const* prefs_get_verify_account_email_from_address(void);
+		extern char const* prefs_get_verify_account_email_from_name(void);
 		extern char const * prefs_get_supportfile(void);
 		extern char const * prefs_get_allowed_clients(void);
 		extern char const * prefs_get_ladder_games(void);
