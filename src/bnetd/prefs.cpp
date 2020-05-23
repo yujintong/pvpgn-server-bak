@@ -160,6 +160,7 @@ namespace pvpgn
 			unsigned int verify_account_email;
 			unsigned int verify_account_email_expiration;
 			char const* verify_account_email_from_address;
+			char const * verify_account_email_from_name;
 			char const * supportfile;
 			char const * allowed_clients;
 			char const * ladder_games;
@@ -664,6 +665,10 @@ namespace pvpgn
 		static const char* conf_get_verify_account_email_from_address(void);
 		static int conf_setdef_verify_account_email_from_address(void);
 
+		static int conf_set_verify_account_email_from_name(const char* valstr);
+		static const char* conf_get_verify_account_email_from_name(void);
+		static int conf_setdef_verify_account_email_from_name(void);
+
 		static int conf_set_allowed_clients(const char *valstr);
 		static const char *conf_get_allowed_clients(void);
 		static int conf_setdef_allowed_clients(void);
@@ -898,6 +903,7 @@ namespace pvpgn
 			{ "verify_account_email", conf_set_verify_account_email, conf_get_verify_account_email, conf_setdef_verify_account_email },
 			{ "verify_account_email_expiration", conf_set_verify_account_email_expiration, conf_get_verify_account_email_expiration, conf_setdef_verify_account_email_expiration },
 			{ "verify_account_email_from_address", conf_set_verify_account_email_from_address, conf_get_verify_account_email_from_address, conf_setdef_verify_account_email_from_address },
+			{ "verify_account_email_from_name", conf_set_verify_account_email_from_name, conf_get_verify_account_email_from_name, conf_setdef_verify_account_email_from_name },
 			{ "allowed_clients", conf_set_allowed_clients, conf_get_allowed_clients, conf_setdef_allowed_clients },
 			{ "ladder_games", conf_set_ladder_games, conf_get_ladder_games, conf_setdef_ladder_games },
 			{ "max_connections", conf_set_max_connections, conf_get_max_connections, conf_setdef_max_connections },
@@ -3465,6 +3471,27 @@ namespace pvpgn
 		static int conf_setdef_verify_account_email_from_address(void)
 		{
 			return conf_set_str(&prefs_runtime_config.verify_account_email_from_address, NULL, NULL);
+		}
+
+
+		extern char const* prefs_get_verify_account_email_from_name(void)
+		{
+			return prefs_runtime_config.verify_account_email_from_name;
+		}
+
+		static int conf_set_verify_account_email_from_name(const char* valstr)
+		{
+			return conf_set_str(&prefs_runtime_config.verify_account_email_from_name, valstr, NULL);
+		}
+
+		static const char* conf_get_verify_account_email_from_name(void)
+		{
+			return prefs_runtime_config.verify_account_email_from_name;
+		}
+
+		static int conf_setdef_verify_account_email_from_name(void)
+		{
+			return conf_set_str(&prefs_runtime_config.verify_account_email_from_name, NULL, NULL);
 		}
 
 

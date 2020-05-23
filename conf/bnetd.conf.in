@@ -383,6 +383,8 @@ verify_account_email_expiration = 10
 # Email address to use for the 'From' field in email verification emails.
 verify_account_email_from_address = ""
 
+verify_account_email_from_name = ""
+
 #                                                                            #
 ##############################################################################
 
