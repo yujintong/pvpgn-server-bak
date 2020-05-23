@@ -2698,7 +2698,7 @@ namespace pvpgn
 			if (account == nullptr)
 			{
 				eventlog(eventlog_level_error, __FUNCTION__, "got NULL account");
-				return -1;
+				return 0;
 			}
 
 			return account_get_numattr(account, "email_verification\\expiration");
