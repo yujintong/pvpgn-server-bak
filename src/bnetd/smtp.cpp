@@ -101,6 +101,8 @@ namespace pvpgn
 			smtp_port = prefs_smtp_port;
 			smtp_username = prefs_smtp_username;
 			smtp_password = prefs_smtp_password;
+
+			return true;
 		}
 
 		void smtp_cleanup()
