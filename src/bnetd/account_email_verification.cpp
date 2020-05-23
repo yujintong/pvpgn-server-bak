@@ -161,7 +161,7 @@ namespace pvpgn
 
 			static std::random_device rdevice;
 			static std::default_random_engine rengine(rdevice());
-			static std::uniform_int_distribution<unsigned long long> uniform_dist(std::numeric_limits<unsigned long long>::min(), std::numeric_limits<unsigned long long>::max());
+			static std::uniform_int_distribution<unsigned int> uniform_dist(100000, 999999);
 
 			std::time_t expiration = now + (60ull * prefs_get_verify_account_email_expiration());
 			std::string code = fmt::to_string(uniform_dist(rengine));
