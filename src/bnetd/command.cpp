@@ -5260,7 +5260,7 @@ namespace pvpgn
 				const char* email = account_get_email(account);
 				if (email == nullptr)
 				{
-					message_send_text(c, message_type_error, c, localize(c, "An error has occurred."));
+					message_send_text(c, message_type_error, c, localize(c, "You have not set an email address yet."));
 					return -1;
 				}
 

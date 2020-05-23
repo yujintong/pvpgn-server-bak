@@ -2108,5 +2108,9 @@
       <original>The email address is too long, please use another one.</original>
       <translate></translate>
     </item>
+    <item id="526" file="command.cpp" function="_handle_email_command">
+      <original>You have not set an email address yet.</original>
+      <translate></translate>
+    </item>
   </items>
 </root>
