@@ -2921,7 +2921,7 @@ namespace pvpgn
 			bn_int_set(&rpacket->u.server_motd_w3.timestamp2, SERVER_MOTD_W3_WELCOME);
 
 
-			// read text from bnmotd_w3.txt
+			// read text from w3motd.txt
 			{
 				fmt::memory_buffer serverinfo;
 
@@ -2932,16 +2932,22 @@ namespace pvpgn
 					while (char* buff = file_get_line(fp))
 					{
 						char* line = message_format_line(c, buff);
-						fmt::format_to(serverinfo, "{}" + '\n', (line + 1));
+						fmt::format_to(std::back_inserter(serverinfo), "{}\n", line);
 						xfree((void*)line);
 					}
 
 					if (std::fclose(fp) == EOF)
 					{
-						eventlog(eventlog_level_error, __FUNCTION__, "could not close motdw3 file \"{}\" after reading (std::fopen: {})", filename, std::strerror(errno));
+						eventlog(eventlog_level_error, __FUNCTION__, "Failed to close w3motd file \"{}\" after reading (std::fopen: {})", filename, std::strerror(errno));
 					}
 				}
-				packet_append_string(rpacket, fmt::to_string(serverinfo).c_str());
+				else
+				{
+					eventlog(eventlog_level_error, __FUNCTION__, "Failed to open w3motd file \"{}\"", filename);
+					fmt::format_to(serverinfo, "An error has occurred.");
+				}
+
+				packet_append_string(rpacket, serverinfo.data());
 			}
 
 			conn_push_outqueue(c, rpacket);
