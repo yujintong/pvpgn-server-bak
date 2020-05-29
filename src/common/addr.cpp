@@ -537,9 +537,8 @@ namespace pvpgn
 		{
 			if (!(addr = addr_create_str(tok, defipaddr, defport)))
 			{
-				eventlog(eventlog_level_error, __FUNCTION__, "could not create addr");
-				xfree(tstr);
-				return -1;
+				eventlog(eventlog_level_error, __FUNCTION__, "could not create addr for {}", tok);
+				continue;
 			}
 			list_append_data(addrlist, addr);
 		}
