@@ -2068,5 +2068,9 @@
       <original>User "{}" is offline</original>
       <translate></translate>
     </item>
+    <item id="516" file="clan.cpp" function="clan_create">
+      <original>This is a newly created clan</original>
+      <translate></translate>
+    </item>
   </items>
 </root>
