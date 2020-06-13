@@ -17,6 +17,7 @@
 #include "smtp.h"
 
 #include <array>
+#include <cstdint>
 #include <ctime>
 #include <mutex>
 #include <string>
@@ -152,7 +153,8 @@ namespace pvpgn
 				return false;
 			}
 
-			if (prefs_smtp_port > 65535)
+			// ports are 16 bit integers, so they should never be above UINT16_MAX (65,535)
+			if (prefs_smtp_port > UINT16_MAX)
 			{
 				eventlog(eventlog_level_error, __FUNCTION__, "Received out-of-range port number ({})", prefs_smtp_port);
 				return false;
