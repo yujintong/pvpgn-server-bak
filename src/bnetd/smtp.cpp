@@ -45,6 +45,8 @@ namespace pvpgn
 		static bool is_curl_initialized = false;
 		static std::thread smtp_thread;
 		static std::array<std::tuple<CURLM*, std::mutex>, 2> handles_and_mutexes = {};
+
+		// smtp data
 		static std::string smtp_ca_cert_store;
 		static char smtp_server_url[512] = {};
 		static long smtp_port;
@@ -264,35 +266,41 @@ namespace pvpgn
 				return;
 			}
 
+			// direct curl to use TLS
 			curl_easy_setopt(curl, CURLOPT_USE_SSL, static_cast<long>(CURLUSESSL_ALL));
 			curl_easy_setopt(curl, CURLOPT_CAINFO, smtp_ca_cert_store.c_str());
 
+			// set smtp server connection information
 			curl_easy_setopt(curl, CURLOPT_URL, smtp_server_url);
 			curl_easy_setopt(curl, CURLOPT_PORT, smtp_port);
 			curl_easy_setopt(curl, CURLOPT_USERNAME, smtp_username.c_str());
 			curl_easy_setopt(curl, CURLOPT_PASSWORD, smtp_password.c_str());
-
+			
+			// set 'from' address
 			curl_easy_setopt(curl, CURLOPT_MAIL_FROM, fmt::format("<{}>", from_address).c_str());
-			struct curl_slist* recipient = nullptr;
-			{
-				struct curl_slist* recipient_temp = curl_slist_append(recipient, fmt::format("<{}>", to_address).c_str());
-				if (recipient_temp == nullptr)
-				{
-					eventlog(eventlog_level_error, __FUNCTION__, "Failed to append recipient address to recipient list");
-					return;
-				}
 
-				recipient = recipient_temp;
+			// set 'to' address
+			struct curl_slist* recipient = curl_slist_append(nullptr, fmt::format("<{}>", to_address).c_str());
+			if (recipient == nullptr)
+			{
+				eventlog(eventlog_level_error, __FUNCTION__, "Failed to append recipient address to recipient list");
+				return;
 			}
 			curl_easy_setopt(curl, CURLOPT_MAIL_RCPT, recipient);
 
 			// store pointer to recipient struct in the handle and retrieve it later to free the memory
 			curl_easy_setopt(curl, CURLOPT_PRIVATE, reinterpret_cast<void*>(recipient));
 
+			// set function for curl to call when it wants to read the message into curl's desired buffer
 			curl_easy_setopt(curl, CURLOPT_READFUNCTION, read_callback);
 
+			// prepend email headers to the message
 			message.insert(0, fmt::format("MIME-Version: 1.0\r\nContent-Type: text/plain; charset=\"UTF-8\"\r\nDate: {:%a, %d %b %Y %T %z}\r\nFrom: {} <{}>\r\nTo: <{}>\r\nSubject: {}\r\n\r\n", *std::localtime(&now), from_name, from_address, to_address, subject));
 
+			// this is the pointer that will be passed in to read_callback().
+			// passing in a pointer to the message alone is not sufficient because read_callback() is called by curl at least twice.
+			// the buffer provided by curl may not be sufficiently large enough for read_callback() to copy the entire message into during a single call.
+			// therefore read_callback() needs a way to keep track of the number of bytes it still needs to copy from the message.
 			read_callback_message* rcbmessage = static_cast<read_callback_message*>(xmalloc(sizeof(read_callback_message)));
 			rcbmessage->message = message;
 			rcbmessage->bytes_remaining = message.length() + 1;
