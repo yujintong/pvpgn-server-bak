@@ -49,7 +49,7 @@ namespace pvpgn
 
 		// smtp data
 		static std::string smtp_ca_cert_store;
-		static char smtp_server_url[512] = {};
+		static std::string smtp_server_url;
 		static long smtp_port;
 		static std::string smtp_username;
 		static std::string smtp_password;
@@ -173,8 +173,7 @@ namespace pvpgn
 			}
 
 			smtp_ca_cert_store = prefs_smtp_ca_cert_store;
-			std::snprintf(smtp_server_url, sizeof(smtp_server_url), "smtps://%s", prefs_smtp_server_url);
-
+			smtp_server_url = fmt::format("smtps://{}", prefs_smtp_server_url);
 			smtp_port = prefs_smtp_port;
 			smtp_username = prefs_smtp_username;
 			smtp_password = prefs_smtp_password;
@@ -273,7 +272,7 @@ namespace pvpgn
 			curl_easy_setopt(curl, CURLOPT_CAINFO, smtp_ca_cert_store.c_str());
 
 			// set smtp server connection information
-			curl_easy_setopt(curl, CURLOPT_URL, smtp_server_url);
+			curl_easy_setopt(curl, CURLOPT_URL, smtp_server_url.c_str());
 			curl_easy_setopt(curl, CURLOPT_PORT, smtp_port);
 			curl_easy_setopt(curl, CURLOPT_USERNAME, smtp_username.c_str());
 			curl_easy_setopt(curl, CURLOPT_PASSWORD, smtp_password.c_str());
