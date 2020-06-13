@@ -424,7 +424,7 @@ int pre_server_startup(void)
 	userlog_init();
 	if (prefs_get_verify_account_email() == 1)
 	{
-		if (smtp_init() && smtp_config(prefs_get_smtp_ca_cert_store(), prefs_get_smtp_server_url(), prefs_get_smtp_port(), prefs_get_smtp_username(), prefs_get_smtp_password()))
+		if (smtp_init(prefs_get_smtp_ca_cert_store(), prefs_get_smtp_server_url(), prefs_get_smtp_port(), prefs_get_smtp_username(), prefs_get_smtp_password()))
 		{
 			eventlog(eventlog_level_info, __FUNCTION__, "Successfully initialized SMTP client");
 		}

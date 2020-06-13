@@ -1512,13 +1512,13 @@ namespace pvpgn
 					{
 						if (do_restart == restart_mode_all || do_restart == restart_mode_smtp)
 						{
-							if (smtp_config(prefs_get_smtp_ca_cert_store(), prefs_get_smtp_server_url(), prefs_get_smtp_port(), prefs_get_smtp_username(), prefs_get_smtp_password()))
+							if (smtp_reconfig(prefs_get_smtp_ca_cert_store(), prefs_get_smtp_server_url(), prefs_get_smtp_port(), prefs_get_smtp_username(), prefs_get_smtp_password()))
 							{
-								eventlog(eventlog_level_info, __FUNCTION__, "Successfully initialized SMTP client");
+								eventlog(eventlog_level_info, __FUNCTION__, "Successfully reconfigured SMTP client");
 							}
 							else
 							{
-								eventlog(eventlog_level_error, __FUNCTION__, "Failed to initialize SMTP client");
+								eventlog(eventlog_level_error, __FUNCTION__, "Failed to reconfigure SMTP client");
 								eventlog(eventlog_level_error, __FUNCTION__, "Disabling account email verification");
 								prefs_set_verify_account_email(false);
 							}

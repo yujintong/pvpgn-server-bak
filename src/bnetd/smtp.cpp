@@ -133,16 +133,69 @@ namespace pvpgn
 		}
 
 		/**
+		* Initializes smtp_server_url, smtp_port, smtp_username, and smtp_password from the four function parameters.
+		* Will return false if prefs_smtp_port is greater than 65535.
+		*/
+		static bool smtp_config(const char* prefs_smtp_ca_cert_store, const char* prefs_smtp_server_url, unsigned int prefs_smtp_port, const char* prefs_smtp_username, const char* prefs_smtp_password)
+		{
+			if (prefs_smtp_ca_cert_store == nullptr)
+			{
+				eventlog(eventlog_level_error, __FUNCTION__, "Received NULL prefs_smtp_ca_cert_store");
+				return false;
+			}
+
+			if (prefs_smtp_server_url == nullptr)
+			{
+				eventlog(eventlog_level_error, __FUNCTION__, "Received NULL prefs_smtp_server_url");
+				return false;
+			}
+
+			if (prefs_smtp_port > 65535)
+			{
+				eventlog(eventlog_level_error, __FUNCTION__, "Received out-of-range port number ({})", prefs_smtp_port);
+				return false;
+			}
+
+			if (prefs_smtp_username == nullptr)
+			{
+				eventlog(eventlog_level_error, __FUNCTION__, "Received NULL prefs_smtp_username");
+				return false;
+			}
+
+			if (prefs_smtp_password == nullptr)
+			{
+				eventlog(eventlog_level_error, __FUNCTION__, "Received NULL prefs_smtp_password");
+				return false;
+			}
+
+			smtp_ca_cert_store = prefs_smtp_ca_cert_store;
+			std::snprintf(smtp_server_url, sizeof(smtp_server_url), "smtps://%s", prefs_smtp_server_url);
+
+			smtp_port = prefs_smtp_port;
+			smtp_username = prefs_smtp_username;
+			smtp_password = prefs_smtp_password;
+
+			return true;
+		}
+
+		/**
 		* Initializes libcurl's global context if it hasn't already been initialized. 
+		* There must only be exactly one call to smtp_init() and smtp_cleanup().
 		*
 		* On success, returns true.
 		* On failure, returns false. Will fail if libcurl couldn't initialize global context.
 		*/
-		bool smtp_init()
+		bool smtp_init(const char* prefs_smtp_ca_cert_store, const char* prefs_smtp_server_url, unsigned int prefs_smtp_port, const char* prefs_smtp_username, const char* prefs_smtp_password)
 		{
 			if (is_curl_initialized)
 			{
 				eventlog(eventlog_level_error, __FUNCTION__, "libcurl has already been initialized");
+				return false;
+			}
+
+			if (smtp_config(prefs_smtp_ca_cert_store, prefs_smtp_server_url, prefs_smtp_port, prefs_smtp_username, prefs_smtp_password) == false)
+			{
+				eventlog(eventlog_level_error, __FUNCTION__, "Failed to set SMTP data");
 				return false;
 			}
 
@@ -170,24 +223,9 @@ namespace pvpgn
 			return true;
 		}
 
-		/**
-		* Initializes smtp_server_url, smtp_port, smtp_username, and smtp_password from the four function parameters.
-		* Will return false if prefs_smtp_port is greater than 65535.
-		*/
-		bool smtp_config(const char* prefs_smtp_ca_cert_store, const char* prefs_smtp_server_url, unsigned int prefs_smtp_port, const char* prefs_smtp_username, const char* prefs_smtp_password)
+		bool smtp_reconfig(const char* prefs_smtp_ca_cert_store, const char* prefs_smtp_server_url, unsigned int prefs_smtp_port, const char* prefs_smtp_username, const char* prefs_smtp_password)
 		{
-			smtp_ca_cert_store = prefs_smtp_ca_cert_store;
-			std::snprintf(smtp_server_url, sizeof(smtp_server_url), "smtps://%s", prefs_smtp_server_url);
-			if (prefs_smtp_port > 65535)
-			{
-				eventlog(eventlog_level_error, __FUNCTION__, "Received out-of-range port number ({})", prefs_smtp_port);
-				return false;
-			}
-			smtp_port = prefs_smtp_port;
-			smtp_username = prefs_smtp_username;
-			smtp_password = prefs_smtp_password;
-
-			return true;
+			return smtp_config(prefs_smtp_ca_cert_store, prefs_smtp_server_url, prefs_smtp_port, prefs_smtp_username, prefs_smtp_password);
 		}
 
 		void smtp_cleanup()
@@ -226,7 +264,7 @@ namespace pvpgn
 				return;
 			}
 
-			curl_easy_setopt(curl, CURLOPT_USE_SSL, (long)CURLUSESSL_ALL);
+			curl_easy_setopt(curl, CURLOPT_USE_SSL, static_cast<long>(CURLUSESSL_ALL));
 			curl_easy_setopt(curl, CURLOPT_CAINFO, smtp_ca_cert_store.c_str());
 
 			curl_easy_setopt(curl, CURLOPT_URL, smtp_server_url);
