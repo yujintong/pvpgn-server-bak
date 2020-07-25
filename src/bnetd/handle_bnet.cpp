@@ -2932,7 +2932,7 @@ namespace pvpgn
 					while (char* buff = file_get_line(fp))
 					{
 						char* line = message_format_line(c, buff);
-						fmt::format_to(std::back_inserter(serverinfo), "{}\n", line);
+						fmt::format_to(std::back_inserter(serverinfo), "{}\n", line + 1);
 						xfree((void*)line);
 					}
 
