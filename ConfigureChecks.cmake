@@ -33,6 +33,8 @@ message(STATUS "*** {fmt} ***")
 add_subdirectory(fmt)
 message(STATUS "*** {fmt} ***")
 
+set(USE_INCLUDED_ZLIB_LIBRARY OFF)
+
 if(WITH_BNETD)
 	if (WIN32)
 		set(CURL_LIBRARY ${CMAKE_SOURCE_DIR}/lib/curl/7.70.0/libcurl.lib)
@@ -43,9 +45,12 @@ if(WITH_BNETD)
 	if (POLICY CMP0074)
 		cmake_policy(SET CMP0074 NEW)
 	endif()
+
 	if (NOT DEFINED ZLIB_ROOT)
+		set(USE_INCLUDED_ZLIB_LIBRARY ON)
 		set(ZLIB_ROOT ${CMAKE_SOURCE_DIR}/include/zlib/1.2.11 ${CMAKE_SOURCE_DIR}/lib/zlib/1.2.11)
 	endif()
+
 	find_package(ZLIB REQUIRED)
 endif(WITH_BNETD)
 
