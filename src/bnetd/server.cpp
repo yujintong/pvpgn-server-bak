@@ -1520,7 +1520,7 @@ namespace pvpgn
 					{
 						if (do_restart == restart_mode_all || do_restart == restart_mode_smtp)
 						{
-							if (smtp_reconfig(prefs_get_smtp_ca_cert_store(), prefs_get_smtp_server_url(), prefs_get_smtp_port(), prefs_get_smtp_username(), prefs_get_smtp_password()))
+							if (smtp_reconfig(prefs_get_smtp_ca_cert_store_file(), prefs_get_smtp_server_url(), prefs_get_smtp_port(), prefs_get_smtp_username(), prefs_get_smtp_password()))
 							{
 								eventlog(eventlog_level_info, __FUNCTION__, "Successfully reconfigured SMTP client");
 							}

@@ -173,7 +173,7 @@ namespace pvpgn
 			unsigned int log_commands;
 			char const * log_command_groups;
 			char const * log_command_list;
-			char const * smtp_ca_cert_store;
+			char const * smtp_ca_cert_store_file;
 			char const * smtp_ca_cert_store_remote_url;
 			unsigned int smtp_ca_cert_store_fetch_interval;
 			char const * smtp_server_url;
@@ -713,9 +713,9 @@ namespace pvpgn
 		static const char *conf_get_log_command_list(void);
 		static int conf_setdef_log_command_list(void);
 
-		static int conf_set_smtp_ca_cert_store(const char* valstr);
-		static const char* conf_get_smtp_ca_cert_store(void);
-		static int conf_setdef_smtp_ca_cert_store(void);
+		static int conf_set_smtp_ca_cert_store_file(const char* valstr);
+		static const char* conf_get_smtp_ca_cert_store_file(void);
+		static int conf_setdef_smtp_ca_cert_store_file(void);
 
 		static int conf_set_smtp_ca_cert_store_remote_url(const char* valstr);
 		static const char* conf_get_smtp_ca_cert_store_remote_url(void);
@@ -915,7 +915,7 @@ namespace pvpgn
 			{ "log_commands", conf_set_log_commands, conf_get_log_commands, conf_setdef_log_commands },
 			{ "log_command_groups", conf_set_log_command_groups, conf_get_log_command_groups, conf_setdef_log_command_groups },
 			{ "log_command_list", conf_set_log_command_list, conf_get_log_command_list, conf_setdef_log_command_list },
-			{ "smtp_ca_cert_store", conf_set_smtp_ca_cert_store, conf_get_smtp_ca_cert_store, conf_setdef_smtp_ca_cert_store },
+			{ "smtp_ca_cert_store_file", conf_set_smtp_ca_cert_store_file, conf_get_smtp_ca_cert_store_file, conf_setdef_smtp_ca_cert_store_file },
 			{ "smtp_ca_cert_store_remote_url", conf_set_smtp_ca_cert_store_remote_url, conf_get_smtp_ca_cert_store_remote_url, conf_setdef_smtp_ca_cert_store_remote_url },
 			{ "smtp_ca_cert_store_fetch_interval", conf_set_smtp_ca_cert_store_fetch_interval, conf_get_smtp_ca_cert_store_fetch_interval, conf_setdef_smtp_ca_cert_store_fetch_interval },
 			{ "smtp_server_url", conf_set_smtp_server_url, conf_get_smtp_server_url, conf_setdef_smtp_server_url, },
@@ -3746,24 +3746,24 @@ namespace pvpgn
 		}
 
 
-		extern char const * prefs_get_smtp_ca_cert_store(void)
+		extern char const * prefs_get_smtp_ca_cert_store_file(void)
 		{
-			return prefs_runtime_config.smtp_ca_cert_store;
+			return prefs_runtime_config.smtp_ca_cert_store_file;
 		}
 
-		static int conf_set_smtp_ca_cert_store(const char* valstr)
+		static int conf_set_smtp_ca_cert_store_file(const char* valstr)
 		{
-			return conf_set_str(&prefs_runtime_config.smtp_ca_cert_store, valstr, NULL);
+			return conf_set_str(&prefs_runtime_config.smtp_ca_cert_store_file, valstr, NULL);
 		}
 
-		static const char* conf_get_smtp_ca_cert_store(void)
+		static const char* conf_get_smtp_ca_cert_store_file(void)
 		{
-			return prefs_runtime_config.smtp_ca_cert_store;
+			return prefs_runtime_config.smtp_ca_cert_store_file;
 		}
 
-		static int conf_setdef_smtp_ca_cert_store(void)
+		static int conf_setdef_smtp_ca_cert_store_file(void)
 		{
-			return conf_set_str(&prefs_runtime_config.smtp_ca_cert_store, NULL, NULL);
+			return conf_set_str(&prefs_runtime_config.smtp_ca_cert_store_file, NULL, NULL);
 		}
 
 

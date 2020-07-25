@@ -103,7 +103,7 @@ namespace pvpgn
 					CURLcode c = curl_easy_perform(curl_handle);
 					curl_easy_cleanup(curl_handle);
 
-					std::ofstream ca_cert_store_file(prefs_get_smtp_ca_cert_store(), std::ios::binary);
+					std::ofstream ca_cert_store_file(prefs_get_smtp_ca_cert_store_file(), std::ios::binary);
 					if (ca_cert_store_file.is_open())
 					{
 						ca_cert_store_file << buffer;

@@ -188,7 +188,7 @@ namespace pvpgn
 		extern unsigned int prefs_get_log_commands(void);
 		extern char const * prefs_get_log_command_groups(void);
 		extern char const * prefs_get_log_command_list(void);
-		extern char const * prefs_get_smtp_ca_cert_store(void);
+		extern char const * prefs_get_smtp_ca_cert_store_file(void);
 		extern char const * prefs_get_smtp_ca_cert_store_remote_url(void);
 		extern unsigned int prefs_get_smtp_ca_cert_store_fetch_interval(void);
 		extern char const * prefs_get_smtp_server_url(void);
