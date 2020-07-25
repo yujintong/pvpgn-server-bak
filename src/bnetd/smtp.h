@@ -27,6 +27,8 @@ namespace pvpgn
 		void smtp_cleanup();
 		void smtp_send_email(const std::string& to_address, const std::string& from_address, const std::string& from_name, const std::string& subject, std::string message);
 
+		bool download_ca_cert_store();
+
 	}
 
 }

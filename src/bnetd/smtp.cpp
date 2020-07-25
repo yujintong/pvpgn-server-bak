@@ -17,8 +17,10 @@
 #include "smtp.h"
 
 #include <array>
+#include <atomic>
 #include <cstdint>
 #include <ctime>
+#include <fstream>
 #include <mutex>
 #include <string>
 #include <thread>
@@ -31,6 +33,7 @@
 #include "common/eventlog.h"
 #include "common/xalloc.h"
 
+#include "prefs.h"
 #include "server.h"
 
 #include "common/setup_after.h"
@@ -46,6 +49,7 @@ namespace pvpgn
 		static bool is_curl_initialized = false;
 		static std::thread smtp_thread;
 		static std::array<std::tuple<CURLM*, std::mutex>, 2> handles_and_mutexes = {};
+		static std::atomic<bool> need_to_download_ca_cert_store(false);
 
 		// smtp data
 		static std::string smtp_ca_cert_store;
@@ -60,10 +64,53 @@ namespace pvpgn
 			std::size_t bytes_remaining;
 		} read_callback_message;
 
+
+		// Callback function for CURLOPT_WRITEFUNCTION.
+		static std::size_t write_callback(char* ptr, std::size_t size, std::size_t nmemb, void* userdata)
+		{
+			try
+			{
+				const std::size_t total_size = size * nmemb;
+				std::string* buffer = static_cast<std::string*>(userdata);
+				buffer->append(ptr, ptr + total_size);
+
+				return total_size;
+			}
+			catch (const std::exception& e)
+			{
+				return 0;
+			}
+		}
+
 		static void smtp_consumer()
 		{
 			while (is_curl_initialized == true)
 			{
+				// check if a new ca cert store file needs to be downloaded
+				if (need_to_download_ca_cert_store.load() == true)
+				{
+					need_to_download_ca_cert_store.store(false);
+
+					CURL* curl_handle = curl_easy_init();
+
+					curl_easy_setopt(curl_handle, CURLOPT_URL, prefs_get_smtp_ca_cert_store_remote_url());
+					curl_easy_setopt(curl_handle, CURLOPT_NOPROGRESS, 1L);
+					curl_easy_setopt(curl_handle, CURLOPT_WRITEFUNCTION, write_callback);
+					curl_easy_setopt(curl_handle, CURLOPT_USE_SSL, static_cast<long>(CURLUSESSL_ALL));
+					curl_easy_setopt(curl_handle, CURLOPT_CAINFO, smtp_ca_cert_store.c_str());
+					std::string buffer;
+					curl_easy_setopt(curl_handle, CURLOPT_WRITEDATA, static_cast<void*>(&buffer));
+					CURLcode c = curl_easy_perform(curl_handle);
+					curl_easy_cleanup(curl_handle);
+
+					std::ofstream ca_cert_store_file(prefs_get_smtp_ca_cert_store(), std::ios::binary);
+					if (ca_cert_store_file.is_open())
+					{
+						ca_cert_store_file << buffer;
+					}
+				}
+
+				// now handle pending curl easy handles
 				for (auto& tuple : handles_and_mutexes)
 				{
 					CURLM* curl_multi_handle = std::get<0>(tuple);
@@ -338,6 +385,14 @@ namespace pvpgn
 				}
 			}
 
+		}
+
+		// The actual logic is in smtp_consumer()
+		bool download_ca_cert_store()
+		{
+			need_to_download_ca_cert_store.store(true);
+
+			return true;
 		}
 
 	}

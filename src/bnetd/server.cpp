@@ -1257,6 +1257,7 @@ namespace pvpgn
 			next_savetime = starttime + prefs_get_user_sync_timer();
 			war3_ladder_updatetime = starttime - prefs_get_war3_ladder_update_secs();
 			output_updatetime = starttime - prefs_get_output_update_secs();
+			std::time_t download_smtp_ca_cert_store_time = starttime + (86400ll * prefs_get_smtp_ca_cert_store_fetch_interval()); // 86400 seconds in 1 day
 
 			for (;;)
 			{
@@ -1349,6 +1350,13 @@ namespace pvpgn
 				{
 					output_updatetime = now;
 					output_write_to_file();
+				}
+
+				if (prefs_get_smtp_ca_cert_store_fetch_interval() != 0 && now >= download_smtp_ca_cert_store_time)
+				{
+					download_smtp_ca_cert_store_time = now + (86400ll * prefs_get_smtp_ca_cert_store_fetch_interval());
+
+					download_ca_cert_store();
 				}
 
 
