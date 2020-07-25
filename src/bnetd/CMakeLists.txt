@@ -61,6 +61,16 @@ target_include_directories(bnetd
 target_link_libraries(bnetd PRIVATE common compat fmt win32 ${NETWORK_LIBRARIES} ${ZLIB_LIBRARIES} ${MYSQL_LIBRARIES} ${SQLITE3_LIBRARIES} ${PGSQL_LIBRARIES} ${ODBC_LIBRARIES} ${LUA_LIBRARIES})
 
 install(TARGETS bnetd DESTINATION ${SBINDIR})
+
 if(WIN32 AND MSVC)
     install(FILES $<TARGET_PDB_FILE:bnetd> DESTINATION ${SBINDIR} OPTIONAL)
+endif()
+
+if (WIN32 AND USE_INCLUDED_ZLIB_LIBRARY)
+	install(
+		FILES
+			"${PROJECT_SOURCE_DIR}/lib/zlib/1.2.11/zlib1.dll"
+		DESTINATION
+			${SBINDIR}
+	)
 endif()
