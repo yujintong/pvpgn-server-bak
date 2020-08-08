@@ -3529,7 +3529,7 @@ namespace pvpgn
 				
 				msgtemp = localize(c, "Email: {} {}",
 					account_get_email(account),
-					account_get_email_verified(account) == 0 ? localize(c, "(Verified)") : localize(c, "(Unverified)"));
+					account_get_email_verified(account) == 1 ? localize(c, "(Verified)") : localize(c, "(Unverified)"));
 				message_send_text(c, message_type_info, c, msgtemp);
 				
 				msgtemp = localize(c, "Last login Owner: {}", account_get_ll_owner(account));
