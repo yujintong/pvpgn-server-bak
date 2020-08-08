@@ -2676,7 +2676,7 @@ namespace pvpgn
 			return account_get_strattr(account, "email_verification\\code");
 		}
 
-		extern int account_set_email_verification_code(t_account* account, char const * expiration_date)
+		extern int account_set_email_verification_code(t_account* account, char const * verification_code)
 		{
 			if (account == nullptr)
 			{
@@ -2684,13 +2684,13 @@ namespace pvpgn
 				return -1;
 			}
 
-			if (expiration_date == nullptr)
+			if (verification_code == nullptr)
 			{
-				eventlog(eventlog_level_error, __FUNCTION__, "got NULL expiration_date");
+				eventlog(eventlog_level_error, __FUNCTION__, "got NULL verification_code");
 				return -1;
 			}
 
-			return account_set_strattr(account, "email_verification\\code", expiration_date);
+			return account_set_strattr(account, "email_verification\\code", verification_code);
 		}
 
 		extern unsigned int account_get_email_verification_expiration(t_account* account)
