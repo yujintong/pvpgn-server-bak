@@ -50,6 +50,7 @@
 #include "common/bnetsrp3.h"
 #include "common/xstring.h"
 
+#include "account_email_verification.h"
 #include "handlers.h"
 #include "connection.h"
 #include "prefs.h"
@@ -5451,6 +5452,11 @@ namespace pvpgn
 			{
 				account_set_email_verified(account, false);
 				eventlog(eventlog_level_info, __FUNCTION__, "[{}] init account \"{}\" email to \"{}\"", conn_get_socket(c), account_get_name(account), email);
+
+				if (prefs_get_verify_account_email() == 1)
+				{
+					account_generate_email_verification_code(account);
+				}
 			}
 			return 0;
 		}
@@ -5499,6 +5505,11 @@ namespace pvpgn
 			{
 				account_set_email_verified(account, false);
 				eventlog(eventlog_level_info, __FUNCTION__, "[{}] change account \"{}\" email to \"{}\"", conn_get_socket(c), account_get_name(account), newaddr);
+
+				if (prefs_get_verify_account_email() == 1)
+				{
+					account_generate_email_verification_code(account);
+				}
 			}
 			return 0;
 		}

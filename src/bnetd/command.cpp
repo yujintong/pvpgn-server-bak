@@ -5299,6 +5299,19 @@ namespace pvpgn
 				account_set_email_verified(account, false);
 				
 				message_send_text(c, message_type_info, c, localize(c, "Email address successfully set to {}.", args[2]));
+
+				if (prefs_get_verify_account_email() == 1)
+				{
+					bool send_verification_code_successful = account_generate_email_verification_code(account);
+					if (send_verification_code_successful)
+					{
+						message_send_text(c, message_type_info, c, localize(c, "An email has been sent, please check your inbox for the verification code."));
+					}
+					else
+					{
+						message_send_text(c, message_type_error, c, localize(c, "An error has occurred, could not send a verification email."));
+					}
+				}
 			}
 			else if (args[1] == "verify")
 			{

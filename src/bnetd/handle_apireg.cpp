@@ -32,6 +32,7 @@
 
 #include "compat/strcasecmp.h"
 
+#include "account_email_verification.h"
 #include "prefs.h"
 #include "irc.h"
 #include "account.h"
@@ -875,8 +876,15 @@ namespace pvpgn
 							account_set_wol_apgar(tempacct, wol_pass_hash);
 							if (apiregmember_get_email(apiregmember))
 							{
-								account_set_email_verified(tempacct, false);
-								account_set_email(tempacct, apiregmember_get_email(apiregmember));
+								if (account_set_email(tempacct, apiregmember_get_email(apiregmember)) == 0)
+								{
+									account_set_email_verified(tempacct, false);
+
+									if (prefs_get_verify_account_email() == 1)
+									{
+										account_generate_email_verification_code(account);
+									}
+								}
 							}
 							std::snprintf(message, sizeof(message), "Welcome in the amazing world of PvPGN! Your login can be used for all PvPGN Supported games!");
 							std::snprintf(hresult, sizeof(hresult), "0");
