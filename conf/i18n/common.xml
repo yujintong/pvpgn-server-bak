@@ -2115,5 +2115,13 @@
       <original>You have not set an email address yet.</original>
       <translate></translate>
     </item>
+    <item id="528" file="command.cpp" function="_handle_email_command">
+      <original>An email has been sent, please check your inbox for the verification code.</original>
+      <translate></translate>
+    </item>
+    <item id="529" file="command.cpp" function="_handle_email_command">
+      <original>An error has occurred, could not send a verification email.</original>
+      <translate></translate>
+    </item>
   </items>
 </root>
