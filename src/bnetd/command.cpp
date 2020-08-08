@@ -82,6 +82,7 @@
 #include "icons.h"
 #include "userlog.h"
 #include "i18n.h"
+#include "account_email_verification.h"
 
 #include "attrlayer.h"
 
@@ -421,6 +422,7 @@ namespace pvpgn
 		static int _handle_clearstats_command(t_connection * c, char const * text);
 		static int _handle_tos_command(t_connection * c, char const * text);
 		static int _handle_alert_command(t_connection * c, char const * text);
+		static int _handle_email_command(t_connection * c, char const * text);
 
 		static const t_command_table_row standard_command_table[] =
 		{
@@ -541,6 +543,7 @@ namespace pvpgn
 			{ "/language", handle_language_command },
 			{ "/lang", handle_language_command },
 			{ "/log", handle_log_command },
+			{ "/email", _handle_email_command},
 
 			{ NULL, NULL }
 
@@ -3524,7 +3527,9 @@ namespace pvpgn
 					account_get_auth_mute(account) == 1 ? yes : no);
 				message_send_text(c, message_type_info, c, msgtemp);
 				
-				msgtemp = localize(c, "Email: {}", account_get_email(account));
+				msgtemp = localize(c, "Email: {} {}",
+					account_get_email(account),
+					account_get_email_verified(account) == 1 ? localize(c, "(Verified)") : localize(c, "(Unverified)"));
 				message_send_text(c, message_type_info, c, msgtemp);
 				
 				msgtemp = localize(c, "Last login Owner: {}", account_get_ll_owner(account));
@@ -3876,6 +3881,10 @@ namespace pvpgn
 				mode = restart_mode_anongame;
 			else if (mode_str == "lua")
 				mode = restart_mode_lua;
+			else if (mode_str == "smtp")
+				mode = restart_mode_smtp;
+			else if (mode_str == "accountemailverification")
+				mode = restart_mode_accountemailverification;
 			else
 			{
 				message_send_text(c, message_type_info, c, localize(c, "Invalid mode."));
@@ -5233,6 +5242,151 @@ namespace pvpgn
 					messagebox_show(conn, goodtext.c_str(), msgtemp.c_str());
 				}
 			}
+
+			return 0;
+		}
+
+		static int _handle_email_command(t_connection* c, char const* text)
+		{
+			std::vector<std::string> args = split_command(text, 2);
+			if (args[1].empty())
+			{
+				describe_command(c, args[0].c_str());
+				return -1;
+			}
+
+			t_account* account = conn_get_account(c);
+
+			if (args[1] == "get")
+			{
+				const char* email = account_get_email(account);
+				if (email == nullptr)
+				{
+					message_send_text(c, message_type_error, c, localize(c, "You have not set an email address yet."));
+					return -1;
+				}
+
+				message_send_text(c, message_type_info, c, localize(c, "Your email address is: {}", email));
+			}
+			else if (args[1] == "set")
+			{
+				if (args[2].empty())
+				{
+					describe_command(c, args[0].c_str());
+					return -1;
+				}
+
+				// FIXME: check format of email address
+
+				const char* current_email = account_get_email(account);
+				if (current_email != nullptr && args[2].compare(current_email) == 0)
+				{
+					message_send_text(c, message_type_error, c, localize(c, "Your email address is already set to {}.", args[2]));
+					return 0;
+				}
+
+				if ((args[2].length() + 1) > MAX_EMAIL_STR)
+				{
+					message_send_text(c, message_type_error, c, localize(c, "The email address is too long, please use another one.", args[2]));
+					return -1;
+				}
+
+				int set_email_result = account_set_email(account, args[2]);
+				if (set_email_result != 0)
+				{
+					message_send_text(c, message_type_error, c, localize(c, "An error has occurred."));
+					return -1;
+				}
+
+				account_set_email_verified(account, false);
+				
+				message_send_text(c, message_type_info, c, localize(c, "Email address successfully set to {}.", args[2]));
+
+				if (prefs_get_verify_account_email() == 1)
+				{
+					bool send_verification_code_successful = account_generate_email_verification_code(account);
+					if (send_verification_code_successful)
+					{
+						message_send_text(c, message_type_info, c, localize(c, "An email has been sent, please check your inbox for the verification code."));
+					}
+					else
+					{
+						message_send_text(c, message_type_error, c, localize(c, "An error has occurred, could not send a verification email."));
+					}
+				}
+			}
+			else if (args[1] == "verify")
+			{
+				if (prefs_get_verify_account_email() == 0)
+				{
+					message_send_text(c, message_type_info, c, localize(c, "Email address verification is disabled."));
+					return -1;
+				}
+
+				if (args[2].empty())
+				{
+					describe_command(c, args[0].c_str());
+					return -1;
+				}
+
+				int is_verified = account_get_email_verified(account);
+				if (is_verified == 1)
+				{
+					message_send_text(c, message_type_info, c, localize(c, "Your email address has already been verified."));
+					return -1;
+				}
+
+				AccountVerifyEmailStatus verify_email_status = account_verify_email(account, args[2]);
+				switch (verify_email_status)
+				{
+				case AccountVerifyEmailStatus::Success:
+					message_send_text(c, message_type_info, c, localize(c, "Successfully verified email address."));
+					break;
+				case AccountVerifyEmailStatus::FailureCodeExpired:
+					message_send_text(c, message_type_error, c, localize(c, "The code has already expired."));
+					return -1;
+				case AccountVerifyEmailStatus::FailureCodeIncorrect:
+					message_send_text(c, message_type_error, c, localize(c, "The code is incorrect."));
+					return -1;
+				case AccountVerifyEmailStatus::FailureOther:
+				default:
+					message_send_text(c, message_type_error, c, localize(c, "An error has occurred."));
+					return -1;
+				}
+			}
+			else if (args[1] == "resendverification")
+			{
+				if (prefs_get_verify_account_email() == 0)
+				{
+					message_send_text(c, message_type_info, c, localize(c, "Email address verification is disabled."));
+					return -1;
+				}
+
+				int is_verified = account_get_email_verified(account);
+				if (is_verified == 1)
+				{
+					message_send_text(c, message_type_info, c, localize(c, "Your email address has already been verified."));
+					return -1;
+				}
+
+				bool resend_verification_code_successful = account_generate_email_verification_code(account);
+				if (resend_verification_code_successful)
+				{
+					message_send_text(c, message_type_info, c, localize(c, "Regenerated verification code. Check your email."));
+				}
+				else
+				{
+					message_send_text(c, message_type_error, c, localize(c, "An error has occurred."));
+					return -1;
+				}
+				
+			}
+			else
+			{
+				describe_command(c, args[0].c_str());
+				return -1;
+			}
+
 
 			return 0;
 		}

@@ -88,6 +88,8 @@
 #include "handle_apireg.h"
 #include "i18n.h"
 #include "userlog.h"
+#include "account_email_verification.h"
+#include "smtp.h"
 #ifdef WIN32
 #include "win32/windump.h"
 #endif
@@ -373,10 +375,10 @@ int pre_server_startup(void)
 		{
 			AdBannerList.unload();
 		}
-		
+
 		AdBannerList.load(prefs_get_adfile());
 	}
-	catch (const std::exception& e)
+	catch (const std::exception & e)
 	{
 		eventlog(eventlog_level_error, __FUNCTION__, "{}", e.what());
 	}
@@ -420,6 +422,30 @@ int pre_server_startup(void)
 		eventlog(eventlog_level_error, __FUNCTION__, "could not load realm list");
 	//topiclist_load(std::string(prefs_get_topicfile()));
 	userlog_init();
+	if (prefs_get_verify_account_email() == 1)
+	{
+		if (smtp_init(prefs_get_smtp_ca_cert_store_file(), prefs_get_smtp_server_url(), prefs_get_smtp_port(), prefs_get_smtp_username(), prefs_get_smtp_password()))
+		{
+			eventlog(eventlog_level_info, __FUNCTION__, "Successfully initialized SMTP client");
+		}
+		else
+		{
+			eventlog(eventlog_level_error, __FUNCTION__, "Failed to initialize SMTP client");
+			eventlog(eventlog_level_error, __FUNCTION__, "Disabling account email verification");
+			prefs_set_verify_account_email(false);
+		}
+
+		if (!account_email_verification_load(prefs_get_email_verification_file(), prefs_get_servername(), prefs_get_verify_account_email_from_address(), prefs_get_verify_account_email_from_name()))
+		{
+			eventlog(eventlog_level_error, __FUNCTION__, "Failed to load email verification message");
+			eventlog(eventlog_level_error, __FUNCTION__, "Disabling account email verification");
+			prefs_set_verify_account_email(false);
+		}
+	}
+	else
+	{
+		eventlog(eventlog_level_debug, __FUNCTION__, "Config option 'verify_account_email' is false");
+	}
 
 #ifdef WITH_LUA
 	lua_load(prefs_get_scriptdir());
@@ -435,6 +461,9 @@ void post_server_shutdown(int status)
 	{
 	case 0:
 		//topiclist_unload();
+		account_email_verification_unload();
+		smtp_cleanup();
+		account_email_verification_unload();
 		realmlist_destroy();
 		teamlist_unload();
 		clanlist_unload();

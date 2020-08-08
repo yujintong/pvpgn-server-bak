@@ -36,7 +36,15 @@ message(STATUS "*** {fmt} ***")
 set(USE_INCLUDED_ZLIB_LIBRARY OFF)
 
 if(WITH_BNETD)
-	cmake_policy(SET CMP0074 NEW)
+	if (WIN32)
+		set(CURL_LIBRARY ${CMAKE_SOURCE_DIR}/lib/curl/7.70.0/libcurl.lib)
+		set(CURL_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/include/curl/7.70.0)
+	endif()
+	find_package(CURL REQUIRED)
+
+	if (POLICY CMP0074)
+		cmake_policy(SET CMP0074 NEW)
+	endif()
 
 	if (NOT DEFINED ZLIB_ROOT)
 		set(USE_INCLUDED_ZLIB_LIBRARY ON)
