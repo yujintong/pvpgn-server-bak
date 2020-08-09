@@ -179,6 +179,11 @@ namespace pvpgn
 				rcbmessage->bytes_remaining -= copy_size;
 			}
 
+			if (copy_size == 0)
+			{
+				delete rcbmessage;
+			}
+
 			return copy_size;
 		}
 
@@ -349,7 +354,7 @@ namespace pvpgn
 			// passing in a pointer to the message alone is not sufficient because read_callback() is called by curl at least twice.
 			// the buffer provided by curl may not be sufficiently large enough for read_callback() to copy the entire message into during a single call.
 			// therefore read_callback() needs a way to keep track of the number of bytes it still needs to copy from the message.
-			read_callback_message* rcbmessage = static_cast<read_callback_message*>(xmalloc(sizeof(read_callback_message)));
+			read_callback_message* rcbmessage = new read_callback_message;
 			rcbmessage->message = message;
 			rcbmessage->bytes_remaining = message.length() + 1;
 			curl_easy_setopt(curl, CURLOPT_READDATA, static_cast<void*>(rcbmessage));
