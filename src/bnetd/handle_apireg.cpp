@@ -882,7 +882,7 @@ namespace pvpgn
 
 									if (prefs_get_verify_account_email() == 1)
 									{
-										account_generate_email_verification_code(account);
+										account_generate_email_verification_code(tempacct);
 									}
 								}
 							}
