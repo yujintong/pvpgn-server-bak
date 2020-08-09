@@ -128,7 +128,7 @@ namespace pvpgn
 						timeout = SMTP_TIMEOUT_DEFAULT;
 					}
 
-					curl_multi_poll(curl_multi_handle, nullptr, 0, timeout, nullptr);
+					curl_multi_wait(curl_multi_handle, nullptr, 0, timeout, nullptr);
 
 					int running_handles = 0; // unused
 					curl_multi_perform(curl_multi_handle, &running_handles);
