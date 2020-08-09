@@ -671,7 +671,7 @@ log_command_list = ""
 # Path to a CA certificate store file in PEM format, relative to ${SYSCONFDIR}, 
 # containing X.509 certificates of public certificate authorities.
 # See https://curl.haxx.se/docs/caextract.html
-smtp_ca_cert_store = "${SYSCONFDIR}/cacert.pem"
+smtp_ca_cert_store_file = "${SYSCONFDIR}/cacert.pem"
 
 # URL to download a new CA certificate store file.
 smtp_ca_cert_store_remote_url = "https://curl.haxx.se/ca/cacert.pem"
