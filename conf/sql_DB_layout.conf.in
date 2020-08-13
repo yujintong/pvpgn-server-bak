@@ -42,8 +42,8 @@
 :"CREATE UNIQUE INDEX username2 ON ${prefix}BNET (username)"
 [${prefix}email_verification]
 "uid int NOT NULL PRIMARY KEY","'0'"
-code varchar(64)","NULL"
-expiration int", "'0'"
+"code varchar(64)","NULL"
+"expiration int", "'0'"
 [${prefix}WOL]
 "uid int NOT NULL PRIMARY KEY","'0'"
 "auth_apgar varchar(8)","NULL"
