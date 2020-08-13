@@ -41,6 +41,9 @@ if(WITH_BNETD)
 		set(CURL_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/include/curl/7.70.0)
 	endif()
 	find_package(CURL REQUIRED)
+	
+	set(THREADS_PREFER_PTHREAD_FLAG TRUE)
+	find_package(THREADS)
 
 	if (POLICY CMP0074)
 		cmake_policy(SET CMP0074 NEW)
