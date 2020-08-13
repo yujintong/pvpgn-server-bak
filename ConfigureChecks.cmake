@@ -43,7 +43,7 @@ if(WITH_BNETD)
 	find_package(CURL REQUIRED)
 	
 	set(THREADS_PREFER_PTHREAD_FLAG TRUE)
-	find_package(THREADS)
+	find_package(Threads)
 
 	if (POLICY CMP0074)
 		cmake_policy(SET CMP0074 NEW)
