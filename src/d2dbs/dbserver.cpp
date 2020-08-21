@@ -156,11 +156,13 @@ namespace pvpgn
 			if (psock_bind(sd, (struct sockaddr*)&sinInterface, (psock_t_socklen)sizeof(struct sockaddr_in)) < 0)
 			{
 				eventlog(eventlog_level_error, __FUNCTION__, "psock_bind() failed : {}", pstrerror(psock_errno()));
+				addr_destroy(servaddr);
 				return -1;
 			}
 			if (psock_listen(sd, LISTEN_QUEUE) < 0)
 			{
 				eventlog(eventlog_level_error, __FUNCTION__, "psock_listen() failed : {}", pstrerror(psock_errno()));
+				addr_destroy(servaddr);
 				return -1;
 			}
 			addr_destroy(servaddr);
