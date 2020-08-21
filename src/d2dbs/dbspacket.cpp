@@ -144,9 +144,18 @@ namespace pvpgn
 			strtolower(CharName);
 
 			std::sprintf(filepath, "%s/%s", prefs_get_charinfo_bak_dir(), AccountName);
-			if (stat(filepath, &statbuf) == -1) {
-				p_mkdir(filepath, S_IRWXU | S_IRWXG | S_IRWXO);
-				eventlog(eventlog_level_info, __FUNCTION__, "created charinfo directory: {}", filepath);
+			if (stat(filepath, &statbuf) == -1)
+			{
+				if (p_mkdir(filepath, S_IRWXU | S_IRWXG | S_IRWXO) == 0)
+				{
+					eventlog(eventlog_level_info, __FUNCTION__, "created charinfo directory: {}", filepath);
+				}
+				else
+				{
+					eventlog(eventlog_level_info, __FUNCTION__, "failed to create charinfo directory \"{}\" (errno: {})", filepath, errno);
+					return 0;
+				}
+				
 			}
 
 			std::sprintf(filename, "%s/%s/.%s.tmp", d2dbs_prefs_get_charinfo_dir(), AccountName, CharName);
