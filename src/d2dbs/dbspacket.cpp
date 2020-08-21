@@ -208,7 +208,11 @@ namespace pvpgn
 			std::sprintf(filename_d2closed, "%s/%s.d2s", d2dbs_prefs_get_charsave_dir(), CharName);
 			if ((access(filename, F_OK) < 0) && (access(filename_d2closed, F_OK) == 0))
 			{
-				std::rename(filename_d2closed, filename);
+				if (std::rename(filename_d2closed, filename) != 0)
+				{
+					eventlog(eventlog_level_error, __FUNCTION__, "failed to rename file \"{}\" to \"{}\"", filename_d2closed, filename);
+					return 0;
+				}
 			}
 			fd = std::fopen(filename, "rb");
 			if (!fd) {
