@@ -452,7 +452,7 @@ namespace pvpgn
 					temp.status = bn_short_get(ldata[i].status);
 					temp.level = bn_byte_get(ldata[i].level);
 					temp.chclass = bn_byte_get(ldata[i].chclass);
-					std::strncpy(temp.charname, ldata[i].charname, sizeof(info[i].charname));
+					std::snprintf(temp.charname, sizeof(temp.charname), "%s", ldata[i].charname);
 					if (d2ladder_update_info_and_pos(d2ladder, &temp,
 						d2ladder_find_char_all(d2ladder, &temp),
 						d2ladder_find_pos(d2ladder, &temp)) == 1) {
