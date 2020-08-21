@@ -152,6 +152,7 @@ namespace pvpgn
 			sinInterface.sin_family = PSOCK_AF_INET;
 			sinInterface.sin_addr.s_addr = htonl(addr_get_ip(servaddr));
 			sinInterface.sin_port = htons(addr_get_port(servaddr));
+			std::memset(sinInterface.sin_zero, 0, sizeof(sinInterface.sin_zero));
 			if (psock_bind(sd, (struct sockaddr*)&sinInterface, (psock_t_socklen)sizeof(struct sockaddr_in)) < 0)
 			{
 				eventlog(eventlog_level_error, __FUNCTION__, "psock_bind() failed : {}", pstrerror(psock_errno()));
