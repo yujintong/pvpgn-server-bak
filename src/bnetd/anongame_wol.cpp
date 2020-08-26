@@ -320,7 +320,7 @@ namespace pvpgn
 
 			std::string data = fmt::format(":matchbot!u@h {} {} {}", command, nick, text);
 
-			DEBUG2("[{}] sent \"{}\"", conn_get_socket(conn));
+			DEBUG2("[{}] sent \"{}\"", conn_get_socket(conn), data);
 			data.append("\r\n");
 			packet_set_size(p, 0);
 			packet_append_data(p, data.c_str(), data.length());
