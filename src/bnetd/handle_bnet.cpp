@@ -306,10 +306,10 @@ namespace pvpgn
 			case conn_state_connected:
 				switch (handle(bnet_htable_con, packet_get_type(packet), c, packet)) {
 				case 1:
-					eventlog(eventlog_level_error, __FUNCTION__, "[{}] unknown (unlogged in) bnet packet type 0x{:04x}, len {}", conn_get_socket(c), packet_get_type(packet), packet_get_size(packet));
+					eventlog(eventlog_level_error, __FUNCTION__, "[{}] unknown (connected) bnet packet type 0x{:04x}, len {}", conn_get_socket(c), packet_get_type(packet), packet_get_size(packet));
 					break;
 				case -1:
-					eventlog(eventlog_level_error, __FUNCTION__, "[{}] (unlogged in) got error handling packet type 0x{:04x}, len {}", conn_get_socket(c), packet_get_type(packet), packet_get_size(packet));
+					eventlog(eventlog_level_error, __FUNCTION__, "[{}] (connected) got error handling packet type 0x{:04x}, len {}", conn_get_socket(c), packet_get_type(packet), packet_get_size(packet));
 					break;
 				};
 				break;
