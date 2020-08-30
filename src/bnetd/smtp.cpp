@@ -18,6 +18,7 @@
 
 #include <array>
 #include <atomic>
+#include <chrono>
 #include <cstdint>
 #include <ctime>
 #include <fstream>
@@ -162,6 +163,8 @@ namespace pvpgn
 
 					curl_multi_handle_mutex.unlock();
 				}
+				
+				std::this_thread::sleep_for(std::chrono::seconds(3));
 			}
 		}
 

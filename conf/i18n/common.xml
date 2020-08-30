@@ -2071,6 +2071,7 @@
     <item id="516" file="clan.cpp" function="clan_create">
       <original>This is a newly created clan</original>
       <translate></translate>
+    </item>
     <item id="517" file="command.cpp" function="_handle_email_command">
       <original>An error has occurred.</original>
       <translate></translate>
