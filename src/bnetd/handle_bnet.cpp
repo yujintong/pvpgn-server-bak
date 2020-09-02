@@ -5436,6 +5436,11 @@ namespace pvpgn
 				eventlog(eventlog_level_error, __FUNCTION__, "[{}] got bad SETEMAILREPLY packet", conn_get_socket(c));
 				return -1;
 			}
+			if (std::strlen(email) == 0)
+			{
+				eventlog(eventlog_level_error, __FUNCTION__, "[{}] user declined to set an email address", conn_get_socket(c));
+				return 0;
+			}
 			if (!(account = conn_get_account(c))) {
 				eventlog(eventlog_level_error, __FUNCTION__, "got NULL account for connection in setemail request");
 				return -1;
