@@ -40,7 +40,7 @@
 "acct_lastlogin_ip varchar(16)","NULL"
 :"DROP INDEX username"
 :"CREATE UNIQUE INDEX username2 ON ${prefix}BNET (username)"
-[${prefix}email_verification]
+[${prefix}emailverification]
 "uid int NOT NULL PRIMARY KEY","'0'"
 "code varchar(64)","NULL"
 "expiration int", "'0'"

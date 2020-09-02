@@ -2665,7 +2665,7 @@ namespace pvpgn
 			return account_set_boolattr(account, "BNET\\acct\\email\\verified", is_verified ? 1 : 0);
 		}
 
-		extern char const * account_get_email_verification_code(t_account* account)
+		extern char const * account_get_emailverification_code(t_account* account)
 		{
 			if (account == nullptr)
 			{
@@ -2673,10 +2673,10 @@ namespace pvpgn
 				return nullptr;
 			}
 
-			return account_get_strattr(account, "email_verification\\code");
+			return account_get_strattr(account, "emailverification\\code");
 		}
 
-		extern int account_set_email_verification_code(t_account* account, char const * verification_code)
+		extern int account_set_emailverification_code(t_account* account, char const * verification_code)
 		{
 			if (account == nullptr)
 			{
@@ -2690,10 +2690,10 @@ namespace pvpgn
 				return -1;
 			}
 
-			return account_set_strattr(account, "email_verification\\code", verification_code);
+			return account_set_strattr(account, "emailverification\\code", verification_code);
 		}
 
-		extern unsigned int account_get_email_verification_expiration(t_account* account)
+		extern unsigned int account_get_emailverification_expiration(t_account* account)
 		{
 			if (account == nullptr)
 			{
@@ -2701,10 +2701,10 @@ namespace pvpgn
 				return 0;
 			}
 
-			return account_get_numattr(account, "email_verification\\expiration");
+			return account_get_numattr(account, "emailverification\\expiration");
 		}
 
-		extern int account_set_email_verification_expiration(t_account* account, unsigned int expiration_date)
+		extern int account_set_emailverification_expiration(t_account* account, unsigned int expiration_date)
 		{
 			if (account == nullptr)
 			{
@@ -2712,7 +2712,7 @@ namespace pvpgn
 				return -1;
 			}
 
-			return account_set_numattr(account, "email_verification\\expiration", expiration_date);
+			return account_set_numattr(account, "emailverification\\expiration", expiration_date);
 		}
 
 		extern int account_set_userlang(t_account * account, const char * lang)

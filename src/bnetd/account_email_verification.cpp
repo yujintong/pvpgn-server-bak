@@ -102,8 +102,8 @@ namespace pvpgn
 		}
 
 		/**
-		* If successful, sets "BNET\\acct\\email\\verified" attribute to true and sets "email_verification\\code"
-		* attribute and "email_verification\\expiration" attribute to 0 for the given account.
+		* If successful, sets "BNET\\acct\\email\\verified" attribute to true and sets "emailverification\\code"
+		* attribute and "emailverification\\expiration" attribute to 0 for the given account.
 		*/
 		AccountVerifyEmailStatus account_verify_email(t_account* account, const std::string& code)
 		{
@@ -113,14 +113,14 @@ namespace pvpgn
 				return AccountVerifyEmailStatus::FailureOther;
 			}
 
-			const char* account_code = account_get_email_verification_code(account);
+			const char* account_code = account_get_emailverification_code(account);
 			if (account_code == nullptr)
 			{
 				eventlog(eventlog_level_error, __FUNCTION__, "Could not retrieve email verification code for account uid {}", account_get_uid(account));
 				return AccountVerifyEmailStatus::FailureOther;
 			}
 
-			unsigned int account_expiration = account_get_email_verification_expiration(account);
+			unsigned int account_expiration = account_get_emailverification_expiration(account);
 			if (account_expiration == 0)
 			{
 				eventlog(eventlog_level_error, __FUNCTION__, "Could not retrieve email verification expiration date for account uid {}", account_get_uid(account));
@@ -146,8 +146,8 @@ namespace pvpgn
 				return AccountVerifyEmailStatus::FailureOther;
 			}
 
-			account_set_email_verification_code(account, "");
-			account_set_email_verification_expiration(account, 0);
+			account_set_emailverification_code(account, "");
+			account_set_emailverification_expiration(account, 0);
 
 			eventlog(eventlog_level_info, __FUNCTION__, "Succesfully verified email address ({}) account uid {}", account_get_email(account), account_get_uid(account));
 
@@ -155,7 +155,7 @@ namespace pvpgn
 		}
 
 		/**
-		* Generates an email verification code and saves it in the "email_verification\\code" attribute for the given account. Sets the "email_verification\\expiration" attribute
+		* Generates an email verification code and saves it in the "emailverification\\code" attribute for the given account. Sets the "emailverification\\expiration" attribute
 		* to X minutes from current time, where X is the value of 'verify_account_email_expiration' in bnetd.conf.
 		* Sends an email containing the email verification code to the registered email address of the account.
 		*/
@@ -174,8 +174,8 @@ namespace pvpgn
 			std::time_t expiration = now + (60ull * prefs_get_verify_account_email_expiration());
 			std::string code = fmt::to_string(uniform_dist(rengine));
 
-			int a = account_set_email_verification_expiration(account, expiration);
-			int b = account_set_email_verification_code(account, code.c_str());
+			int a = account_set_emailverification_expiration(account, expiration);
+			int b = account_set_emailverification_code(account, code.c_str());
 			if (!(a == 0 && b == 0))
 			{
 				eventlog(eventlog_level_error, __FUNCTION__, "Could not generate an email verification code for account uid {}", account_get_uid(account));
