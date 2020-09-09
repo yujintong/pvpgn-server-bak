@@ -669,6 +669,7 @@ namespace pvpgn
 					if (!(team->teamid = std::atoi(row[0])))
 					{
 						eventlog(eventlog_level_error, __FUNCTION__, "got bad teamid");
+						xfree(team);
 						sql->free_result(result);
 						return -1;
 					}
