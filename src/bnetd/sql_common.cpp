@@ -414,10 +414,14 @@ namespace pvpgn
 							if (row2[0] == NULL)
 							{
 								eventlog(eventlog_level_error, __FUNCTION__, "got NULL uid from db");
+								xfree(member);
 								continue;
 							}
 							if (!(member_uid = std::atoi(row2[0])))
+							{
+								xfree(member);
 								continue;
+							}
 							if (!(member->memberacc = accountlist_find_account_by_uid(member_uid)))
 							{
 								eventlog(eventlog_level_error, __FUNCTION__, "cannot find uid {}", member_uid);
