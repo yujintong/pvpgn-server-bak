@@ -389,6 +389,7 @@ namespace pvpgn
 					if (!(clan->clanid = std::atoi(row[0])))
 					{
 						eventlog(eventlog_level_error, __FUNCTION__, "got bad cid");
+						xfree(clan);
 						sql->free_result(result);
 						return -1;
 					}
