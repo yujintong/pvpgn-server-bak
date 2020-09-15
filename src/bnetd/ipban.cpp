@@ -805,7 +805,6 @@ namespace pvpgn
 		static t_ipban_entry * ipban_str_to_ipban_entry(char const * ipstr)
 		{
 			char *          matched;
-			char *          whole;
 			char *          cp;
 			t_ipban_entry * entry;
 
@@ -847,7 +846,7 @@ namespace pvpgn
 				eventlog(eventlog_level_debug, __FUNCTION__, "entry: {} matched as ipban_type_wildcard", cp);
 
 				/* only xfree() info1! */
-				whole = xstrdup(cp);
+				char * whole = xstrdup(cp);
 				entry->info1 = std::strtok(whole, ".");
 				entry->info2 = std::strtok(NULL, ".");
 				entry->info3 = std::strtok(NULL, ".");
@@ -858,6 +857,7 @@ namespace pvpgn
 					xfree(entry->info1);
 					xfree(entry);
 					xfree(cp);
+					xfree(whole);
 					return NULL;
 				}
 			}
