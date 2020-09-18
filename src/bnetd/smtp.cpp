@@ -228,7 +228,7 @@ namespace pvpgn
 			}
 
 			smtp_ca_cert_store = prefs_smtp_ca_cert_store;
-			smtp_server_url = fmt::format("smtps://{}", prefs_smtp_server_url);
+			smtp_server_url = fmt::format("smtp://{}", prefs_smtp_server_url);
 			smtp_port = prefs_smtp_port;
 			smtp_username = prefs_smtp_username;
 			smtp_password = prefs_smtp_password;
