@@ -164,8 +164,7 @@ namespace pvpgn
 				bn_int ext;
 				std::vector<std::size_t> candidates = {};
 
-				std::for_each(this->m_banners.begin(), this->m_banners.end(), 
-					[client_tag, client_lang, &candidates, &ext](const AdBanner& ad) -> void
+				for (const auto& ad : this->m_banners)
 				{
 					if ((ad.get_client() == client_tag || ad.get_client() == 0)
 						&& (ad.get_language() == client_lang || ad.get_language() == 0))
@@ -178,7 +177,7 @@ namespace pvpgn
 							// ignore all formats except MNG for Warcraft 3, cause it's only one supported format
 							if (bn_int_tag_eq(ext, EXTENSIONTAG_MNG) != 0)
 							{
-								return;
+								continue;
 							}
 						}
 						// Starcraft, Warcraft 2, Diablo, Diablo 2
@@ -187,12 +186,12 @@ namespace pvpgn
 							// ignore MNG, cause it's not supported format for other games
 							if (bn_int_tag_eq(ext, EXTENSIONTAG_MNG) == 0)
 							{
-								return;
+								continue;
 							}
 						}
 						candidates.push_back(ad.get_id());
 					}
-				});
+				}
 
 				if (candidates.empty())
 				{
