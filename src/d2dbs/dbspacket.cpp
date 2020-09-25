@@ -313,11 +313,8 @@ namespace pvpgn
 			char CharName[MAX_CHARNAME_LEN];
 			char RealmName[MAX_REALMNAME_LEN];
 			t_d2gs_d2dbs_save_data_request	* savecom;
-			t_d2dbs_d2gs_save_data_reply	* saveret;
-			char * readpos;
-			unsigned char * writepos;
+			char* readpos = conn->ReadBuf;
 
-			readpos = conn->ReadBuf;
 			savecom = (t_d2gs_d2dbs_save_data_request	*)readpos;
 			datatype = bn_short_get(savecom->datatype);
 			datalen = bn_short_get(savecom->datalen);
@@ -375,20 +372,29 @@ namespace pvpgn
 				eventlog(eventlog_level_error, __FUNCTION__, "unknown data type {}", datatype);
 				return -1;
 			}
-			std::size_t writelen = sizeof(*saveret) + std::strlen(CharName) + 1;
-			if (writelen > kBufferSize - conn->nCharsInWriteBuffer)
-				return 0;
 
-			writepos = (unsigned char*)(conn->WriteBuf + conn->nCharsInWriteBuffer);
-			saveret = (t_d2dbs_d2gs_save_data_reply *)writepos;
+			t_d2dbs_d2gs_save_data_reply* saveret;
+			std::size_t writelen = sizeof(*saveret) + std::strlen(CharName) + 1;
+			std::size_t buffer_available_len = sizeof(conn->WriteBuf) - conn->nCharsInWriteBuffer;
+
+			if (buffer_available_len < writelen)
+			{
+				eventlog(eventlog_level_error, __FUNCTION__, "[{}] not enough space in write buffer (available space: {}, needed: {})", conn->sd, buffer_available_len, writelen);
+				return 0;
+			}
+
+			unsigned char* writepos = reinterpret_cast<unsigned char*>(conn->WriteBuf + conn->nCharsInWriteBuffer);
+			saveret = reinterpret_cast<t_d2dbs_d2gs_save_data_reply*>(writepos);
 			bn_short_set(&saveret->h.type, D2DBS_D2GS_SAVE_DATA_REPLY);
 			bn_short_set(&saveret->h.size, writelen);
 			bn_int_set(&saveret->h.seqno, bn_int_get(savecom->h.seqno));
 			bn_short_set(&saveret->datatype, bn_short_get(savecom->datatype));
 			bn_int_set(&saveret->result, result);
 			writepos += sizeof(*saveret);
-			std::strncpy((char*)writepos, CharName, MAX_CHARNAME_LEN);
+			std::memcpy(writepos, CharName, std::strlen(CharName) + 1);
+
 			conn->nCharsInWriteBuffer += writelen;
+
 			return 1;
 		}
 
@@ -400,7 +406,6 @@ namespace pvpgn
 
 		static int dbs_packet_getdata(t_d2dbs_connection * conn)
 		{
-			unsigned short	writelen;
 			unsigned short	datatype;
 			unsigned short	datalen;
 			unsigned int	result;
@@ -521,8 +526,15 @@ namespace pvpgn
 				eventlog(eventlog_level_error, __FUNCTION__, "unknown data type {}", datatype);
 				return -1;
 			}
-			writelen = datalen + sizeof(*getret) + std::strlen(CharName) + 1;
-			if (writelen > kBufferSize - conn->nCharsInWriteBuffer) return 0;
+
+			std::size_t buffer_available_len = sizeof(conn->WriteBuf) - conn->nCharsInWriteBuffer;
+			std::size_t writelen = sizeof(*getret) + std::strlen(CharName) + 1 + datalen;
+			if (buffer_available_len < writelen)
+			{
+				eventlog(eventlog_level_error, __FUNCTION__, "[{}] not enough space in write buffer (available space: {}, needed: {})", conn->sd, buffer_available_len, writelen);
+				return 0;
+			}
+
 			bn_short_set(&getret->h.type, D2DBS_D2GS_GET_DATA_REPLY);
 			bn_short_set(&getret->h.size, writelen);
 			bn_int_set(&getret->h.seqno, bn_int_get(getcom->h.seqno));
@@ -530,10 +542,17 @@ namespace pvpgn
 			bn_int_set(&getret->result, result);
 			bn_short_set(&getret->datalen, datalen);
 			writepos += sizeof(*getret);
-			std::strncpy(writepos, CharName, MAX_CHARNAME_LEN);
+
+			std::memcpy(writepos, CharName, std::strlen(CharName) + 1);
 			writepos += std::strlen(CharName) + 1;
-			if (datalen) std::memcpy(writepos, databuf, datalen);
+
+			if (datalen)
+			{
+				std::memcpy(writepos, databuf, datalen);
+			}
+
 			conn->nCharsInWriteBuffer += writelen;
+
 			return 1;
 		}
 
