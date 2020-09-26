@@ -378,7 +378,7 @@ namespace pvpgn
 
 					CURLM* curl_multi_handle = std::get<0>(tuple);
 					CURLMcode code = curl_multi_add_handle(curl_multi_handle, curl);
-					if (code == CURLE_OK)
+					if (code == CURLM_OK)
 					{
 						eventlog(eventlog_level_trace, __FUNCTION__, "Added handle to CURL multi handle ({})", curl_multi_handle);
 					}
