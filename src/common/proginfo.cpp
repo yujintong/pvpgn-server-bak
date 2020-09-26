@@ -22,6 +22,10 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <string>
+
+#include <fmt/format.h>
+
 #include "common/setup_after.h"
 
 
@@ -82,16 +86,13 @@ namespace pvpgn
 	}
 
 
-	extern char const * vernum_to_verstr(unsigned long vernum)
+	extern std::string vernum_to_verstr(std::uint32_t vernum)
 	{
-		static char verstr[16];
-
-		std::sprintf(verstr, "%lu.%lu.%lu.%lu",
+		return fmt::format("{}.{}.{}.{}",
 			(vernum >> 24),
 			(vernum >> 16) & 0xff,
 			(vernum >> 8) & 0xff,
-			(vernum)& 0xff);
-		return verstr;
+			(vernum) & 0xff);
 	}
 
 }
