@@ -2924,7 +2924,7 @@ namespace pvpgn
 
 			// read text from w3motd.txt
 			{
-				fmt::memory_buffer serverinfo;
+				std::string serverinfo;
 
 				std::string filename = i18n_filename(prefs_get_motdw3file(), conn_get_gamelang_localized(c));
 				std::FILE* fp = std::fopen(filename.c_str(), "r");
@@ -2945,10 +2945,10 @@ namespace pvpgn
 				else
 				{
 					eventlog(eventlog_level_error, __FUNCTION__, "Failed to open w3motd file \"{}\"", filename);
-					fmt::format_to(serverinfo, "An error has occurred.");
+					fmt::format_to(std::back_inserter(serverinfo), "An error has occurred.");
 				}
 
-				packet_append_string(rpacket, serverinfo.data());
+				packet_append_string(rpacket, serverinfo.c_str());
 			}
 
 			conn_push_outqueue(c, rpacket);
