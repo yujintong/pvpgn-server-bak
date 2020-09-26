@@ -3795,7 +3795,7 @@ namespace pvpgn
 
 		static int conf_set_smtp_ca_cert_store_fetch_interval(const char* valstr)
 		{
-			return conf_set_int(&prefs_runtime_config.smtp_ca_cert_store_fetch_interval, valstr, NULL);
+			return conf_set_int(&prefs_runtime_config.smtp_ca_cert_store_fetch_interval, valstr, 0);
 		}
 
 		static const char* conf_get_smtp_ca_cert_store_fetch_interval(void)
@@ -3805,7 +3805,7 @@ namespace pvpgn
 
 		static int conf_setdef_smtp_ca_cert_store_fetch_interval(void)
 		{
-			return conf_set_int(&prefs_runtime_config.smtp_ca_cert_store_fetch_interval, NULL, 30);
+			return conf_set_int(&prefs_runtime_config.smtp_ca_cert_store_fetch_interval, NULL, BNETD_SMTP_CERT_STORE_FETCH_INTERVAL);
 		}
 
 
@@ -3837,7 +3837,7 @@ namespace pvpgn
 
 		static int conf_set_smtp_port(const char* valstr)
 		{
-			return conf_set_int(&prefs_runtime_config.smtp_port, valstr, NULL);
+			return conf_set_int(&prefs_runtime_config.smtp_port, valstr, 0);
 		}
 
 		static const char* conf_get_smtp_port(void)
@@ -3847,7 +3847,7 @@ namespace pvpgn
 
 		static int conf_setdef_smtp_port(void)
 		{
-			return conf_set_int(&prefs_runtime_config.smtp_port, NULL, 587);
+			return conf_set_int(&prefs_runtime_config.smtp_port, NULL, BNETD_SMTP_PORT);
 		}
 
 

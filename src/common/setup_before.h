@@ -237,6 +237,8 @@ const char * const BNETD_EXEINFO_MATCH = "true";
 const unsigned PVPGN_VERSION_TIMEDIV = 0; /* no timediff check by default */
 const int PVPGN_CACHE_MEMLIMIT = 5000000;  /* bytes */
 const char * const PVPGN_DEFAULT_SYMB = "-_[]";
+const unsigned int BNETD_SMTP_CERT_STORE_FETCH_INTERVAL = 30;
+const unsigned int BNETD_SMTP_PORT = 587;
 
 const char * const BNETD_LOG_COMMAND_GROUPS = "2345678";
 const char * const BNETD_LOG_COMMAND_LIST = "";
