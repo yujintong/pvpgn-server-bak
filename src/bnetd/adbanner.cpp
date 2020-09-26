@@ -164,9 +164,9 @@ namespace pvpgn
 				default:
 				{
 					bn_int ext;
-					std::vector<const AdBanner&> candidates = {};
+					std::vector<AdBanner*> candidates = {};
 
-					for (const auto& ad : this->m_banners)
+					for (auto& ad : this->m_banners)
 					{
 						if ((ad.get_client() == client_tag || ad.get_client() == 0)
 							&& (ad.get_language() == client_lang || ad.get_language() == 0))
@@ -191,7 +191,8 @@ namespace pvpgn
 									continue;
 								}
 							}
-							candidates.push_back(ad);
+
+							candidates.push_back(&ad);
 						}
 					}
 
@@ -211,7 +212,7 @@ namespace pvpgn
 					else
 					{
 						// if prev_id in middle (for first and last idx=0)
-						if (prev_ad_id != 0 && prev_ad_id != candidates.at(candidates.size() - 1).get_id())
+						if (prev_ad_id != 0 && prev_ad_id != candidates.at(candidates.size() - 1)->get_id())
 						{
 							bool prev_found = false;
 							for (unsigned int i = 0; i < candidates.size(); i++)
@@ -221,7 +222,7 @@ namespace pvpgn
 									idx = i;
 									break;
 								}
-								if (prev_ad_id == candidates.at(i).get_id())
+								if (prev_ad_id == candidates.at(i)->get_id())
 								{
 									prev_found = true;
 								}
@@ -236,7 +237,7 @@ namespace pvpgn
 						client_lang ? tag_uint_to_str(lang, client_lang) : "NULL");
 					*/
 
-					const AdBanner* const ad = &candidates.at(idx);
+					const AdBanner* const ad = candidates.at(idx);
 					return ad;
 				}
 				}
