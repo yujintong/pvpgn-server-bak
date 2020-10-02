@@ -231,6 +231,9 @@ namespace pvpgn
 #define INCLUDED_CONNECTION_PROTOS
 
 #include <ctime>
+#include <string>
+
+#include <optional.hpp>
 
 #define JUST_NEED_TYPES
 #include "common/packet.h"
@@ -365,7 +368,7 @@ namespace pvpgn
 		extern int conn_unget_chatcharname(t_connection const * c, char const * name);
 		extern t_message_class conn_get_message_class(t_connection const * c, t_connection const * dst);
 		extern unsigned int conn_get_userid(t_connection const * c);
-		extern char const * conn_get_playerinfo(t_connection const * c);
+		extern nonstd::optional<std::string> conn_get_playerinfo(t_connection const * c);
 		extern int conn_set_playerinfo(t_connection const * c, char const * playerinfo);
 		extern char const * conn_get_realminfo(t_connection const * c);
 		extern int conn_set_realminfo(t_connection * c, char const * realminfo);

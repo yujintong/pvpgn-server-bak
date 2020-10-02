@@ -31,7 +31,10 @@
 #include <fstream>
 #include <limits>
 #include <sstream>
+#include <string>
 #include <tuple>
+
+#include <optional.hpp>
 
 #include "compat/strcasecmp.h"
 #include "compat/strncasecmp.h"
@@ -3580,7 +3583,23 @@ namespace pvpgn
 
 				if (account) {
 					packet_append_string(rpacket, username);
-					packet_append_string(rpacket, conn_get_playerinfo(c));
+
+					nonstd::optional<std::string> playerinfo = conn_get_playerinfo(c);
+					if (playerinfo.has_value())
+					{
+						packet_append_string(rpacket, playerinfo.value().c_str());
+					}
+					else
+					{
+						// just send reversed client tag, it's better than nothing
+
+						t_clienttag client_tag = conn_get_clienttag(c);
+						char reversed_client_tag[5] = {};
+						tag_uint_to_revstr(reversed_client_tag, client_tag);
+
+						packet_append_string(rpacket, reversed_client_tag);
+					}
+
 					packet_append_string(rpacket, username);
 				}
 				else {
