@@ -4825,7 +4825,7 @@ namespace pvpgn
 				msgtemp = localize(c, "Your latency {}", conn_get_latency(c));
 			}
 			else if ((user = connlist_find_connection_by_accountname(text)))
-				msgtemp = localize(c, "{} latency ()", text, conn_get_latency(user));
+				msgtemp = localize(c, "{} latency {}", text, conn_get_latency(user));
 			else
 			{
 				msgtemp = localize(c, "Invalid user.");
