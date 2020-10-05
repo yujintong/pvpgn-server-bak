@@ -65,11 +65,11 @@ On Windows, [Magic Builder](https://github.com/pvpgn/pvpgn-magic-builder) is a c
 
 #### Ubuntu / Debian
 ```
-apt install build-essential git cmake zlib1g-dev
-apt install liblua5.1-0-dev # Lua support
-apt install mysql-server mysql-client libmysqlclient-dev # MySQL support
-apt install sqlite3 libsqlite3-dev # SQLite3 support
-apt install postgresql libpq-dev # PostgreSQL support
+apt install -y build-essential git cmake zlib1g-dev libcurl4-openssl-dev
+apt install -y liblua5.1-0-dev # Lua support
+apt install -y mysql-server mysql-client libmysqlclient-dev # MySQL support
+apt install -y sqlite3 libsqlite3-dev # SQLite3 support
+apt install -y postgresql libpq-dev # PostgreSQL support
 ```
 
 #### CentOS 8
