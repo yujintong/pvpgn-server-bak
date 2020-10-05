@@ -74,11 +74,11 @@ apt install -y postgresql libpq-dev # PostgreSQL support
 
 #### CentOS 8
 ```
-dnf install gcc-c++ make git cmake zlib-devel
-# Lua 5.1 must be compiled and installed from source.
-dnf install mysql-server mysql-devel
-dnf install sqlite-devel
-dnf install postgresql
+dnf -y install wget gcc-c++ make git cmake zlib-devel libcurl-devel
+dnf -y install readline-devel && wget -c https://www.lua.org/ftp/lua-5.1.5.tar.gz -O - | tar -xz && cd lua-5.1.5 && make linux && make install # Lua 5.1 must be compiled and installed from source. Newer version not supported yet.
+dnf -y install mysql-server mysql-devel
+dnf -y install sqlite-devel
+dnf -y install postgresql
 ```
 
 ##### CentOS 7
