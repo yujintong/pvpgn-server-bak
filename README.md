@@ -63,7 +63,7 @@ On Windows, [Magic Builder](https://github.com/pvpgn/pvpgn-magic-builder) is a c
 
 ### Obtain packages.
 
-#### Ubuntu / Debian
+#### Ubuntu / Debian 10
 ```
 apt install -y build-essential git cmake zlib1g-dev libcurl4-openssl-dev
 apt install -y liblua5.1-0-dev # Lua support
@@ -83,23 +83,21 @@ dnf -y install postgresql
 
 ##### CentOS 7
 ```
-sudo yum -y install epel-release centos-release-scl
-sudo yum -y install git zlib-devel cmake3 devtoolset-4-gcc*
-sudo ln -s /usr/bin/cmake3 /usr/bin/cmake
+yum -y install epel-release centos-release-scl
+yum -y install git zlib-devel cmake3 libcurl-devel devtoolset-7-gcc*
+ln -s /usr/bin/cmake3 /usr/bin/cmake
+scl enable devtoolset-7 bash
 ```
 
-##### Fedora
+##### Fedora 32
 ```
-dnf install gcc-c++ make git cmake zlib-devel
-# Lua?
-dnf install community-mysql-server
-# SQLite3?
-# PostgreSQL?
+dnf -y install gcc-c++ make git cmake zlib-devel libcurl-devel
+dnf -y install community-mysql-server
 ```
 
-#### FreeBSD 11
+#### FreeBSD 12
 ```
-pkg install git cmake
+env ASSUME_ALWAYS_YES=yes pkg install git cmake curl
 # Lua?
 # MySQL?
 # SQLite3?
