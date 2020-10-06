@@ -27,8 +27,10 @@
 #include <cstdlib>
 #include <cstring>
 #include <ctime>
+#include <string>
 
 #include <fmt/format.h>
+#include <optional.hpp>
 
 #include "compat/strcasecmp.h"
 
@@ -1740,13 +1742,12 @@ namespace pvpgn
 
 		extern int irc_send_topic(t_connection* c, t_channel const* channel)
 		{
-			class_topic Topic;
-			std::string topicstr = Topic.get(channel_get_name(channel));
+			nonstd::optional<std::string> topic = channel_get_topic(channel);
 			char temp[MAX_IRC_MESSAGE_LEN];
 
-			if (topicstr.empty() == false)
+			if (topic.has_value())
 			{
-				std::snprintf(temp, sizeof(temp), "%s :%s", irc_convert_channel(channel, c), topicstr.c_str());
+				std::snprintf(temp, sizeof(temp), "%s :%s", irc_convert_channel(channel, c), topic.value().c_str());
 				irc_send(c, RPL_TOPIC, temp);
 			}
 			else
@@ -1765,15 +1766,17 @@ namespace pvpgn
 		{
 			char** e = NULL;
 			char temp[MAX_IRC_MESSAGE_LEN];
-			class_topic Topic;
 
 			if (params && params[0])
 			{
 				if (conn_get_wol(conn) == 1) {
 					t_channel* channel = conn_get_channel(conn);
 					if (channel)
-						Topic.set(std::string(channel_get_name(channel)), std::string(text), false);
-					else {
+					{
+						channel_set_topic(channel, text);
+					}
+					else
+					{
 						std::snprintf(temp, sizeof(temp), "%s :You're not on that channel", params[0]);
 						irc_send(conn, ERR_NOTONCHANNEL, temp);
 					}

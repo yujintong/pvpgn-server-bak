@@ -1329,6 +1329,7 @@ namespace pvpgn
 					clanlist_save();
 					gamelist_check_voidgame();
 					ladders.save();
+					topiclist_save();
 					next_savetime += prefs_get_user_sync_timer();
 				}
 				accountlist_save(FS_NONE);
