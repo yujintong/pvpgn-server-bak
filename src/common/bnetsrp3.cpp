@@ -59,7 +59,7 @@ namespace pvpgn
 
 	BigInt BnetSRP3::N = BigInt(bnetsrp3_N, 32);
 	BigInt BnetSRP3::g = BigInt(bnetsrp3_g);
-	BigInt BnetSRP3::I = BigInt(bnetsrp3_I, 32);
+	BigInt BnetSRP3::I = BigInt(bnetsrp3_I, 20);
 
 	int
 		BnetSRP3::init(const char* username_, const char* password_, BigInt* salt_)
