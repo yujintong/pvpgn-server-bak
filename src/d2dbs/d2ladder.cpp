@@ -304,15 +304,22 @@ namespace pvpgn
 		{
 			d2ladder_change_count = 0;
 			d2ladder_maxtype = 0;
-			d2ladder_ladder_file = (char*)xmalloc(std::strlen(d2dbs_prefs_get_ladder_dir()) + 1 +
-				std::strlen(LADDER_FILE_PREFIX) + 1 + std::strlen(CLIENTTAG_DIABLO2DV) + 1 + 10);
-			d2ladder_backup_file = (char*)xmalloc(std::strlen(d2dbs_prefs_get_ladder_dir()) + 1 +
-				std::strlen(LADDER_BACKUP_PREFIX) + 1 + std::strlen(CLIENTTAG_DIABLO2DV) + 1 + 10);
-			std::sprintf(d2ladder_ladder_file, "%s/%s.%s", d2dbs_prefs_get_ladder_dir(), \
-				LADDER_FILE_PREFIX, CLIENTTAG_DIABLO2DV);
 
-			std::sprintf(d2ladder_backup_file, "%s/%s.%s", d2dbs_prefs_get_ladder_dir(), \
-				LADDER_BACKUP_PREFIX, CLIENTTAG_DIABLO2DV);
+			try
+			{
+				std::size_t d2ladder_ladder_file_len = fmt::formatted_size("{}/{}.{}", d2dbs_prefs_get_ladder_dir(), LADDER_FILE_PREFIX, CLIENTTAG_DIABLO2DV) + 1;
+				d2ladder_ladder_file = static_cast<char*>(xmalloc(d2ladder_ladder_file_len));
+				fmt::format_to_n(std::back_inserter(d2ladder_ladder_file), d2ladder_ladder_file_len, "{}/{}.{}", d2dbs_prefs_get_ladder_dir(), LADDER_FILE_PREFIX, CLIENTTAG_DIABLO2DV);
+
+				std::size_t d2ladder_backup_file_len = fmt::formatted_size("{}/{}.{}", d2dbs_prefs_get_ladder_dir(), LADDER_BACKUP_PREFIX, CLIENTTAG_DIABLO2DV) + 1;
+				d2ladder_backup_file = static_cast<char*>(xmalloc(d2ladder_backup_file_len));
+				fmt::format_to_n(std::back_inserter(d2ladder_backup_file), d2ladder_backup_file_len, "{}/{}.{}", d2dbs_prefs_get_ladder_dir(), LADDER_BACKUP_PREFIX, CLIENTTAG_DIABLO2DV);
+			}
+			catch (const std::exception& e)
+			{
+				eventlog(eventlog_level_error, __FUNCTION__, "error initializing d2ladder_ladder_file and d2ladder_backup_file ({})", e.what());
+				return -1;
+			}
 
 			if (d2ladderlist_init() < 0) {
 				return -1;

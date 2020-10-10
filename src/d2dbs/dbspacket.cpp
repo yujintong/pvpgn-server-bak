@@ -23,6 +23,9 @@
 #include <cerrno>
 #include <cstring>
 #include <ctime>
+#include <string>
+
+#include <fmt/format.h>
 
 #ifdef HAVE_SYS_TYPES_H
 # include <sys/types.h>
@@ -73,9 +76,6 @@ namespace pvpgn
 
 		static unsigned int dbs_packet_savedata_charsave(t_d2dbs_connection* conn, char * AccountName, char * CharName, char * data, unsigned int datalen)
 		{
-			char filename[MAX_PATH];
-			char savefile[MAX_PATH];
-			char bakfile[MAX_PATH];
 			std::FILE * fd;
 			int checksum_header;
 			int checksum_calc;
@@ -94,8 +94,8 @@ namespace pvpgn
 			}
 
 
-			std::sprintf(filename, "%s/.%s.tmp", d2dbs_prefs_get_charsave_dir(), CharName);
-			fd = std::fopen(filename, "wb");
+			std::string filename = fmt::format("{}/.{}.tmp", d2dbs_prefs_get_charsave_dir(), CharName);
+			fd = std::fopen(filename.c_str(), "wb");
 			if (!fd) {
 				eventlog(eventlog_level_error, __FUNCTION__, "open() failed : {}", filename);
 				return 0;
@@ -118,12 +118,12 @@ namespace pvpgn
 			}
 			std::fclose(fd);
 
-			std::sprintf(bakfile, "%s/%s", prefs_get_charsave_bak_dir(), CharName);
-			std::sprintf(savefile, "%s/%s", d2dbs_prefs_get_charsave_dir(), CharName);
-			if (p_rename(savefile, bakfile) == -1) {
+			std::string bakfile = fmt::format("{}/{}", prefs_get_charsave_bak_dir(), CharName);
+			std::string savefile = fmt::format("{}/{}", d2dbs_prefs_get_charsave_dir(), CharName);
+			if (p_rename(savefile.c_str(), bakfile.c_str()) == -1) {
 				eventlog(eventlog_level_warn, __FUNCTION__, "error std::rename {} to {}", savefile, bakfile);
 			}
-			if (p_rename(filename, savefile) == -1) {
+			if (p_rename(filename.c_str(), savefile.c_str()) == -1) {
 				eventlog(eventlog_level_error, __FUNCTION__, "error std::rename {} to {}", filename, savefile);
 				return 0;
 			}
@@ -133,20 +133,16 @@ namespace pvpgn
 
 		static unsigned int dbs_packet_savedata_charinfo(t_d2dbs_connection* conn, char * AccountName, char * CharName, char * data, unsigned int datalen)
 		{
-			char savefile[MAX_PATH];
-			char bakfile[MAX_PATH];
-			char filepath[MAX_PATH];
-			char filename[MAX_PATH];
 			std::FILE * fd;
 			struct stat statbuf;
 
 			strtolower(AccountName);
 			strtolower(CharName);
 
-			std::sprintf(filepath, "%s/%s", prefs_get_charinfo_bak_dir(), AccountName);
-			if (stat(filepath, &statbuf) == -1)
+			std::string filepath = fmt::format("{}/{}", prefs_get_charinfo_bak_dir(), AccountName);
+			if (stat(filepath.c_str(), &statbuf) == -1)
 			{
-				if (p_mkdir(filepath, S_IRWXU | S_IRWXG | S_IRWXO) == 0)
+				if (p_mkdir(filepath.c_str(), S_IRWXU | S_IRWXG | S_IRWXO) == 0)
 				{
 					eventlog(eventlog_level_info, __FUNCTION__, "created charinfo directory: {}", filepath);
 				}
@@ -158,8 +154,8 @@ namespace pvpgn
 				
 			}
 
-			std::sprintf(filename, "%s/%s/.%s.tmp", d2dbs_prefs_get_charinfo_dir(), AccountName, CharName);
-			fd = std::fopen(filename, "wb");
+			std::string filename = fmt::format("{}/{}/.{}.tmp", d2dbs_prefs_get_charinfo_dir(), AccountName, CharName);
+			fd = std::fopen(filename.c_str(), "wb");
 			if (!fd) {
 				eventlog(eventlog_level_error, __FUNCTION__, "open() failed : {}", filename);
 				return 0;
@@ -182,12 +178,12 @@ namespace pvpgn
 			}
 			std::fclose(fd);
 
-			std::sprintf(bakfile, "%s/%s/%s", prefs_get_charinfo_bak_dir(), AccountName, CharName);
-			std::sprintf(savefile, "%s/%s/%s", d2dbs_prefs_get_charinfo_dir(), AccountName, CharName);
-			if (p_rename(savefile, bakfile) == -1) {
+			std::string bakfile = fmt::format("{}/{}/{}", prefs_get_charinfo_bak_dir(), AccountName, CharName);
+			std::string savefile = fmt::format("{}/{}/{}", d2dbs_prefs_get_charinfo_dir(), AccountName, CharName);
+			if (p_rename(savefile.c_str(), bakfile.c_str()) == -1) {
 				eventlog(eventlog_level_info, __FUNCTION__, "error std::rename {} to {}", savefile, bakfile);
 			}
-			if (p_rename(filename, savefile) == -1) {
+			if (p_rename(filename.c_str(), savefile.c_str()) == -1) {
 				eventlog(eventlog_level_error, __FUNCTION__, "error std::rename {} to {}", filename, savefile);
 				return 0;
 			}
@@ -197,24 +193,22 @@ namespace pvpgn
 
 		static unsigned int dbs_packet_getdata_charsave(t_d2dbs_connection* conn, char * AccountName, char * CharName, char * data, long bufsize)
 		{
-			char filename[MAX_PATH];
-			char filename_d2closed[MAX_PATH];
 			std::FILE * fd;
 
 			strtolower(AccountName);
 			strtolower(CharName);
 
-			std::sprintf(filename, "%s/%s", d2dbs_prefs_get_charsave_dir(), CharName);
-			std::sprintf(filename_d2closed, "%s/%s.d2s", d2dbs_prefs_get_charsave_dir(), CharName);
-			if ((access(filename, F_OK) < 0) && (access(filename_d2closed, F_OK) == 0))
+			std::string filename = fmt::format("{}/{}", d2dbs_prefs_get_charsave_dir(), CharName);
+			std::string filename_d2closed = fmt::format("{}/{}.d2s", d2dbs_prefs_get_charsave_dir(), CharName);
+			if ((access(filename.c_str(), F_OK) < 0) && (access(filename_d2closed.c_str(), F_OK) == 0))
 			{
-				if (std::rename(filename_d2closed, filename) != 0)
+				if (std::rename(filename_d2closed.c_str(), filename.c_str()) != 0)
 				{
 					eventlog(eventlog_level_error, __FUNCTION__, "failed to rename file \"{}\" to \"{}\"", filename_d2closed, filename);
 					return 0;
 				}
 			}
-			fd = std::fopen(filename, "rb");
+			fd = std::fopen(filename.c_str(), "rb");
 			if (!fd) {
 				eventlog(eventlog_level_error, __FUNCTION__, "open() failed : {}", filename);
 				return 0;
@@ -257,14 +251,13 @@ namespace pvpgn
 
 		static unsigned int dbs_packet_getdata_charinfo(t_d2dbs_connection* conn, char * AccountName, char * CharName, char * data, unsigned int bufsize)
 		{
-			char filename[MAX_PATH];
 			std::FILE * fd;
 
 			strtolower(AccountName);
 			strtolower(CharName);
 
-			std::sprintf(filename, "%s/%s/%s", d2dbs_prefs_get_charinfo_dir(), AccountName, CharName);
-			fd = std::fopen(filename, "rb");
+			std::string filename = fmt::format("{}/{}/{}", d2dbs_prefs_get_charinfo_dir(), AccountName, CharName);
+			fd = std::fopen(filename.c_str(), "rb");
 			if (!fd) {
 				eventlog(eventlog_level_error, __FUNCTION__, "open() failed : {}", filename);
 				return 0;
