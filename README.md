@@ -81,7 +81,7 @@ dnf -y install sqlite-devel
 dnf -y install postgresql
 ```
 
-##### CentOS 7
+#### CentOS 7
 ```
 yum -y install epel-release centos-release-scl
 yum -y install git zlib-devel cmake3 libcurl-devel devtoolset-7-gcc*
@@ -89,7 +89,7 @@ ln -s /usr/bin/cmake3 /usr/bin/cmake
 scl enable devtoolset-7 bash
 ```
 
-##### Fedora 32
+#### Fedora 32
 ```
 dnf -y install gcc-c++ make git cmake zlib-devel libcurl-devel
 dnf -y install community-mysql-server
