@@ -309,11 +309,13 @@ namespace pvpgn
 			{
 				std::size_t d2ladder_ladder_file_len = fmt::formatted_size("{}/{}.{}", d2dbs_prefs_get_ladder_dir(), LADDER_FILE_PREFIX, CLIENTTAG_DIABLO2DV) + 1;
 				d2ladder_ladder_file = static_cast<char*>(xmalloc(d2ladder_ladder_file_len));
+				std::memset(d2ladder_ladder_file, 0, d2ladder_ladder_file_len);
 				fmt::format_to(d2ladder_ladder_file, "{}/{}.{}", d2dbs_prefs_get_ladder_dir(), LADDER_FILE_PREFIX, CLIENTTAG_DIABLO2DV);
 
 				std::size_t d2ladder_backup_file_len = fmt::formatted_size("{}/{}.{}", d2dbs_prefs_get_ladder_dir(), LADDER_BACKUP_PREFIX, CLIENTTAG_DIABLO2DV) + 1;
 				d2ladder_backup_file = static_cast<char*>(xmalloc(d2ladder_backup_file_len));
 				fmt::format_to(d2ladder_backup_file, "{}/{}.{}", d2dbs_prefs_get_ladder_dir(), LADDER_BACKUP_PREFIX, CLIENTTAG_DIABLO2DV);
+				*(d2ladder_backup_file + d2ladder_backup_file_len - 1) = '\0';
 			}
 			catch (const std::exception& e)
 			{
