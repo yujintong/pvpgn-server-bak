@@ -49,7 +49,10 @@ By default, tracking is enabled and is only used for the purpose of sending info
 
 ## Support
 [Create an issue](https://github.com/pvpgn/pvpgn-server/issues) if you have any questions, suggestions, or anything else to say about PvPGN-PRO. Please note that D2GS is not part of the PvPGN project and is therefore unsupported here.
-Set `loglevels = fatal,error,warn,info,debug,trace` in `bnetd.conf` before obtaining logs and posting them.
+
+You may also find people familiar with PvPGN at these Discord servers:
+- **#botdev** at [Discord - BNETDocs](https://discord.com/invite/u87WVeu)
+- **#pvpgn-d2gs-support** at [Discord - DIABLO2.ORG](https://discord.com/invite/FkFJNBu)
 
 ## Development
 Submit pull requests to contribute to this project. Utilize C++11 features and adhere to the [C++ Core Guidelines](https://github.com/isocpp/CppCoreGuidelines/blob/master/CppCoreGuidelines.md) whenever possible.
