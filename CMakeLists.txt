@@ -33,12 +33,12 @@ include(ConfigureChecks.cmake)
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 	# using Clang
 
-	set( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wcast-qual -pedantic")
+	set( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wno-implicit-fallthrough -pedantic")
 
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 	# using G++
 
-	set( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wcast-qual -pedantic" )
+	set( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wno-implicit-fallthrough -pedantic" )
 
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
 	# using Visual Studio
