@@ -33,23 +33,15 @@ include(ConfigureChecks.cmake)
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 	# using Clang
 
-	set( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -O3 -march=native -mtune=native -pedantic -stdlib=libc++")
+	set( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wcast-qual -pedantic")
 
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 	# using G++
 
-	if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 5.1)
-		message(FATAL_ERROR "G++ 5.1 or higher required")
-	endif()
-
-	set( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -O3 -march=native -mtune=native -pedantic -Wno-variadic-macros" )
+	set( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wcast-qual -pedantic" )
 
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
 	# using Visual Studio
-
-	if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 19.0)
-		message(FATAL_ERROR "Visual Studio 2015 or higher required")
-	endif()
 
 	add_definitions(
 		-D_CRT_SECURE_NO_DEPRECATE
