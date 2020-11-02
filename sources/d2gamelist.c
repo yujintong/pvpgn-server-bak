@@ -147,13 +147,13 @@ void D2GSDeleteAllCharInGame(D2GAMEINFO *lpGameInfo)
  * Purpose: to insert a new game info the game info list
  * Return: 0(success), other(failed)
  *********************************************************************/
-int D2GSGameListInsert(UCHAR *GameName, UCHAR expansion,
+int D2GSGameListInsert(const char* game_name, const char* game_pass, const char* game_desc, UCHAR expansion,
 						UCHAR difficulty, UCHAR hardcore, WORD wGameId)
 {
 	D2GAMEINFO		*lpGameInfo;
 	D2GAMEINFO		*lpTemp;
 
-	if (!GameName) return D2GSERROR_BAD_PARAMETER;
+	if (!game_name || !game_pass || !game_desc) return D2GSERROR_BAD_PARAMETER;
 
 	/* alloc memory for the structure */
 	lpGameInfo = (D2GAMEINFO *)malloc(sizeof(D2GAMEINFO));
@@ -161,7 +161,9 @@ int D2GSGameListInsert(UCHAR *GameName, UCHAR expansion,
 
 	/* fill the fields */
 	ZeroMemory(lpGameInfo, sizeof(D2GAMEINFO));
-	strncpy(lpGameInfo->GameName, GameName, MAX_GAMENAME_LEN-1);
+	strncpy(lpGameInfo->GameName, game_name, MAX_GAMENAME_LEN-1);
+	snprintf(lpGameInfo->game_pass, sizeof(lpGameInfo->game_pass), "%s", game_pass);
+	snprintf(lpGameInfo->game_desc, sizeof(lpGameInfo->game_desc), "%s", game_desc);
 	lpGameInfo->expansion  = expansion;
 	lpGameInfo->difficulty = difficulty;
 	lpGameInfo->hardcore   = hardcore;
@@ -184,7 +186,7 @@ int D2GSGameListInsert(UCHAR *GameName, UCHAR expansion,
 	LeaveCriticalSection(&csGameList);
 
 	D2GSEventLog("D2GSGameListInsert",
-		"Insert into game list '%s' (%u)", GameName, wGameId);
+		"Insert into game list '%s' (%u)", game_name, wGameId);
 	return 0;
 
 } /* End of D2GSGameListInsert() */
@@ -634,7 +636,7 @@ void D2GSGetDataRequestTimerRoutine(void)
 		lpGetDataReq = lpGetDataReq->next;
 		if (lpTimeOutReq) {
 			dwClientId = lpTimeOutReq->ClientId;
-			D2GSSendDatabaseCharacter(dwClientId, NULL, 0, 0, TRUE, 0, NULL);
+			D2GSSendDatabaseCharacter(dwClientId, NULL, 0, 0, TRUE, 0, NULL, 1);
 			D2GSEventLog("D2GSGetDataRequestTimerRoutine",
 				"Failed get CHARSAVE data for '%s'(*%s)",
 				lpTimeOutReq->CharName, lpTimeOutReq->AcctName);

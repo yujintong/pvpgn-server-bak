@@ -33,6 +33,8 @@ typedef struct RAW_D2CHARINFO {
 
 typedef struct RAW_D2GAMEINFO {
 	bn_char		GameName[MAX_GAMENAME_LEN];
+	bn_char		game_pass[MAX_GAMEPASS_LEN];
+	bn_char		game_desc[MAX_GAMEDESC_LEN];
 	bn_byte		expansion;
 	bn_byte		difficulty;
 	bn_byte		hardcore;
@@ -71,7 +73,7 @@ void D2GSResetGameList(void);
 int  D2GSGetCurrentGameNumber(void);
 int  D2GSGetCurrentGameStatistic(DWORD *gamenum, DWORD *usernum);
 void D2GSDeleteAllCharInGame(D2GAMEINFO *lpGameInfo);
-int  D2GSGameListInsert(UCHAR *GameName, UCHAR expansion,
+int  D2GSGameListInsert(const char* game_name, const char* game_pass, const char* game_desc, UCHAR expansion,
 						UCHAR difficulty, UCHAR hardcore, WORD wGameId);
 int  D2GSGameListDelete(D2GAMEINFO *lpGameInfo);
 int  D2GSInsertCharIntoGameInfo(D2GAMEINFO *lpGameInfo, DWORD token, UCHAR *AcctName,

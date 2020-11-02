@@ -28,6 +28,9 @@ void D2GSAuthreq(LPVOID *lpdata);
 void D2GSAuthReply(LPVOID *lpdata);
 void D2GSSetD2CSMaxGameNumber(DWORD maxgamenum);
 void D2XSEchoReply(int peer);
+void D2CSControlCmd(LPVOID* lpdata);
+void D2GSSetInitInfo(LPVOID* lpdata);
+void D2GSSetConfFile(LPVOID* lpdata);
 void D2CSCreateEmptyGame(LPVOID *lpdata);
 void D2CSClientJoinGameRequest(LPVOID *lpdata);
 

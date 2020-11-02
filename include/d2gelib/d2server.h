@@ -56,8 +56,9 @@ typedef struct
 	DWORD					dwBusySleep;
 	DWORD					dwMaxGame;
 	DWORD					dwProcessAffinityMask;
+	DWORD					dwReserved[26];
 } D2GSINFO, * PD2GSINFO, * LPD2GSINFO;
-#define D2GS_LIBRARY_VERSION	0x00010913
+#define D2GS_LIBRARY_VERSION	0x010A0304
 #define	DEFAULT_IDLE_SLEEP		10
 #define	DEFAULT_BUSY_SLEEP		30
 #define DEFAULT_MAX_GAME		100
@@ -70,6 +71,8 @@ typedef struct
 {
 	PLAYERMARK	PlayerMark;
 	DWORD		dwReserved;
+	UCHAR		CharName[16];
+	UCHAR		AcctName[16];
 } PLAYERINFO, * PPLAYERINFO, * LPPLAYERINFO;
 
 typedef BOOL  (__stdcall * D2GSStartFunc ) (LPD2GSINFO lpD2GSInfo);
@@ -79,22 +82,101 @@ typedef BOOL  (__stdcall * D2GSNewEmptyGameFunc) (LPCSTR lpGameName, LPCSTR lpGa
 					BYTE bReserved2, LPWORD pwGameId);
 typedef BOOL  (__stdcall * D2GSSendDatabaseCharacterFunc)(DWORD dwClientId, LPVOID lpSaveData,
 					DWORD dwSize, DWORD dwTotalSize, BOOL bLock,
-					DWORD dwReserved1, LPPLAYERINFO lpPlayerInfo);
+					DWORD dwReserved1, LPPLAYERINFO lpPlayerInfo, DWORD dwReserved2);
 typedef VOID  (__stdcall * D2GSRemoveClientFromGameFunc)(DWORD dwClientId);
 typedef VOID  (__stdcall * D2GSEndAllGamesFunc) (VOID);
 
 typedef DWORD (__stdcall * D2GSSendClientChatMessageFunc)(DWORD dwClientId,
 		DWORD dwType, DWORD dwColor, LPCSTR lpName, LPCSTR lpText);
 
+typedef BOOL(__stdcall* D2GSSetTickCountFunc)(int TickCount);
+
+typedef BOOL(__stdcall* D2GSSetACDataFunc)(LPCSTR data);
+
+typedef BOOL(__stdcall* D2GSLoadConfigFunc)(LPCSTR filename);
+
+typedef DWORD(__stdcall* D2GSInitConfigFunc)(void);
+
 typedef struct 
 {
 	DWORD							Reserved;		/* Reserved, ignore it */
+	LPCSTR							D2GSLibVer;
 	D2GSStartFunc		 			D2GSStart;
 	D2GSSendDatabaseCharacterFunc 	D2GSSendDatabaseCharacter;
 	D2GSRemoveClientFromGameFunc	D2GSRemoveClientFromGame;
 	D2GSNewEmptyGameFunc			D2GSNewEmptyGame;
 	D2GSEndAllGamesFunc				D2GSEndAllGames;
 	D2GSSendClientChatMessageFunc	D2GSSendClientChatMessage;
+	D2GSSetTickCountFunc			D2GSSetTickCount;
+	/*
+	* Does nothing if param_1 is 0.
+	* BOOL D2GSSetTickCount(DWORD param_1)
+	*/
+	D2GSSetACDataFunc					D2GSSetACData;
+	/*
+	* Pass "0" to disable anticheat i think
+	* D2GSSetACData(char* param_1)
+	*/
+	DWORD							Reserved3;
+	/*
+	* BOOL Reserved3(DWORD param_1)
+	*/
+	D2GSLoadConfigFunc				D2GSLoadConfig;
+	/*
+	* d2server.ini filename max length = 260 bytes
+	* has something to do with world event
+	* also reads 32 bytes from D2GEVar.dat
+	* BOOL D2GSLoadConfig(char* filename)
+	*/
+	DWORD							Reserved4;
+	/*
+	* Returns 1 if it successfully writes 32 bytes of data into D2GEVar.dat, 0 otherwise.
+	* BOOL Reserved4(void)
+	* {
+	*		DWORD DVar1 = GetTickCount();
+	*		if (DVar1 - DAT_68013464 < param_1)
+	*			return 0;
+	*		...
+	*		unknownfunc(0x33445566);
+	*		return WriteToD2GEVar_dat(0x33445566);
+	* }
+	*/
+	D2GSInitConfigFunc				D2GSInitConfig;
+	/*
+	*	void* fp1
+	*	void* fp2
+	*	void* fp3
+	*	void* fp4
+	*	void* fp5
+	*	void* fp6
+	*	void* fp7
+	*	void* fp8
+	*	LPCSTR str1 (128 bytes long)
+	*/
+	DWORD							Reserved5;
+	/*
+	*	DebugGetGameInfo(WORD wGameId);
+	*	Returns a pointer to a struct?
+	*/
+	DWORD							Reserved6;
+	/*
+	BOOL Reserved6(DWORD param_1)
+	{
+		if (DAT_68010ef4 == 0)
+		{
+			return 0;
+		}
+
+		if (param_1 == 0)
+		{
+			param_1 = 300000;
+		}
+
+		DWORD tickCount = GetTickCount();
+
+		return param_1 < tickCount - DAT_68010ef4;
+	}
+	*/
 } D2GSINTERFACE, * PD2GSINTERFACE, * LPD2GSINTERFACE;
 
 
@@ -109,7 +191,7 @@ extern __declspec(dllimport) LPD2GSINTERFACE QueryInterface(VOID);
 
 
 /* callback functions */
-extern VOID __fastcall 	CloseGame(WORD wGameId);
+extern VOID __fastcall 	CloseGame(WORD wGameId, DWORD dwClientTag, DWORD dwTotalEnter, DWORD dwGameLife);
 
 extern VOID __fastcall 	LeaveGame(LPGAMEDATA lpGameData, WORD wGameId, WORD wCharClass,
 				DWORD dwCharLevel, DWORD dwExpLow, DWORD dwExpHigh,
@@ -131,7 +213,7 @@ extern VOID __fastcall 	EnterGame(WORD wGameId, LPCSTR lpCharName, WORD wCharCla
 				DWORD dwCharLevel, DWORD dwZero);
 
 extern BOOL __fastcall 	FindPlayerToken(LPCSTR lpCharName, DWORD dwToken, WORD wGameId,
-					LPSTR lpAccountName, LPPLAYERDATA lpPlayerData);
+					LPSTR lpAccountName, LPPLAYERDATA lpPlayerData, void* unused1, void* unused2);
 
 extern VOID __fastcall 	UnlockDatabaseCharacter(LPGAMEDATA lpGameData, LPCSTR lpCharName,
 						LPCSTR lpAccountName);

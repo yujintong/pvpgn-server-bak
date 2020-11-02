@@ -18,8 +18,8 @@
 #define D2GSERVER					0x04
 
 /* version */
-#define D2GS_VERSION				0x01090006
-#define VERNUM						"1.09 beta6"
+#define D2GS_VERSION				0x01133000
+#define VERNUM						"1.13c"
 #define BUILDDATE					__DATE__ " " __TIME__
 #define D2GS_VERSION_STRING			D2COLOR_GOLDEN "D2GS Version " VERNUM ", build on " BUILDDATE
 
@@ -49,6 +49,8 @@
 
 /* string lengtn */
 #define MAX_GAMENAME_LEN			16
+#define MAX_GAMEPASS_LEN			32
+#define MAX_GAMEDESC_LEN			32
 #define MAX_ACCTNAME_LEN			16
 #define MAX_CHARNAME_LEN			16
 #define MAX_REALMNAME_LEN			32

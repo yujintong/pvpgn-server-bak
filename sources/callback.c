@@ -14,9 +14,9 @@
 EVENTCALLBACKTABLE	gEventCallbackTable;
 
 
-extern void __fastcall CloseGame(WORD wGameId)
+extern void __fastcall CloseGame(WORD wGameId, DWORD dwClientTag, DWORD dwTotalEnter, DWORD dwGameLife)
 {
-	DebugEventCallback("CloseGame",1, _D(wGameId));
+	DebugEventCallback("CloseGame", 4, _D(wGameId), _D(dwClientTag), _D(dwTotalEnter), _D(dwGameLife));
 	D2GSCBCloseGame(wGameId);
 	return;
 }
@@ -86,10 +86,10 @@ extern void __fastcall EnterGame(WORD wGameId, LPCSTR lpCharName, WORD wCharClas
 
 
 extern BOOL __fastcall FindPlayerToken(LPCSTR lpCharName, DWORD dwToken, WORD wGameId,
-					LPSTR lpAccountName, LPPLAYERDATA lpPlayerData)
+					LPSTR lpAccountName, LPPLAYERDATA lpPlayerData, void* unused1, void* unused2)
 {
-	DebugEventCallback("FindPlayerToken",5, _D(lpCharName), _D(dwToken), 
-			_D(wGameId), _D(lpAccountName), _D(lpPlayerData));
+	DebugEventCallback("FindPlayerToken",7, _D(lpCharName), _D(dwToken), 
+			_D(wGameId), _D(lpAccountName), _D(lpPlayerData), _D(unused1), _D(unused2));
 	return D2GSCBFindPlayerToken(lpCharName, dwToken, wGameId, lpAccountName, lpPlayerData);
 }
 

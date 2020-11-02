@@ -17,6 +17,10 @@ D2GSRemoveClientFromGameFunc	D2GSRemoveClientFromGame;
 D2GSNewEmptyGameFunc			D2GSNewEmptyGame;
 D2GSEndAllGamesFunc				D2GSEndAllGames;
 D2GSSendClientChatMessageFunc	D2GSSendClientChatMessage;
+D2GSSetTickCountFunc			D2GSSetTickCount;
+D2GSSetACDataFunc				D2GSSetACData;
+D2GSLoadConfigFunc				D2GSLoadConfig;
+D2GSInitConfigFunc				D2GSInitConfig;
 
 
 /* variables */
@@ -60,6 +64,9 @@ int D2GEStartup(void)
 	CloseHandle(hEvent);
 
 	if (CleanupRoutineInsert(D2GECleanup, "Diablo II Game Engine")) {
+		Sleep(5000); // give time for the server to start up
+		// avoids crash caused by calling D2GSEndAllGames() in D2GSResetGameList() before server has fully initialized
+
 		return TRUE;
 	} else {
 		/* do some cleanup before quiting */
@@ -112,6 +119,7 @@ int D2GEThreadInit(void)
 	gD2GSInfo.dwBusySleep			= d2gsconf.busysleep;
 	gD2GSInfo.dwMaxGame				= d2gsconf.gemaxgames;
 	gD2GSInfo.dwProcessAffinityMask = d2gsconf.multicpumask;
+	memset(gD2GSInfo.dwReserved, 0, sizeof(gD2GSInfo.dwReserved));
 	return TRUE;
 
 } /* D2GEThreadInit() */
@@ -134,6 +142,11 @@ static BOOL D2GSGetInterface(void)
 	D2GSNewEmptyGame			= lpD2GSInterface->D2GSNewEmptyGame;
 	D2GSEndAllGames				= lpD2GSInterface->D2GSEndAllGames;
 	D2GSSendClientChatMessage	= lpD2GSInterface->D2GSSendClientChatMessage;
+	D2GSSetTickCount			= lpD2GSInterface->D2GSSetTickCount;
+	D2GSSetACData				= lpD2GSInterface->D2GSSetACData;
+	D2GSLoadConfig				= lpD2GSInterface->D2GSLoadConfig;
+	D2GSLoadConfig				= lpD2GSInterface->D2GSLoadConfig;
+	D2GSInitConfig				= lpD2GSInterface->D2GSInitConfig;
 
 	return TRUE;
 
@@ -210,6 +223,17 @@ DWORD WINAPI D2GEThread(LPVOID lpParameter)
 		D2GSEventLog("D2GEThread", "Game Server Thread Start Successfully");
 		SetEvent(hEvent);
 		bGERunning = TRUE;
+
+		// test
+		char configfile[] = "d2server.ini";
+		D2GSLoadConfig(configfile);
+
+		D2GSInitConfig();
+
+		D2GSSetTickCount(time(NULL));
+
+		char acdata[] = "";
+		D2GSSetACData(acdata);
 	} else {
 		D2GSEventLog("D2GEThread", "Wait Server Thread Returned %d", dwRetval);
 		SetEvent(hEvent);

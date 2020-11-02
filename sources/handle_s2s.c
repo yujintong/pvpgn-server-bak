@@ -213,10 +213,30 @@ void D2GSHandleS2SPacket(D2GSPACKET *lpPacket)
 				return;		/* bad packet, drop it */
 			D2GSAuthReply((LPVOID)(lpPacket->data));
 			break;
+		case D2CS_D2GS_SETGSINFO:
+			if (bn_ntohs(lpcshead->size) < sizeof(t_d2cs_d2gs_setgsinfo))
+				return;		/* bad packet, drop it */
+			// Do nothing, D2CS just echoes back the same data
+			break;
 		case D2CS_D2GS_ECHOREQ:
 			if (bn_ntohs(lpcshead->size) < sizeof(t_d2cs_d2gs_echoreq))
 				return;
 			D2XSEchoReply(D2CSERVER);
+			break;
+		case D2CS_D2GS_CONTROL:
+			if (bn_ntohs(lpcshead->size) < sizeof(t_d2cs_d2gs_control))
+				return;		/* bad packet, drop it */
+			D2CSControlCmd((LPVOID)(lpPacket->data));
+			break;
+		case D2CS_D2GS_SETINITINFO:
+			if (bn_ntohs(lpcshead->size) < sizeof(t_d2cs_d2gs_setinitinfo))
+				return;		/* bad packet, drop it */
+			D2GSSetInitInfo((LPVOID)(lpPacket->data));
+			break;
+		case D2CS_D2GS_SETCONFFILE:
+			if (bn_ntohs(lpcshead->size) < sizeof(t_d2cs_d2gs_setconffile))
+				return;		/* bad packet, drop it */
+			D2GSSetConfFile((LPVOID)(lpPacket->data));
 			break;
 		}
 	} else if (lpPacket->peer == PACKET_PEER_RECV_FROM_D2DBS) {
@@ -254,29 +274,35 @@ void D2GSHandleS2SPacket(D2GSPACKET *lpPacket)
  *********************************************************************/
 void D2GSAuthreq(LPVOID *lpdata)
 {
-	UCHAR		RealmName[MAX_REALMNAME_LEN];
 	DWORD		seqno;
 	D2GSPACKET	packet;
 	t_d2cs_d2gs_authreq		*preq;
-	t_d2gs_d2cs_authreply	*preply;
 
 	preq = (t_d2cs_d2gs_authreq *)(lpdata);
+
+	// Deprecated
+	//bn_int signlen = bn_ntohl(preq->signlen);
+
 	/* get realm name */
-	CopyMemory(RealmName, preq+1, sizeof(RealmName));
-	RealmName[MAX_REALMNAME_LEN-1] = '\0';
-	strcpy(d2gsparam.realmname, RealmName);
+	char realm_name[MAX_REALMNAME_LEN] = { 0 };
+	snprintf(realm_name, sizeof(realm_name), "%s", (char*)&((void*)preq) + sizeof(t_d2cs_d2gs_authreq));
+	strcpy(d2gsparam.realmname, realm_name);
+
 	/* get session number */
 	d2gsparam.sessionnum = bn_ntohl(preq->sessionnum);
-	if ((strlen(RealmName)<=0)  || (strlen(RealmName)>=MAX_REALMNAME_LEN)) return;
+	if ((strlen(realm_name)<=0)  || (strlen(realm_name)>=MAX_REALMNAME_LEN)) return;
 	seqno = bn_ntohl(preq->h.seqno);
 	
 	ZeroMemory(&packet, sizeof(packet));
-	preply = (t_d2gs_d2cs_authreply *)(packet.data);
+	t_d2gs_d2cs_authreply* preply = (t_d2gs_d2cs_authreply *)(packet.data);
 	preply->h.type   = bn_htons(D2GS_D2CS_AUTHREPLY);
 	preply->h.size   = bn_ntohs(sizeof(t_d2gs_d2cs_authreply));
 	preply->h.seqno  = bn_htonl(seqno);
 	preply->version  = bn_ntohl(D2GS_VERSION);
 	preply->checksum = bn_ntohl(D2GSGetCheckSum());
+	preply->randnum = bn_htonl(0); // Deprecated
+	preply->signlen = bn_htonl(0); // Deprecated
+	memset(preply->sign, 0, sizeof(preply->sign)); // Deprecated
 	packet.peer      = PACKET_PEER_SEND_TO_D2CS;
 	packet.datalen   = sizeof(t_d2gs_d2cs_authreply);
 	D2GSNetSendPacket(&packet);
@@ -293,14 +319,32 @@ void D2GSAuthReply(LPVOID *lpdata)
 	t_d2cs_d2gs_authreply	*preq;
 
 	preq = (t_d2cs_d2gs_authreply *)(lpdata);
-	if (preq->reply) {
-		/* error occur, disconnect */
-		CloseConnectionToD2CS();
-	} else {
+
+	if (preq->reply == D2CS_D2GS_AUTHREPLY_SUCCEED)
+	{
+		D2GSEventLog(__FUNCTION__, "D2CS accepted authentication");
+
 		D2GSActive(TRUE);
-		D2GSEventLog("D2GSAuthReply", "Game Server Activated by D2CS");
+		D2GSEventLog(__FUNCTION__, "Game server activated by D2CS");
+
 		D2GSSetD2CSMaxGameNumber(d2gsconf.gsmaxgames);
+
+		return;
 	}
+	else if (preq->reply == D2CS_D2GS_AUTHREPLY_BAD_VERSION)
+	{
+		D2GSEventLog(__FUNCTION__, "D2CS rejected authentication: bad version");
+	}
+	else if (preq->reply == D2CS_D2GS_AUTHREPLY_BAD_CHECKSUM)
+	{
+		D2GSEventLog(__FUNCTION__, "D2CS rejected authentication: bad checksum");
+	}
+	else
+	{
+		D2GSEventLog(__FUNCTION__, "D2CS rejected authentication: unknown");
+	}
+
+	CloseConnectionToD2CS(); // error occur, disconnect
 
 } /* End of D2GSAuthReply() */
 
@@ -322,6 +366,7 @@ void D2GSSetD2CSMaxGameNumber(DWORD maxgamenum)
 	preply->h.size  = bn_htons(sizeof(t_d2gs_d2cs_setgsinfo));
 	preply->h.seqno = bn_htonl(D2GSGetSequence());
 	preply->maxgame = bn_htonl(d2gsconf.gsmaxgames);
+	preply->gameflag = bn_htonl(0); // Unused
 	packet.datalen  = sizeof(t_d2gs_d2cs_setgsinfo);
 	packet.peer     = PACKET_PEER_SEND_TO_D2CS;
 	D2GSNetSendPacket(&packet);
@@ -365,12 +410,62 @@ void D2XSEchoReply(int peer)
 
 
 /*********************************************************************
+ * Purpose: Fulfill server restart and shutdown commands by D2CS.
+ * Return: None
+ *********************************************************************/
+void D2CSControlCmd(LPVOID* lpdata)
+{
+	t_d2cs_d2gs_control* preq = (t_d2cs_d2gs_control*)(lpdata);
+
+	if (preq->cmd == D2CS_D2GS_CONTROL_CMD_RESTART)
+	{
+		D2GSEventLog(__FUNCTION__, "Received server restart command from D2CS (UNIMPLEMENTED)");
+	}
+	else if (preq->cmd == D2CS_D2GS_CONTROL_CMD_SHUTDOWN) // Unused
+	{
+		D2GSEventLog(__FUNCTION__, "Received server shutdown command from D2CS (UNIMPLEMENTED)");
+	}
+	else
+	{
+		D2GSEventLog(__FUNCTION__, "Received unknown command from D2CS: %#X", preq->cmd);
+	}
+
+} /* End of D2CSControlCmd() */
+
+
+/*********************************************************************
+ * Purpose: To set anticheat settings from D2CS.
+ * Return: None
+ * Deprecated
+ *********************************************************************/
+void D2GSSetInitInfo(LPVOID* lpdata)
+{
+	t_d2cs_d2gs_setinitinfo* preq = (t_d2cs_d2gs_setinitinfo*)(lpdata);
+
+	D2GSEventLog(__FUNCTION__, "Received deprecated packet %#X from D2CS", preq->h.type);
+} /* End of D2GSSetInitInfo() */
+
+
+/*********************************************************************
+ * Purpose: To update d2server.ini from D2CS.
+ * Return: None
+ *********************************************************************/
+void D2GSSetConfFile(LPVOID* lpdata)
+{
+	t_d2cs_d2gs_setconffile* preq = (t_d2cs_d2gs_setconffile*)(lpdata);
+
+	D2GSEventLog(__FUNCTION__, "Received unimplemented packet %#X from D2CS", preq->h.type);
+
+} /* End of D2GSSetConfFile() */
+
+
+/*********************************************************************
  * Purpose: to create a new empty game on GE
  * Return: None
  *********************************************************************/
 void D2CSCreateEmptyGame(LPVOID *lpdata)
 {
-	UCHAR		GameName[MAX_GAMENAME_LEN];
+	
 	DWORD		dwGameFlag;
 	WORD		wGameId;
 	DWORD		seqno;
@@ -379,43 +474,114 @@ void D2CSCreateEmptyGame(LPVOID *lpdata)
 	t_d2gs_d2cs_creategamereply	*preply;
 
 	preq = (t_d2cs_d2gs_creategamereq *)(lpdata);
-	CopyMemory(GameName, preq+1, sizeof(GameName));
-	GameName[MAX_GAMENAME_LEN-1] = '\0';
-	if (strlen(GameName)<=0) return;
+	preply = (t_d2gs_d2cs_creategamereply*)(packet.data);
 	seqno = bn_ntohl(preq->h.seqno);
-	
-	ZeroMemory(&packet, sizeof(packet));
-	preply = (t_d2gs_d2cs_creategamereply *)(packet.data);
 
-	dwGameFlag = 0x04;
-	if (preq->expansion) dwGameFlag |= 0x100000;
-	if (preq->hardcore)  dwGameFlag |= 0x800;
+	ZeroMemory(&packet, sizeof(packet));
+
+	char game_name[MAX_GAMENAME_LEN] = { 0 };
+	size_t game_name_length = strlen((char*)(preq + 1));
+	if (game_name_length == 0 || game_name_length >= sizeof(game_name))
+	{
+		D2GSEventLog(__FUNCTION__, "Received invalid game name length (%zu bytes)", game_name_length);
+
+		preply->result = bn_htonl(D2GS_D2CS_CREATEGAME_FAILED);
+		preply->gameid = bn_htonl(0);
+		preply->h.type = bn_htons(D2GS_D2CS_CREATEGAMEREPLY);
+		preply->h.size = bn_htons(sizeof(t_d2gs_d2cs_creategamereply));
+		preply->h.seqno = bn_htonl(seqno);
+		packet.peer = PACKET_PEER_SEND_TO_D2CS;
+		packet.datalen = sizeof(t_d2gs_d2cs_creategamereply);
+		D2GSNetSendPacket(&packet);
+		return;
+	}
+	else
+	{
+		memcpy(game_name, (void*)(preq + 1), game_name_length + 1);
+	}
+
+
+	char game_pass[MAX_GAMEPASS_LEN] = { 0 };
+	size_t game_pass_length = strlen((char*)((unsigned char*)(preq + 1) + game_name_length + 1));
+	if (game_pass_length >= sizeof(game_pass))
+	{
+		D2GSEventLog(__FUNCTION__, "Received invalid game password length (%zu bytes)", game_pass_length);
+
+		preply->result = bn_htonl(D2GS_D2CS_CREATEGAME_FAILED);
+		preply->gameid = bn_htonl(0);
+		preply->h.type = bn_htons(D2GS_D2CS_CREATEGAMEREPLY);
+		preply->h.size = bn_htons(sizeof(t_d2gs_d2cs_creategamereply));
+		preply->h.seqno = bn_htonl(seqno);
+		packet.peer = PACKET_PEER_SEND_TO_D2CS;
+		packet.datalen = sizeof(t_d2gs_d2cs_creategamereply);
+		D2GSNetSendPacket(&packet);
+		return;
+	}
+	else
+	{
+		memcpy(game_pass, (void*)((unsigned char*)(preq + 1) + game_name_length + 1), game_pass_length + 1);
+	}
+	
+	char game_desc[MAX_GAMEDESC_LEN] = { 0 };
+	size_t game_desc_length = strlen((char*)((unsigned char*)(preq + 1) + game_name_length + 1 + game_pass_length + 1));
+	if (game_desc_length >= sizeof(game_desc))
+	{
+		D2GSEventLog(__FUNCTION__, "Received invalid game description length (%zu bytes)", game_desc_length);
+
+		preply->result = bn_htonl(D2GS_D2CS_CREATEGAME_FAILED);
+		preply->gameid = bn_htonl(0);
+		preply->h.type = bn_htons(D2GS_D2CS_CREATEGAMEREPLY);
+		preply->h.size = bn_htons(sizeof(t_d2gs_d2cs_creategamereply));
+		preply->h.seqno = bn_htonl(seqno);
+		packet.peer = PACKET_PEER_SEND_TO_D2CS;
+		packet.datalen = sizeof(t_d2gs_d2cs_creategamereply);
+		D2GSNetSendPacket(&packet);
+		return;
+	}
+	else
+	{
+		memcpy(game_desc, (void*)((unsigned char*)(preq + 1) + game_name_length + 1 + game_pass_length + 1), game_desc_length + 1);
+	}
+
+
+
+	
+
+	dwGameFlag = 0x00000004;
+	if (preq->expansion) dwGameFlag |= 0x00100000;
+	if (preq->ladder)    dwGameFlag |= 0x00200000;
+	if (preq->hardcore)  dwGameFlag |= 0x00000800;
 	if (preq->difficulty>2) preq->difficulty = 0;
 	dwGameFlag |= ((preq->difficulty) << 0x0c);
 	if (D2GSIsActive()) {
 		if (D2GSGetCurrentGameNumber()>=(int)(d2gsconf.gsmaxgames)) {
 			D2GSEventLog("D2CSCreateEmptyGame", "Reach max game number");
 			preply->result = bn_htonl(D2GS_D2CS_CREATEGAME_FAILED);
+			preply->gameid = bn_htonl(0);
 		}
-		else if (D2GSNewEmptyGame(GameName, "GamePass", "GameDesc", dwGameFlag, 0x11, 0x22, 0x33, &wGameId)) {
+		else if (D2GSNewEmptyGame(game_name, game_pass, game_desc, dwGameFlag, 0x11, 0x22, 0x33, &wGameId)) {
 			preply->result = bn_htonl(D2GS_D2CS_CREATEGAME_SUCCEED);
 			D2GSEventLog("D2CSCreateEmptyGame",
-				"Created game '%s', %u,%s,%s,%s, seqno=%lu", GameName, wGameId,
+				"Created game '%s', %u,%s,%s,%s, seqno=%lu", game_name, wGameId,
 				preq->expansion ? "expansion" : "classic",
 				desc_game_difficulty[preq->difficulty%3],
 				preq->hardcore ? "hardcore" : "softcore", seqno);
 			/* add the game info into the game queue */
-			D2GSGameListInsert(GameName, (UCHAR)(preq->expansion),
+			D2GSGameListInsert(game_name, game_pass, game_desc, (UCHAR)(preq->expansion),
 				(UCHAR)(preq->difficulty), (UCHAR)(preq->hardcore), (WORD)wGameId);
+
+			preply->gameid = bn_htonl(wGameId);
 		} else {
-			D2GSEventLog("D2CSCreateEmptyGame", "Failed creating game '%s'", GameName);
+			D2GSEventLog("D2CSCreateEmptyGame", "Failed creating game '%s'", game_name);
 			preply->result = bn_htonl(D2GS_D2CS_CREATEGAME_FAILED);
+			preply->gameid = bn_htonl(0);
 		}
 	} else {
 		D2GSEventLog("D2CSCreateEmptyGame", "Game Server is not Authorized.");
 		preply->result = bn_htonl(D2GS_D2CS_CREATEGAME_FAILED);
+		preply->gameid = bn_htonl(0);
 	}
-	preply->gameid  = bn_htonl(wGameId);
+
 	preply->h.type  = bn_htons(D2GS_D2CS_CREATEGAMEREPLY);
 	preply->h.size  = bn_htons(sizeof(t_d2gs_d2cs_creategamereply));
 	preply->h.seqno = bn_htonl(seqno);
@@ -437,7 +603,7 @@ void D2CSClientJoinGameRequest(LPVOID *lpdata)
 	UCHAR		CharName[MAX_CHARNAME_LEN];
 	UCHAR		AcctName[MAX_ACCTNAME_LEN];
 	UCHAR		*ptr;
-	WORD		wGameId;
+	DWORD		dwGameId;
 	DWORD		dwToken;
 	D2GAMEINFO	*lpGame;
 	D2CHARINFO	*lpChar;
@@ -450,7 +616,7 @@ void D2CSClientJoinGameRequest(LPVOID *lpdata)
 
 	/* get out parameter */
 	preq = (t_d2cs_d2gs_joingamereq *)(lpdata);
-	wGameId = bn_ntohl(preq->gameid);
+	dwGameId = bn_ntohl(preq->gameid);
 	dwToken = bn_ntohl(preq->token);
 	ptr = (UCHAR *)(preq+1);
 	CopyMemory(CharName, ptr, sizeof(CharName));
@@ -468,7 +634,7 @@ void D2CSClientJoinGameRequest(LPVOID *lpdata)
 
 	/* find the game by gameid */
 	if (D2GSIsActive()) {
-		lpGame = D2GSFindGameInfoByGameId(wGameId);
+		lpGame = D2GSFindGameInfoByGameId(dwGameId);
 		if (lpGame) {
 			/* try to find the user */
 			lpChar = D2GSFindPendingCharByCharName(CharName);
@@ -493,7 +659,7 @@ void D2CSClientJoinGameRequest(LPVOID *lpdata)
 			/* the game not found, error */ 
 			result = D2GS_D2CS_JOINGAME_FAILED;
 			D2GSEventLog("D2CSClientJoinGameRequest",
-				"%s(*%s) join game %u not exist", CharName, AcctName, wGameId);
+				"%s(*%s) join game %u not exist", CharName, AcctName, dwGameId);
 		}
 	} else {
 		result = D2GS_D2CS_JOINGAME_FAILED;
@@ -506,11 +672,11 @@ void D2CSClientJoinGameRequest(LPVOID *lpdata)
 			result = D2GS_D2CS_JOINGAME_FAILED;
 			D2GSEventLog("D2CSClientJoinGameRequest",
 				"%s(*%s) failed insert into pending list, game %s(%u)", 
-				CharName, AcctName, lpGame->GameName, wGameId);
+				CharName, AcctName, lpGame->GameName, dwGameId);
 		} else {
 			D2GSEventLog("D2CSClientJoinGameRequest",
 				"%s(*%s) join game '%s', id=%u(%s,%s,%s)",
-				CharName, AcctName, lpGame->GameName, wGameId,
+				CharName, AcctName, lpGame->GameName, dwGameId,
 				lpGame->expansion ? "exp" : "classic",
 				desc_game_difficulty[lpGame->difficulty%3],
 				lpGame->hardcore ? "hardcore" : "softcore");
@@ -521,7 +687,7 @@ void D2CSClientJoinGameRequest(LPVOID *lpdata)
 	LeaveCriticalSection(&csGameList);
 
 	preply->result  = bn_htonl(result);
-	preply->gameid  = bn_htonl((DWORD)wGameId);
+	preply->gameid  = bn_htonl(dwGameId);
 	preply->h.type  = bn_htons(D2GS_D2CS_JOINGAMEREPLY);
 	preply->h.size  = bn_htons(sizeof(t_d2gs_d2cs_joingamereply));
 	preply->h.seqno = preq->h.seqno;
@@ -915,7 +1081,7 @@ void D2GSCBGetDatabaseCharacter(LPGAMEDATA lpGameData, LPCSTR lpCharName,
 	if (D2GSInsertGetDataRequest((UCHAR*)lpAccountName, (UCHAR*)lpCharName, dwClientId, seqno)) {
 		D2GSEventLog("D2GSCBGetDatabaseCharacter",
 			"Failed insert get data request for %s(*%s)", lpCharName, lpAccountName);
-		D2GSSendDatabaseCharacter(dwClientId, NULL, 0, 0, TRUE, 0, NULL);
+		D2GSSendDatabaseCharacter(dwClientId, NULL, 0, 0, TRUE, 0, NULL, 1);
 		return;
 	}
 	lpGameInfo = (D2GAMEINFO*)charlist_getdata(lpCharName, CHARLIST_GET_GAMEINFO);
@@ -930,7 +1096,7 @@ void D2GSCBGetDatabaseCharacter(LPGAMEDATA lpGameData, LPCSTR lpCharName,
 		D2GSEventLog("D2GSCBGetDatabaseCharacter",
 			"Call back to get save for %s(*%s), but the char or the game is invalid",
 			lpCharName, lpAccountName);
-		D2GSSendDatabaseCharacter(dwClientId, NULL, 0, 0, TRUE, 0, NULL);
+		D2GSSendDatabaseCharacter(dwClientId, NULL, 0, 0, TRUE, 0, NULL, 1);
 		return;
 	}
 
@@ -1281,7 +1447,7 @@ void D2DBSGetDataReply(LPVOID *lpdata)
 				lpCharInfo->CharLockStatus = TRUE;
 				lpCharInfo->AllowLadder    = bn_ntohl(preply->allowladder);
 				lpCharInfo->CharCreateTime = bn_ntohl(preply->charcreatetime);
-				if (D2GSSendDatabaseCharacter(dwClientId, pSaveData, size, size, FALSE, 0, &PlayerInfo)) {
+				if (D2GSSendDatabaseCharacter(dwClientId, pSaveData, size, size, FALSE, 0, &PlayerInfo, 1)) {
 					D2GSEventLog("D2DBSGetDataReply",
 							"send CHARSAVE to GE for %s(*%s) success, %lu bytes",
 							CharName, AcctName, size);
@@ -1296,12 +1462,12 @@ void D2DBSGetDataReply(LPVOID *lpdata)
 			} else {
 				/* char NOT found, set the char to unlock status */
 				D2GSSetCharLockStatus(AcctName, CharName, d2gsparam.realmname, FALSE);
-				D2GSSendDatabaseCharacter(dwClientId, NULL, 0, 0, TRUE, 0, NULL);
+				D2GSSendDatabaseCharacter(dwClientId, NULL, 0, 0, TRUE, 0, NULL, 1);
 				D2GSEventLog("D2DBSGetDataReply", "%s(*%s) not found in charlist",
 						CharName, AcctName);
 			}
 		} else {
-			D2GSSendDatabaseCharacter(dwClientId, NULL, 0, 0, TRUE, 0, NULL);
+			D2GSSendDatabaseCharacter(dwClientId, NULL, 0, 0, TRUE, 0, NULL, 1);
 			/* need to delete the char from the list in gameinfo structure */
 			lpGameInfo = (D2GAMEINFO*)charlist_getdata(CharName, CHARLIST_GET_GAMEINFO);
 			lpCharInfo = (D2CHARINFO*)charlist_getdata(CharName, CHARLIST_GET_CHARINFO);

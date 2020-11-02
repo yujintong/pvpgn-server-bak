@@ -40,11 +40,7 @@ static CLEANUP_RT_ITEM	*pCleanupRT = NULL;
 /********************************************************************************
  * Main procedure begins here
  ********************************************************************************/
-#ifdef _DEBUG
-int main(int argc, char **argv)
-#else
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nCmdShow)
-#endif
 {
 	DWORD	dwWait;
 
