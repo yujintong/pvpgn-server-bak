@@ -143,15 +143,18 @@ typedef struct
 	*/
 	D2GSInitConfigFunc				D2GSInitConfig;
 	/*
-	*	void* fp1
-	*	void* fp2
-	*	LPCSTR WorldEventKeyItem
-	*	void* fp4
-	*	void* fp5
-	*	void* fp6
-	*	void* fp7
-	*	void* fp8
-	*	LPCSTR str1 (128 bytes long)
+	*	This function doesn't initialize config, it should be renamed to D2GSGetConfig() in my opinion.
+	*	If config file is not loaded through D2GSLoadConfig(), returns a null pointer.
+	*	Otherwise, returns a pointer to the following struct:
+	*	void*      fp1
+	*	DWORD      WorldEventBaseCount
+	*	DWORD      WorldEventCurrentSpawnCount
+	*	DWORD      WorldEventLastSpawnCount
+	*	DWORD      WorldEventNextSpawnCount
+	*	__time32_t WorldEventLastSellTime
+	*	__time32_t WorldEventLastSpawnTime
+	*	DWORD      WorldEventTotalSpawn
+	*	LPCSTR     WorldEventKeyItem (128 bytes long)
 	*/
 	DWORD							Reserved5;
 	/*
