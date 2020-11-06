@@ -145,7 +145,7 @@ typedef struct
 	/*
 	*	void* fp1
 	*	void* fp2
-	*	void* fp3
+	*	LPCSTR WorldEventKeyItem
 	*	void* fp4
 	*	void* fp5
 	*	void* fp6
