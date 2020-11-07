@@ -1,6 +1,6 @@
 /*  
 	Diablo2 Game Server Library
-  	Copyright (C) 2000, 2001  Onlyer(onlyer@263.net)
+	Copyright (C) 2000, 2001  Onlyer(onlyer@263.net)
 
 	This library is based on original Diablo2 game library,
 	Diablo2 is a trademark of Blizzard Entertainment.
@@ -107,28 +107,32 @@ typedef struct
 	D2GSNewEmptyGameFunc			D2GSNewEmptyGame;
 	D2GSEndAllGamesFunc				D2GSEndAllGames;
 	D2GSSendClientChatMessageFunc	D2GSSendClientChatMessage;
-	D2GSSetTickCountFunc			D2GSSetTickCount;
+
 	/*
 	* Does nothing if param_1 is 0.
 	* BOOL D2GSSetTickCount(DWORD param_1)
 	*/
-	D2GSSetACDataFunc					D2GSSetACData;
+	D2GSSetTickCountFunc			D2GSSetTickCount;
+
 	/*
 	* Pass "0" to disable anticheat i think
 	* D2GSSetACData(char* param_1)
 	*/
-	DWORD							Reserved3;
+	D2GSSetACDataFunc				D2GSSetACData;
+
 	/*
 	* BOOL Reserved3(DWORD param_1)
 	*/
-	D2GSLoadConfigFunc				D2GSLoadConfig;
+	DWORD							Reserved3;
+
 	/*
 	* d2server.ini filename max length = 260 bytes
 	* has something to do with world event
 	* also reads 32 bytes from D2GEVar.dat
 	* BOOL D2GSLoadConfig(char* filename)
 	*/
-	DWORD							Reserved4;
+	D2GSLoadConfigFunc				D2GSLoadConfig;
+
 	/*
 	* Returns 1 if it successfully writes 32 bytes of data into D2GEVar.dat, 0 otherwise.
 	* BOOL Reserved4(void)
@@ -141,7 +145,8 @@ typedef struct
 	*		return WriteToD2GEVar_dat(0x33445566);
 	* }
 	*/
-	D2GSInitConfigFunc				D2GSInitConfig;
+	DWORD							Reserved4;
+
 	/*
 	*	void* fp1
 	*	void* fp2
@@ -153,12 +158,14 @@ typedef struct
 	*	void* fp8
 	*	LPCSTR str1 (128 bytes long)
 	*/
-	DWORD							Reserved5;
+	D2GSInitConfigFunc				D2GSInitConfig;
+
 	/*
 	*	DebugGetGameInfo(WORD wGameId);
 	*	Returns a pointer to a struct?
 	*/
-	DWORD							Reserved6;
+	DWORD							Reserved5;
+
 	/*
 	BOOL Reserved6(DWORD param_1)
 	{
@@ -177,6 +184,7 @@ typedef struct
 		return param_1 < tickCount - DAT_68010ef4;
 	}
 	*/
+	DWORD							Reserved6;
 } D2GSINTERFACE, * PD2GSINTERFACE, * LPD2GSINTERFACE;
 
 
