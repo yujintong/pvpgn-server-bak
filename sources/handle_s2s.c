@@ -1411,10 +1411,11 @@ void D2DBSGetDataReply(LPVOID *lpdata)
 		pSaveData = (u_char*)lpdata + sizeof(t_d2dbs_d2gs_get_data_reply);
 		strncpy(CharName, pSaveData, MAX_CHARNAME_LEN-1);
 		CharName[MAX_CHARNAME_LEN-1] = '\0';
+		snprintf(PlayerInfo.CharName, sizeof(PlayerInfo.CharName), "%s", CharName);
 		pSaveData += strlen(CharName)+1;
 		size = (DWORD)(bn_ntohs(preply->datalen));
-		PlayerInfo.PlayerMark = 0xabcdef;
-		PlayerInfo.dwReserved = 0xfedcba;
+		PlayerInfo.PlayerMark = 0;
+		PlayerInfo.dwReserved = 0;
 		/* find get data request in the list */
 		seqno = bn_ntohl(preply->h.seqno);
 		EnterCriticalSection(&csGameList);
@@ -1431,6 +1432,7 @@ void D2DBSGetDataReply(LPVOID *lpdata)
 		dwClientId = lpGetDataReq->ClientId;
 		strncpy(AcctName, lpGetDataReq->AcctName, MAX_ACCTNAME_LEN-1);
 		AcctName[MAX_ACCTNAME_LEN-1] = '\0';
+		snprintf(PlayerInfo.AcctName, sizeof(PlayerInfo.AcctName), "%s", AcctName);
 		D2GSDeleteGetDataRequest(lpGetDataReq);
 		LeaveCriticalSection(&csGameList);
 		/* send the save data to GE */
