@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <conio.h>
+#include <time.h>
 #include "d2gelib/d2server.h"
 #include "d2gs.h"
 #include "d2ge.h"
@@ -63,10 +64,22 @@ int D2GEStartup(void)
 
 	CloseHandle(hEvent);
 
-	if (CleanupRoutineInsert(D2GECleanup, "Diablo II Game Engine")) {
-		Sleep(5000); // give time for the server to start up
-		// avoids crash caused by calling D2GSEndAllGames() in D2GSResetGameList() before server has fully initialized
+	
+	Sleep(2500);// give time for the server to start up
+	/* reset game list */
+	D2GSResetGameList();
 
+	D2GSSetTickCount(time(NULL));
+
+	char acdata[] = "bogus_ac_string";
+	D2GSSetACData(acdata);
+
+	char configfile[] = "d2server.ini";
+	D2GSLoadConfig(configfile);
+
+	D2GSInitConfig();
+
+	if (CleanupRoutineInsert(D2GECleanup, "Diablo II Game Engine")) {
 		return TRUE;
 	} else {
 		/* do some cleanup before quiting */
@@ -94,7 +107,6 @@ int D2GECleanup(void)
 	return TRUE;
 
 } /* End of D2GEShutdown() */
-
 
 /*********************************************************************
  * Purpose: to initialize the D2 Game Engine thread
@@ -223,17 +235,6 @@ DWORD WINAPI D2GEThread(LPVOID lpParameter)
 		D2GSEventLog("D2GEThread", "Game Server Thread Start Successfully");
 		SetEvent(hEvent);
 		bGERunning = TRUE;
-
-		// test
-		char configfile[] = "d2server.ini";
-		D2GSLoadConfig(configfile);
-
-		D2GSInitConfig();
-
-		D2GSSetTickCount(time(NULL));
-
-		char acdata[] = "";
-		D2GSSetACData(acdata);
 	} else {
 		D2GSEventLog("D2GEThread", "Wait Server Thread Returned %d", dwRetval);
 		SetEvent(hEvent);

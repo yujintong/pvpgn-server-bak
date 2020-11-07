@@ -78,9 +78,6 @@ int D2GSNetInitialize(void)
 	    return FALSE;
 	}
 
-	/* reset game list */
-	D2GSResetGameList();
-
 	/* create event object for packet receiving from D2CS or D2DBS */
 	hRecvCS  = WSACreateEvent();
 	hRecvDBS = WSACreateEvent();
