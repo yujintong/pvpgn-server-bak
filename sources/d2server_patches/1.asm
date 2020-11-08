@@ -93,35 +93,27 @@ cb_FindPlayerToken_orig dd 680073E0h ; +18
 cb_UpdateCharacterLadder_orig dd 68007450h ; +28
 cb_UpdateGameInformation_orig dd 68007480h ; +2C
 cb_UnlockDatabaseCharacter_orig dd 680074C0h ;+1C
-D2GSPreInit		dd	680010C0h
-D2GSInit			dd	680013F0h
-D2GSCleanup		dd	68001760h
-GetProcAddr		dd	6800B03Ch
-D2COMMON			dd	68010F20h
-D2GAME				dd	68010F1Ch
-D2NET					dd	68010F24h
-GetGameInfo		dd	680064E8h
+D2GSPreInit	dd	680010C0h
+D2GSInit	dd	680013F0h
+D2GSCleanup	dd	68001760h
+GetProcAddr	dd	6800B03Ch
+D2COMMON	dd	68010F20h
+D2GAME		dd	68010F1Ch
+D2NET		dd	68010F24h
+GetGameInfo	dd	680064E8h
 SendSystemMessage dd 68005B20h
-malloc				dd	6800B190h
-free					dd	6800B18Ch
+malloc		dd	6800B190h
+free		dd	6800B18Ch
 
-GetModuleHandleA	dd 6800B028h
-LoadLibraryA	dd 6800B018h
-FreeLibrary	dd 0040C060h
-CreateEventA	dd 0040C024h
-SetEvent	dd 6800B010h
-WaitForSingleObject	dd 0040C014h
-CreateMutexA	dd 0040C044h
-CloseHandle	dd 0040C07Ch
-CreateThread	dd 0040C018h
-GetExitCodeThread	dd 0040C02Ch
-TerminateThread	dd 0040C04Ch
-Sleep	dd 0040C01Ch
-InitializeCriticalSection	dd 0040C040h
-EnterCriticalSection	dd 0040C090h
-LeaveCriticalSection	dd 0040C080h
-DeleteCriticalSection	dd 0040C050h
-VirtualProtect dd 6800B040h
+
+; WinAPI Functions (D2GS.exe)
+CreateThread				dd 0040C018h
+FreeLibrary					dd 0040C060h
+; WinAPI Functions (D2Server.dll)
+LoadLibraryA				dd 6800B018h
+VirtualProtect				dd 6800B040h
+
+
 GetRandomNumber	dd 680055A0h
 sub_68005A10	dd 68005A10h
 SOJ_Counter	dd 680145E8h
