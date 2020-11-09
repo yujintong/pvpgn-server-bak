@@ -110,7 +110,7 @@ free		dd	6800B18Ch
 LoadLibraryA				dd 6800B018h
 FreeLibrary					dd 6800B024h
 VirtualProtect				dd 6800B040h
-CreateThread				dd 0040C018h
+CreateThread				dd 680250B4h
 
 
 GetRandomNumber	dd 680055A0h
