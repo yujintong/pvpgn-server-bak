@@ -5,8 +5,6 @@
  * check the documents for more details
 */
 
-#define D2GS
-
 /* include your own header files here */
 #ifdef D2CS
 # include "common/bn_type.h"

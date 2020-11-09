@@ -1,8 +1,6 @@
 #ifndef INCLUDED_D2CS_D2GS_CHARACTER_H
 #define INCLUDED_D2CS_D2GS_CHARACTER_H
 
-#define D2GS
-
 #ifdef D2CS
 # include "common/bn_type.h"
 #endif
