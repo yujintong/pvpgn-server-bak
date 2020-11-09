@@ -106,12 +106,11 @@ malloc		dd	6800B190h
 free		dd	6800B18Ch
 
 
-; WinAPI Functions (D2GS.exe)
-CreateThread				dd 0040C018h
-FreeLibrary					dd 0040C060h
-; WinAPI Functions (D2Server.dll)
+; WinAPI Functions
 LoadLibraryA				dd 6800B018h
+FreeLibrary					dd 6800B024h
 VirtualProtect				dd 6800B040h
+CreateThread				dd 0040C018h
 
 
 GetRandomNumber	dd 680055A0h
