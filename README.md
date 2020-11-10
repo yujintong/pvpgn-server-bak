@@ -3,8 +3,6 @@ This repository contains changes to [pvpgn/d2gs109](https://github.com/pvpgn/d2g
 
 Compile with Visual Studio 2019 in *Debug* mode and run the resulting binary using compatibility mode for *Windows 8*.
 
-This D2GS is unplayable due to issue [Disable Anti-Abuse Mechanisms](https://github.com/RElesgoe/d2gs/issues/1).
-
 ## How Does D2GS Work
 The game server application loads `D2Server.dll`, calls `QueryInterface()`, and then calls the start function using one of the function pointers returned by `QueryInterface()`. Once started, `D2Server.dll` sets up network processing and performs calls to DLLs such as `Fog.dll` and `D2Game.dll` to create and run game instances.
 
