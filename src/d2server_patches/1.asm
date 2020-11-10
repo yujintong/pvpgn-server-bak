@@ -2004,7 +2004,7 @@ cb_stub_func06 proc
 	ret
 cb_stub_func06 endp
 
-	INCLUDE UberQuest.asm
+	INCLUDE UberQuest.inc
 
 ;双光环PET的BUG
 ;产生原因：当物品被移除的时候，挂在PET身上相应的光环事件并没有被移除，导致再次装备物品的时候，光环事件不断增多
@@ -2518,7 +2518,7 @@ fail_over:
 MonsterDamageFix endp
 
 
-INCLUDE Warden.asm
+INCLUDE Warden.inc
 
 ProtectDLL proc
 	flOldProtect    = dword ptr -4
