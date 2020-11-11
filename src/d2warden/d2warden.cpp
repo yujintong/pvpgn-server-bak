@@ -74,7 +74,7 @@ dword_6FF3D8D4 : inet_addr结果"127.0.0.1;"
 #include "MD5.h"
 #include "rc4.h"
 #include "d2ptrs.h"
-#include "d2callstub.cpp"
+#include "d2callstub.h"
 
 extern "C" void  __fastcall HashGameSeed(unsigned char *pt_0XAE_RC4_KEY, unsigned char *pt_0X66_RC4_KEY, unsigned char * TheGameSeed, unsigned int TheLength);
 extern "C" void  __fastcall Double_MD5(DWORD *Mod_Length, DWORD unk, unsigned char *ptResult);

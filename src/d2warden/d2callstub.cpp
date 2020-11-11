@@ -1,5 +1,6 @@
 #include <windows.h>
 #include "d2ptrs.h"
+#include "d2callstub.h"
 
 DWORD __declspec(naked) __fastcall D2GAME_GetClient_STUB(DWORD ClientID)
 {
