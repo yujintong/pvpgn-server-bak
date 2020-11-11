@@ -1,3 +1,4 @@
+/*
 sub_18C1098(unsigned char *result=esi,int length=eax,unsigned char *GameSeed=arg_0)
 {
 	int var_4;
@@ -112,3 +113,4 @@ loc_18C22EA:
 	if (edi <= length) goto loc_18C22EA
 		
 }
+*/
