@@ -58,8 +58,8 @@ To detect RedVex like proxy hack, warden should check the BNClient.dll (6FF3D8D4
 for example, the BNETIP=127.0.0.1, this should known as a Redvex hack.
 
 6FF3D230: BNETIP string
-6FF3D330: ÓòÃû½âÊÍºóµÄµØÖ·£º127.0.0.1
-dword_6FF3D8D4 : inet_addr½á¹û"127.0.0.1;"
+6FF3D330: åŸŸåè§£é‡Šåçš„åœ°å€ï¼š127.0.0.1
+dword_6FF3D8D4 : inet_addrç»“æœ"127.0.0.1;"
 */
 
 //#define D2_1_11_b
@@ -108,16 +108,16 @@ BYTE SupportD2Version[10];
 
 struct WardenHackCheckStruct
 {
-	unsigned char D2Version;		// ¿Í»§¶Ë°æ±¾
-	unsigned char HackName[50];	// HackµÄÃû³Æ
+	unsigned char D2Version;		// å®¢æˆ·ç«¯ç‰ˆæœ¬
+	unsigned char HackName[50];	// Hackçš„åç§°
 	char Msg[256];
-	unsigned char Log;		// ÊÇ·ñ¼ÇÂ¼Hack,0=not log, 1=log, bit0=HackLog bit1=UnknownLog bit2=TimeoutLog
+	unsigned char Log;		// æ˜¯å¦è®°å½•Hack,0=not log, 1=log, bit0=HackLog bit1=UnknownLog bit2=TimeoutLog
 	unsigned char Action;			// 0=skip, 1=kick , bit0=HackAction  bit1=UnknownAction bit2=TimeoutAction
-	unsigned char Debug;	// ¼ÇÂ¼ÏÂ·¢ËÍµÄAE±¨ÎÄÒÔ¼°ÊÕµ½µÄ66±¨ÎÄ
-	int PacketAELen;	// ·¢ËÍµÄPacketAE³¤¶È
-	unsigned char PacketAE[512];	// ·¢ËÍµÄPacketAE±¨ÎÄ
-	DWORD HackCHKSUM;	// Ô¤ÆÚ½ÓÊÕµ½µÄHack Packet66±¨ÎÄ
-	DWORD CorrectCHKSUM;	// Ô¤ÆÚ½ÓÊÕµ½µÄÕıÈ·Packet66±¨ÎÄ
+	unsigned char Debug;	// è®°å½•ä¸‹å‘é€çš„AEæŠ¥æ–‡ä»¥åŠæ”¶åˆ°çš„66æŠ¥æ–‡
+	int PacketAELen;	// å‘é€çš„PacketAEé•¿åº¦
+	unsigned char PacketAE[512];	// å‘é€çš„PacketAEæŠ¥æ–‡
+	DWORD HackCHKSUM;	// é¢„æœŸæ¥æ”¶åˆ°çš„Hack Packet66æŠ¥æ–‡
+	DWORD CorrectCHKSUM;	// é¢„æœŸæ¥æ”¶åˆ°çš„æ­£ç¡®Packet66æŠ¥æ–‡
 	int HackChatLen;
 	int MsgOffset;
 	unsigned char HackChat[65];
@@ -133,7 +133,7 @@ struct Client_Data_Struct
 	char AccountName[20];
 	DWORD ClientLogonTime;
 	unsigned char D2Version;
-	DWORD WardenStatus;			// 0-³õÊ¼»¯	1-ĞèÒªÖØĞÂÏÂÔØMOD 2-ÕıÔÚÏÂÔØMOD 3-ÏÂÔØÍê±Ï£¨ÒÑ¾­ÓµÓĞMOD£©£¬ĞèÒª·¢ËÍ01±¨ÎÄ¼ì²é 4-01±¨ÎÄÒÑ¾­·¢ËÍ£¬µÈ´ı66±¨ÎÄ»ØÓ¦
+	DWORD WardenStatus;			// 0-åˆå§‹åŒ–	1-éœ€è¦é‡æ–°ä¸‹è½½MOD 2-æ­£åœ¨ä¸‹è½½MOD 3-ä¸‹è½½å®Œæ¯•ï¼ˆå·²ç»æ‹¥æœ‰MODï¼‰ï¼Œéœ€è¦å‘é€01æŠ¥æ–‡æ£€æŸ¥ 4-01æŠ¥æ–‡å·²ç»å‘é€ï¼Œç­‰å¾…66æŠ¥æ–‡å›åº”
 	unsigned char CanRecv66Packet;
 	int NextHackCheck;
 	DWORD NextCheckTime;
@@ -142,7 +142,7 @@ struct Client_Data_Struct
 	DWORD Packet66_ReceiveTime;
 	DWORD Packet66_PacketLen;
 	unsigned char ThePacket[MAX66LEN];
-	DWORD MOD_Position;		// µ±Ç°´«ËÍµ½¸ÃMODµÄµÚ¼¸¸ö×Ö½Ú	0-»¹Ã»ÓĞ´«ËÍ  FFFFFFFF-ÒÑ¾­´«ËÍÍê±Ï
+	DWORD MOD_Position;		// å½“å‰ä¼ é€åˆ°è¯¥MODçš„ç¬¬å‡ ä¸ªå­—èŠ‚	0-è¿˜æ²¡æœ‰ä¼ é€  FFFFFFFF-å·²ç»ä¼ é€å®Œæ¯•
 	unsigned char RC4_KEY_0X66[258];
 	unsigned char RC4_KEY_0XAE[258];
 	unsigned char AE_Packet00[40];
@@ -161,14 +161,14 @@ struct Client_Data_Struct
 	unsigned char ChatMsg[MAX_CHAT_MSG_BUF][65];
 	
 	/*
-		Èç¹û·şÎñÆ÷ÉÏÍæ¼ÒÔÚRun»òÕßWalk£¬µ«ÊÇ¿Í»§¶ËÃ»ÓĞEmode¶¯×÷£¬±íÊ¾ÓĞÎÊÌâ£¡
-		Èç¹û·şÎñÆ÷ÉÏÍæ¼ÒÕıÔÚTrade NPC£¬µ«ÊÇ¿Í»§¶ËÃ»ÓĞ´ò¿ªTradeWindow£¬±íÊ¾ÓĞÎÊÌâ£¡
+		å¦‚æœæœåŠ¡å™¨ä¸Šç©å®¶åœ¨Runæˆ–è€…Walkï¼Œä½†æ˜¯å®¢æˆ·ç«¯æ²¡æœ‰EmodeåŠ¨ä½œï¼Œè¡¨ç¤ºæœ‰é—®é¢˜ï¼
+		å¦‚æœæœåŠ¡å™¨ä¸Šç©å®¶æ­£åœ¨Trade NPCï¼Œä½†æ˜¯å®¢æˆ·ç«¯æ²¡æœ‰æ‰“å¼€TradeWindowï¼Œè¡¨ç¤ºæœ‰é—®é¢˜ï¼
 	*/
 	BYTE EnablePlayerMouseCheck;
 	DWORD PlayerPtr;
 	DWORD PlayerPathPtr;
 
-	// Êó±êÒÔ¼°Íæ¼ÒµÄÎ»ÖÃ
+	// é¼ æ ‡ä»¥åŠç©å®¶çš„ä½ç½®
 //	DWORD PlayerXPosition;
 //	DWORD PlayerYPosition;
 //	DWORD PlayerXPosition_Modify;
@@ -193,7 +193,7 @@ struct Client_Data_Struct
 
 struct D2Warden_Parameter_Struct
 {
-	CRITICAL_SECTION WardenLock;	// ·ÃÎÊClient Logon¶ÓÁĞµÄ»¥³âËø
+	CRITICAL_SECTION WardenLock;	// è®¿é—®Client Logoné˜Ÿåˆ—çš„äº’æ–¥é”
 
 	struct Client_Data_Struct *Warden_Client_Data;
 } D2Warden_Parameter;
@@ -248,53 +248,53 @@ unsigned char log_level;
 //
 // WardenCMD2: 02 00 ID_Mem_Check(1b) String_Index(01) Offset Len 
 // WardenCMD2: 02 00 ID_PAGE_CHECK_A (DWORD)Unknown_Seed (DWORD[5])SHA1 (DWORD)Address (BYTE)Len BYTE=00
-// WardenCMD2: 02 00 d8 [ce fd 4f 48] {[d4 96 3A 2E de][c5 c5 17 05 71][e1 24 cf ae f5][92 68 a4 34 0f]}4X5 [b8 fe][20] Õâ¸öÃüÁîÓÃÓÚ¼ì²éNtQueryVirtualMemoryº¯ÊıÊÇ·ñ±»¹Ò¹³
-// WardenCMD2: 02 00 0E [01]  ¶Ô±¨ÎÄµÄµÚÒ»¸ö×Ö·û´®ËùÖ¸Ã÷µÄÎÄ¼ş£¬¶ÁÈ¡ÆäSHAÖµ
+// WardenCMD2: 02 00 d8 [ce fd 4f 48] {[d4 96 3A 2E de][c5 c5 17 05 71][e1 24 cf ae f5][92 68 a4 34 0f]}4X5 [b8 fe][20] è¿™ä¸ªå‘½ä»¤ç”¨äºæ£€æŸ¥NtQueryVirtualMemoryå‡½æ•°æ˜¯å¦è¢«æŒ‚é’©
+// WardenCMD2: 02 00 0E [01]  å¯¹æŠ¥æ–‡çš„ç¬¬ä¸€ä¸ªå­—ç¬¦ä¸²æ‰€æŒ‡æ˜çš„æ–‡ä»¶ï¼Œè¯»å–å…¶SHAå€¼
 // WardenCMD2: 02 00 1b 02 [7b 33 06 00] [07] 
 // WardenCMD2: 02 00 d8 [17 a0 c8 36] 4X5 [2a ff][20]
 // WardenCMD2: 02 00 0e [03]
 // WardenCMD2: 02 00 d8 [15 34 fb 1a] 4X5 [00 00][1f]
 
-// WardenCMD2: 02 00 a2 [b8 08 d3 e1] 4X5 [58 a4 00 00][3c] Ê¹ÓÃNtQueryVirtualMemoryÀ´Çî¾ÙËùÓĞÊı¾İ¶Î£¬µ±´óĞ¡>OffsetµÄÊ±ºò£¬¶ÁÈ¡Êı¾İ14A458
+// WardenCMD2: 02 00 a2 [b8 08 d3 e1] 4X5 [58 a4 00 00][3c] ä½¿ç”¨NtQueryVirtualMemoryæ¥ç©·ä¸¾æ‰€æœ‰æ•°æ®æ®µï¼Œå½“å¤§å°>Offsetçš„æ—¶å€™ï¼Œè¯»å–æ•°æ®14A458
 
-// WardenCMD2: 02 00 51 {[d3 dc 0c ec]MD5} 4X5 Ã¶¾ÙÏµÍ³½ø³Ì£¬»ñµÃ½ø³ÌµÄÎÄ¼şÃû£¬SHA£¬ÓëÔ¤ÆÚµÄSHAÖµ±È½Ï
+// WardenCMD2: 02 00 51 {[d3 dc 0c ec]MD5} 4X5 æšä¸¾ç³»ç»Ÿè¿›ç¨‹ï¼Œè·å¾—è¿›ç¨‹çš„æ–‡ä»¶åï¼ŒSHAï¼Œä¸é¢„æœŸçš„SHAå€¼æ¯”è¾ƒ
 // WardenCMD2: 02 00 26 16bytes
 // WardenCMD2: 02 00 36 [xx] [xx xx xx xx] [xx] 
 // WardenCMD2: 02 00 44 [xx]
 // WardenCMD2: 02 00 6C {[xx xx xx xx]MD5}
 // WardenCMD2: 02 00 87 {[xx xx xx xx]MD5} [xx xx xx xx] [xx] 
-// WardenCMD2´¦Àí: d8½øĞĞÅĞ¶Ï£¨51 0E 1B 29 36 44 6C 87 A2 BD D8£©
+// WardenCMD2å¤„ç†: d8è¿›è¡Œåˆ¤æ–­ï¼ˆ51 0E 1B 29 36 44 6C 87 A2 BD D8ï¼‰
 
 
-// +30 WardenCMD2: D8 [DWORD seed] [DWORD X 5  SHA][WORD Offset][BYTE LEN] Õâ¸öÃüÁîÓÃÓÚ¼ì²éNtQueryVirtualMemoryº¯ÊıÊÇ·ñ±»¹Ò¹³
-// +40 WardenCMD2: 0E [BYTE Index]  ¶ÔIndex×Ö·û´®Ö¸Ã÷µÄÎÄ¼ş£¬¶ÁÈ¡ÆäSHAÖµ
-// +4 WardenCMD2: 1B [BYTE Index] [DWORD Offset] [BYTE len]  ¶ÔIndex×Ö·û´®Ö¸Ã÷µÄModule£¬¶ÁÈ¡ÆäOffset´¦³¤¶ÈÎªlenµÄÄÚÈİ
-// +20 WardenCMD2: A2 [DWORD seed] [DWORD X 5  SHA][DWORD Offset][BYTE LEN] Ê¹ÓÃNtQueryVirtualMemoryÀ´Çî¾ÙËùÓĞÊı¾İ¶Î£¬µ±´óĞ¡>Offset+lenµÄÊ±ºò£¬¶ÁÈ¡Êı¾İ14A458£¬²¢ÓëÔ¤ÆÚµÄSHA±È½Ï
-// +14 WardenCMD2: 51 [DWORD seed] [DWORD X 5  SHA] Ã¶¾ÙÏµÍ³½ø³Ì£¬»ñµÃ½ø³ÌµÄÎÄ¼şÃû£¬×ª³É´óĞ´£¬SHA£¬ÓëÔ¤ÆÚµÄSHAÖµ±È½Ï
+// +30 WardenCMD2: D8 [DWORD seed] [DWORD X 5  SHA][WORD Offset][BYTE LEN] è¿™ä¸ªå‘½ä»¤ç”¨äºæ£€æŸ¥NtQueryVirtualMemoryå‡½æ•°æ˜¯å¦è¢«æŒ‚é’©
+// +40 WardenCMD2: 0E [BYTE Index]  å¯¹Indexå­—ç¬¦ä¸²æŒ‡æ˜çš„æ–‡ä»¶ï¼Œè¯»å–å…¶SHAå€¼
+// +4 WardenCMD2: 1B [BYTE Index] [DWORD Offset] [BYTE len]  å¯¹Indexå­—ç¬¦ä¸²æŒ‡æ˜çš„Moduleï¼Œè¯»å–å…¶Offsetå¤„é•¿åº¦ä¸ºlençš„å†…å®¹
+// +20 WardenCMD2: A2 [DWORD seed] [DWORD X 5  SHA][DWORD Offset][BYTE LEN] ä½¿ç”¨NtQueryVirtualMemoryæ¥ç©·ä¸¾æ‰€æœ‰æ•°æ®æ®µï¼Œå½“å¤§å°>Offset+lençš„æ—¶å€™ï¼Œè¯»å–æ•°æ®14A458ï¼Œå¹¶ä¸é¢„æœŸçš„SHAæ¯”è¾ƒ
+// +14 WardenCMD2: 51 [DWORD seed] [DWORD X 5  SHA] æšä¸¾ç³»ç»Ÿè¿›ç¨‹ï¼Œè·å¾—è¿›ç¨‹çš„æ–‡ä»¶åï¼Œè½¬æˆå¤§å†™ï¼ŒSHAï¼Œä¸é¢„æœŸçš„SHAå€¼æ¯”è¾ƒ
 
 // +44 WardenCMD2: 29 16bytes
-// +4 +c WardenCMD2: 36 [BYTE Index] [DWORD Offset] [BYTE Len]   ¶ÔIndex×Ö·û´®Ö¸Ã÷µÄModule£¬¶ÁÈ¡ÆäOffset´¦³¤¶ÈÎª4µÄÄÚÈİA£¬È»ºóÑ°Ö·Base+A+4£¬½«³¤¶ÈÎªLenµÄÄÚÈİ·µ»Ø£¬Ö÷ÒªÓÃÓÚ¼ì²éCallÖ¸ÁîÊÇ·ñ±»ĞŞ¸Äµ÷ÓÃÁËÆäËû³ÌĞò
-// ESI WardenCMD2: 44 [BYTE Index] µ÷ÓÃ+9DC´¦µÄº¯Êı£¿£¡ĞèÒªÍ¨¹ıWardenCMD3ÉèÖÃ£¿£¡
-// +18 WardenCMD2: 6C [DWORD Seed] [DWORD X 5 SHA] ËÑË÷ËùÓĞ¿ÉÖ´ĞĞµÄ´úÂë¶Î£¬»ñÈ¡¸ÃÖ´ĞĞÎÄ¼şÃû£¬×ª³É´óĞ´£¬SHA£¬ÓëÔ¤ÆÚµÄSHAÖµ±È½Ï
-// +1c WardenCMD2: 87 [DWORD Seed] [DWORD X 5 SHA] [DWORD Offset][BYTE LEN] Ê¹ÓÃsnapshotÀ´Çî¾ÙËùÓĞ´úÂë¶Î£¬µ±´óĞ¡>Offset+lenµÄÊ±ºò£¬¶ÁÈ¡Êı¾İ14A458£¬²¢ÓëÔ¤ÆÚµÄSHA±È½Ï
-// +2c WardenCMD2: BD [BYTE ¶ÑÕ»ÉÏ¹ı³ÌÇ¶Ì×µÄ¼¶Êı] [BYTE Len]  »ñÈ¡µ±Ç°¶ÑÕ»¶¥²¿µÄ·µ»ØµØÖ·£¬×·×ÙÖ¸¶¨¼¶Êı£¨Ç¶Ì×¹ı³Ìµ÷ÓÃ£©£¬È»ºó½«¶ÔÓ¦´úÂë¶ÎËù´¦Î»ÖÃµÄÖ¸¶¨³¤¶È´úÂë·µ»Ø
+// +4 +c WardenCMD2: 36 [BYTE Index] [DWORD Offset] [BYTE Len]   å¯¹Indexå­—ç¬¦ä¸²æŒ‡æ˜çš„Moduleï¼Œè¯»å–å…¶Offsetå¤„é•¿åº¦ä¸º4çš„å†…å®¹Aï¼Œç„¶åå¯»å€Base+A+4ï¼Œå°†é•¿åº¦ä¸ºLençš„å†…å®¹è¿”å›ï¼Œä¸»è¦ç”¨äºæ£€æŸ¥CallæŒ‡ä»¤æ˜¯å¦è¢«ä¿®æ”¹è°ƒç”¨äº†å…¶ä»–ç¨‹åº
+// ESI WardenCMD2: 44 [BYTE Index] è°ƒç”¨+9DCå¤„çš„å‡½æ•°ï¼Ÿï¼éœ€è¦é€šè¿‡WardenCMD3è®¾ç½®ï¼Ÿï¼
+// +18 WardenCMD2: 6C [DWORD Seed] [DWORD X 5 SHA] æœç´¢æ‰€æœ‰å¯æ‰§è¡Œçš„ä»£ç æ®µï¼Œè·å–è¯¥æ‰§è¡Œæ–‡ä»¶åï¼Œè½¬æˆå¤§å†™ï¼ŒSHAï¼Œä¸é¢„æœŸçš„SHAå€¼æ¯”è¾ƒ
+// +1c WardenCMD2: 87 [DWORD Seed] [DWORD X 5 SHA] [DWORD Offset][BYTE LEN] ä½¿ç”¨snapshotæ¥ç©·ä¸¾æ‰€æœ‰ä»£ç æ®µï¼Œå½“å¤§å°>Offset+lençš„æ—¶å€™ï¼Œè¯»å–æ•°æ®14A458ï¼Œå¹¶ä¸é¢„æœŸçš„SHAæ¯”è¾ƒ
+// +2c WardenCMD2: BD [BYTE å †æ ˆä¸Šè¿‡ç¨‹åµŒå¥—çš„çº§æ•°] [BYTE Len]  è·å–å½“å‰å †æ ˆé¡¶éƒ¨çš„è¿”å›åœ°å€ï¼Œè¿½è¸ªæŒ‡å®šçº§æ•°ï¼ˆåµŒå¥—è¿‡ç¨‹è°ƒç”¨ï¼‰ï¼Œç„¶åå°†å¯¹åº”ä»£ç æ®µæ‰€å¤„ä½ç½®çš„æŒ‡å®šé•¿åº¦ä»£ç è¿”å›
 // +34 WardenCMD2: F3 [BYTE*4][DWORD X 5 SHA][WORD][BYTE]
 
-// 1.12a WardenMODµÄ×ÓÃüÁî
-// 76 [BYTE*4][DWORD X 5 SHA] Ã¶¾ÙÏµÍ³½ø³Ì£¬»ñµÃ½ø³ÌµÄÎÄ¼şÃû£¬×ª³É´óĞ´£¬SHA£¬ÓëÔ¤ÆÚµÄSHAÖµ±È½Ï
-// 00 [BYTE*4][DWORD X 5 SHA][DWORD][BYTE] Ê¹ÓÃsnapshotÀ´Çî¾ÙËùÓĞ´úÂë¶Î£¬µ±´óĞ¡>Offset+lenµÄÊ±ºò£¬¶ÁÈ¡Êı¾İ14A458£¬²¢ÓëÔ¤ÆÚµÄSHA±È½Ï
-// 77 [BYTE*4][DWORD X 5 SHA][DWORD][BYTE] Ê¹ÓÃNtQueryVirtualMemoryÀ´Çî¾ÙËùÓĞÊı¾İ¶Î£¬µ±´óĞ¡>Offset+lenµÄÊ±ºò£¬¶ÁÈ¡Êı¾İ14A458£¬²¢ÓëÔ¤ÆÚµÄSHA±È½Ï
-// ED [BYTE*4][DWORD X 5 SHA] Ã¶Ê¹ÓÃsnapshotÀ´Çî¾ÙËùÓĞ´úÂë¶Î£¬»ñµÃ½ø³ÌµÄÎÄ¼şÃû£¬×ª³É´óĞ´£¬SHA£¬ÓëÔ¤ÆÚµÄSHAÖµ±È½Ï
-// EC [BYTE Index][DWORD Offset][BYTE Len] ¶ÔIndex×Ö·û´®Ö¸Ã÷µÄModule£¬¶ÁÈ¡ÆäOffset´¦³¤¶ÈÎªlenµÄÄÚÈİ
-// D9 ½«[ebx]ÉèÖÃÎª1£¿£¿£¡£¡½Ø¶ÏÃüÁî£¬D9ºóÃæµÄ¶¼ÊÇÎŞĞ§µÄ±¨ÎÄ
-// 9E [BYTE*4][DWORD X 5 SHA][BYTE] ¶ÔIndex×Ö·û´®£¨±ØĞëÊÇÒ»¸öÉè±¸Ãû£¬ÀıÈçC:£©£¬Ê¹ÓÃQueryDosDevice»ñµÃ¸ÃÉè±¸µÄÏêÏ¸ĞÅÏ¢£¬ÀıÈç\Device\HarddiskVolume1£¬¶Ô´Ë×Ö·û´®½øĞĞSHA£¬²¢ÓëÔ¤ÆÚµÄSHA±È½Ï
-// 8B [BYTE*4][DWORD X 5 SHA][BYTE StrIndex1][BYTE StrIndex2][DWORD Offset][BYTE Len] Ê¹ÓÃGetProcess»ñµÃStrIndex1Ä£¿éÖĞStrIndex2º¯ÊıµÄµØÖ·£¨Ìø¹ıÆğÊ¼µÄNOPÖ¸Áî£©£¬Èç¹ûÊÇCALLÖ¸Áî£¬Ôò¼ì²éÆäÖ¸ÏòµØÖ·Offset´¦³¤¶ÈÎªLenµÄSHAÖµ¡£Ö÷ÒªÓÃÓÚ¼ì²âÊä³öº¯ÊıÊÇ·ñ±»¹Ò¹³
-// 8A [BYTE ¶ÑÕ»ÉÏ¹ı³ÌÇ¶Ì×µÄ¼¶Êı] [BYTE Len] »ñÈ¡µ±Ç°¶ÑÕ»¶¥²¿µÄ·µ»ØµØÖ·£¬×·×ÙÖ¸¶¨¼¶Êı£¨Ç¶Ì×¹ı³Ìµ÷ÓÃ stack frame£©£¬È»ºó½«¶ÔÓ¦´úÂë¶ÎËù´¦Î»ÖÃµÄÖ¸¶¨³¤¶È´úÂë·µ»Ø 01D37910
-// 63 [BYTE] [DWORD Offset][BYTE Len] ¶ÔIndex×Ö·û´®Ö¸Ã÷µÄModule£¬¶ÁÈ¡ÆäOffset´¦³¤¶ÈÎª4µÄÄÚÈİA£¬È»ºóÑ°Ö·Base+A+4£¬½«³¤¶ÈÎªLenµÄÄÚÈİ·µ»Ø£¬Ö÷ÒªÓÃÓÚ¼ì²éCallÖ¸ÁîÊÇ·ñ±»ĞŞ¸Äµ÷ÓÃÁËÆäËû³ÌĞò
-// 28 »ñÈ¡¿Í»§¶ËµÄTickCount£¬Ê±¼ä£¿»òÕß»ñÈ¡[ESI+7E0]º¯ÊıµÄ·µ»ØÖµ
-// 15 [16Bytes] µ÷ÓÃWardenº¯Êı£¨¿Õº¯Êı£©Àí16×Ö½ÚÊı¾İ£¬·µ»Ø5¸ö×Ö½ÚµÄ½á¹û
-// 14 [BYTE Index] ¶ÔIndex×Ö·û´®£¨ÎÄ¼ş£©£¬Ê¹ÓÃESI+7DCº¯Êı½øĞĞ´¦Àí£¬²¢·µ»Ø½á¹û£¨³É¹¦·µ»Ø0£¬Ê§°Ü´íÎó·µ»Ø1£©
-// 01 [BYTE Index] ¶ÔIndex×Ö·û´®ÎÄ¼ş£¬Ö´ĞĞSHA²Ù×÷£¬Ã²ËÆ±ØĞëÊÇmpqÎÄ¼ş£¿£¡±ØĞëÏÈÓÃWarden_CMD3ÅäÖÃ¼ÓÔØ
+// 1.12a WardenMODçš„å­å‘½ä»¤
+// 76 [BYTE*4][DWORD X 5 SHA] æšä¸¾ç³»ç»Ÿè¿›ç¨‹ï¼Œè·å¾—è¿›ç¨‹çš„æ–‡ä»¶åï¼Œè½¬æˆå¤§å†™ï¼ŒSHAï¼Œä¸é¢„æœŸçš„SHAå€¼æ¯”è¾ƒ
+// 00 [BYTE*4][DWORD X 5 SHA][DWORD][BYTE] ä½¿ç”¨snapshotæ¥ç©·ä¸¾æ‰€æœ‰ä»£ç æ®µï¼Œå½“å¤§å°>Offset+lençš„æ—¶å€™ï¼Œè¯»å–æ•°æ®14A458ï¼Œå¹¶ä¸é¢„æœŸçš„SHAæ¯”è¾ƒ
+// 77 [BYTE*4][DWORD X 5 SHA][DWORD][BYTE] ä½¿ç”¨NtQueryVirtualMemoryæ¥ç©·ä¸¾æ‰€æœ‰æ•°æ®æ®µï¼Œå½“å¤§å°>Offset+lençš„æ—¶å€™ï¼Œè¯»å–æ•°æ®14A458ï¼Œå¹¶ä¸é¢„æœŸçš„SHAæ¯”è¾ƒ
+// ED [BYTE*4][DWORD X 5 SHA] æšä½¿ç”¨snapshotæ¥ç©·ä¸¾æ‰€æœ‰ä»£ç æ®µï¼Œè·å¾—è¿›ç¨‹çš„æ–‡ä»¶åï¼Œè½¬æˆå¤§å†™ï¼ŒSHAï¼Œä¸é¢„æœŸçš„SHAå€¼æ¯”è¾ƒ
+// EC [BYTE Index][DWORD Offset][BYTE Len] å¯¹Indexå­—ç¬¦ä¸²æŒ‡æ˜çš„Moduleï¼Œè¯»å–å…¶Offsetå¤„é•¿åº¦ä¸ºlençš„å†…å®¹
+// D9 å°†[ebx]è®¾ç½®ä¸º1ï¼Ÿï¼Ÿï¼ï¼æˆªæ–­å‘½ä»¤ï¼ŒD9åé¢çš„éƒ½æ˜¯æ— æ•ˆçš„æŠ¥æ–‡
+// 9E [BYTE*4][DWORD X 5 SHA][BYTE] å¯¹Indexå­—ç¬¦ä¸²ï¼ˆå¿…é¡»æ˜¯ä¸€ä¸ªè®¾å¤‡åï¼Œä¾‹å¦‚C:ï¼‰ï¼Œä½¿ç”¨QueryDosDeviceè·å¾—è¯¥è®¾å¤‡çš„è¯¦ç»†ä¿¡æ¯ï¼Œä¾‹å¦‚\Device\HarddiskVolume1ï¼Œå¯¹æ­¤å­—ç¬¦ä¸²è¿›è¡ŒSHAï¼Œå¹¶ä¸é¢„æœŸçš„SHAæ¯”è¾ƒ
+// 8B [BYTE*4][DWORD X 5 SHA][BYTE StrIndex1][BYTE StrIndex2][DWORD Offset][BYTE Len] ä½¿ç”¨GetProcessè·å¾—StrIndex1æ¨¡å—ä¸­StrIndex2å‡½æ•°çš„åœ°å€ï¼ˆè·³è¿‡èµ·å§‹çš„NOPæŒ‡ä»¤ï¼‰ï¼Œå¦‚æœæ˜¯CALLæŒ‡ä»¤ï¼Œåˆ™æ£€æŸ¥å…¶æŒ‡å‘åœ°å€Offsetå¤„é•¿åº¦ä¸ºLençš„SHAå€¼ã€‚ä¸»è¦ç”¨äºæ£€æµ‹è¾“å‡ºå‡½æ•°æ˜¯å¦è¢«æŒ‚é’©
+// 8A [BYTE å †æ ˆä¸Šè¿‡ç¨‹åµŒå¥—çš„çº§æ•°] [BYTE Len] è·å–å½“å‰å †æ ˆé¡¶éƒ¨çš„è¿”å›åœ°å€ï¼Œè¿½è¸ªæŒ‡å®šçº§æ•°ï¼ˆåµŒå¥—è¿‡ç¨‹è°ƒç”¨ stack frameï¼‰ï¼Œç„¶åå°†å¯¹åº”ä»£ç æ®µæ‰€å¤„ä½ç½®çš„æŒ‡å®šé•¿åº¦ä»£ç è¿”å› 01D37910
+// 63 [BYTE] [DWORD Offset][BYTE Len] å¯¹Indexå­—ç¬¦ä¸²æŒ‡æ˜çš„Moduleï¼Œè¯»å–å…¶Offsetå¤„é•¿åº¦ä¸º4çš„å†…å®¹Aï¼Œç„¶åå¯»å€Base+A+4ï¼Œå°†é•¿åº¦ä¸ºLençš„å†…å®¹è¿”å›ï¼Œä¸»è¦ç”¨äºæ£€æŸ¥CallæŒ‡ä»¤æ˜¯å¦è¢«ä¿®æ”¹è°ƒç”¨äº†å…¶ä»–ç¨‹åº
+// 28 è·å–å®¢æˆ·ç«¯çš„TickCountï¼Œæ—¶é—´ï¼Ÿæˆ–è€…è·å–[ESI+7E0]å‡½æ•°çš„è¿”å›å€¼
+// 15 [16Bytes] è°ƒç”¨Wardenå‡½æ•°ï¼ˆç©ºå‡½æ•°ï¼‰ç†16å­—èŠ‚æ•°æ®ï¼Œè¿”å›5ä¸ªå­—èŠ‚çš„ç»“æœ
+// 14 [BYTE Index] å¯¹Indexå­—ç¬¦ä¸²ï¼ˆæ–‡ä»¶ï¼‰ï¼Œä½¿ç”¨ESI+7DCå‡½æ•°è¿›è¡Œå¤„ç†ï¼Œå¹¶è¿”å›ç»“æœï¼ˆæˆåŠŸè¿”å›0ï¼Œå¤±è´¥é”™è¯¯è¿”å›1ï¼‰
+// 01 [BYTE Index] å¯¹Indexå­—ç¬¦ä¸²æ–‡ä»¶ï¼Œæ‰§è¡ŒSHAæ“ä½œï¼Œè²Œä¼¼å¿…é¡»æ˜¯mpqæ–‡ä»¶ï¼Ÿï¼å¿…é¡»å…ˆç”¨Warden_CMD3é…ç½®åŠ è½½
 
 unsigned char WardenCMD2[] = { // load d2client.dll and check memory.... response:02 07 00 00 40 50 0f 00 40 ae 06 03 1e 00 
 0x02, 0x0c, 0x44, 0x32, 0x43, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x2e, 0x64, 0x6c, 0x6c, 0x00, 0x1b, 	
@@ -894,7 +894,7 @@ extern "C" DWORD __stdcall d2warden_thread(struct D2Warden_Parameter_Struct *lpP
 	Log(LOG_INFO,"d2warden_thread: Starting Warden Loop on this server.\n");
 	while (1)
 	{
-		// É¨ÃèËùÓĞClient_Data£¬½øĞĞWarden´¦Àí
+		// æ‰«ææ‰€æœ‰Client_Dataï¼Œè¿›è¡ŒWardenå¤„ç†
 		WardenLoop();
 		Sleep(1);
 	}
@@ -1002,7 +1002,7 @@ int Reading_HackCheck(char *filename,char *HackName)
 
 void Warden_Init(void)
 {
-	// ³õÊ¼»¯WardenÄ£¿é£¬´Ód2warden.iniÖĞ¶ÁÈ¡WardenÅäÖÃ²ÎÊı
+	// åˆå§‹åŒ–Wardenæ¨¡å—ï¼Œä»d2warden.iniä¸­è¯»å–Wardené…ç½®å‚æ•°
 	char filename[MAX_PATH];
 	FILE *fp;
 	int i;
@@ -1178,10 +1178,10 @@ void Warden_Init(void)
 	
 	for (i=0;i<16;i++)
 	{
-		// ¼ì²émodµÄÃû×ÖÊÇ·ñµÈÓÚMD5µÄĞ£ÑéºÍ
+		// æ£€æŸ¥modçš„åå­—æ˜¯å¦ç­‰äºMD5çš„æ ¡éªŒå’Œ
 	}
 
-	// MOD_Length*8µ÷ÓÃDouble_MD5
+	// MOD_Length*8è°ƒç”¨Double_MD5
 	// D9DF8ADAD5959F307FD000AC06F577E598008D01
 	
 	unsigned char ptResult[16];
@@ -1248,7 +1248,7 @@ void WardenLoop(void)
 		if ((CheckValidClient(ptCurrentClient->ClientID,ptCurrentClient->ClientLogonTime) == false) || ptCurrentClient->NextCheckTime == NEVER)
 		{
 			unsigned char cause;
-			// µ±Ç°¿Í»§¶ËÒÑ¾­ÊÇÎŞĞ§¿Í»§¶Ë£¬»òÕßÓÀÔ¶²»»á¼ì²é£¬È¥µô
+			// å½“å‰å®¢æˆ·ç«¯å·²ç»æ˜¯æ— æ•ˆå®¢æˆ·ç«¯ï¼Œæˆ–è€…æ°¸è¿œä¸ä¼šæ£€æŸ¥ï¼Œå»æ‰
 			if (CheckValidClient(ptCurrentClient->ClientID,ptCurrentClient->ClientLogonTime) == false) cause=0;
 			else
 			if (ptCurrentClient->NextCheckTime == NEVER) cause=1;
@@ -1278,10 +1278,10 @@ void WardenLoop(void)
 		
 		if (1)//ptCurrentClient->NextCheckTime < CurrentTick)
 		{
-			// ÒÑ¾­µ½Ê±ºò¼ì²é¿Í»§¶ËÁË
+			// å·²ç»åˆ°æ—¶å€™æ£€æŸ¥å®¢æˆ·ç«¯äº†
 			if (ptCurrentClient->NextTimeout < CurrentTick)
 			{
-				// ½ÓÊÕ³¬Ê±
+				// æ¥æ”¶è¶…æ—¶
 				if (WardenHackCheckArray[ptCurrentClient->NextHackCheck].Log & 0x04)
 				{
 					Log(LOG_HACK,"Warden_Loop: Player %s(*%s) time out[HackCheck=%s reason=%d]..\n",ptCurrentClient->CharName,ptCurrentClient->AccountName,WardenHackCheckArray[ptCurrentClient->NextHackCheck].HackName,ptCurrentClient->TimeoutReason);
@@ -1296,11 +1296,11 @@ void WardenLoop(void)
 							{
 								ptCurrentClient->NextHackCheck = 0;
 								ptCurrentClient->CheckTimes++;
-								ptCurrentClient->NextCheckTime = SlowTick;	// ÏÂÒ»ÂÖ¼ì²é
+								ptCurrentClient->NextCheckTime = SlowTick;	// ä¸‹ä¸€è½®æ£€æŸ¥
 								ptCurrentClient->NextTimeout = SlowTick+15000;
 								if (ptCurrentClient->EnablePlayerMouseCheck)
 								{
-//									ptCurrentClient->NextCheckTime = CurrentTick;	// ÏÂÒ»ÂÖ¼ì²é
+//									ptCurrentClient->NextCheckTime = CurrentTick;	// ä¸‹ä¸€è½®æ£€æŸ¥
 //									ptCurrentClient->NextTimeout = CurrentTick+15000;
 									goto try_update_targetxy;
 								}
@@ -1324,7 +1324,7 @@ void WardenLoop(void)
 					}
 			}
 			
-			// ±£Ö¤ÄÜ¹»ÔÚÏÂ´Î²»»á³¬Ê±
+			// ä¿è¯èƒ½å¤Ÿåœ¨ä¸‹æ¬¡ä¸ä¼šè¶…æ—¶
 			SlowTick = CurrentTick + WardenCheckInterv;
 			
 			Packet66_ReceiveTime=ptCurrentClient->Packet66_ReceiveTime;
@@ -1358,17 +1358,17 @@ void WardenLoop(void)
 					if ((retval = UpdateClientInfo(ptCurrentClient)) < 1)
 					{
 						ptCurrentClient->TimeoutReason=100+retval;
-						ptCurrentClient->NextCheckTime = CurrentTick+500;	// Á¢¿Ì¼ì²é
+						ptCurrentClient->NextCheckTime = CurrentTick+500;	// ç«‹åˆ»æ£€æŸ¥
 						//ptCurrentClient->NextTimeout = CurrentTick+15000;
 						//Log(LOG_HACK,"ERROR: WARDEN_START ClientID=%04d Invalid[%d]\n",ptCurrentClient->ClientID,retval);
 						break;
 					}
 					
 					ptCurrentClient->ErrorCount = 0;						
-					UPDATE_WARDEN(WARDEN_START1,CurrentTick+1000,CurrentTick+25000);// 10ÃëºóÔÙ¼ì²é
+					UPDATE_WARDEN(WARDEN_START1,CurrentTick+1000,CurrentTick+25000);// 10ç§’åå†æ£€æŸ¥
 					break;
 				case WARDEN_START1:
-					// Ê×ÏÈ²éÑ¯¿Í»§¶ËÊÇ·ñ´æÔÚÖ¸¶¨µÄMOD£¬·¢ËÍAE00±¨ÎÄ
+					// é¦–å…ˆæŸ¥è¯¢å®¢æˆ·ç«¯æ˜¯å¦å­˜åœ¨æŒ‡å®šçš„MODï¼Œå‘é€AE00æŠ¥æ–‡
 					ptCurrentClient->LastCheckTime=CurrentTick;
 					memcpy(WardenCMD0_local,&AE_Packet00[3],37);
 					rc4_crypt(ptCurrentClient->RC4_KEY_0XAE,&AE_Packet00[3],37);
@@ -1383,12 +1383,12 @@ Send_AE00_Again:
 					break;
 				case WARDEN_CHECK_CLIENT_HAS_MOD_OR_NOT:
 					ptCurrentClient->TimeoutReason=WARDEN_CHECK_CLIENT_HAS_MOD_OR_NOT;
-					// ¼ì²é¿Í»§¶Ë·µ»ØAE00±¨ÎÄµÄ½á¹û
+					// æ£€æŸ¥å®¢æˆ·ç«¯è¿”å›AE00æŠ¥æ–‡çš„ç»“æœ
 					Log(LOG_DEBUG,"WardenLoop: WARDEN_CHECK_CLIENT_HAS_MOD_OR_NOT  ClientID=%04d\n",ptCurrentClient->ClientID);
 					if (Packet66_PacketLen)
 					{
 						Log(LOG_DEBUG,"WardenLoop: WARDEN_CHECK_CLIENT_HAS_MOD_OR_NOT  Got Packet ClientID=%04d\n",ptCurrentClient->ClientID);
-						// ½ÓÊÕµ½AE 00µÄÓ¦´ğ±¨ÎÄ
+						// æ¥æ”¶åˆ°AE 00çš„åº”ç­”æŠ¥æ–‡
 						Remove0X66Packet(ptCurrentClient);
 						if (Packet66_PacketLen != 1)
 						{
@@ -1604,7 +1604,7 @@ Send_AE00_Again:
 							if (tt != 0)
 							{
 								ptCurrentClient->PlayerPathPtr = tt+0x10;
-								ptCurrentClient->NextCheckTime = CurrentTick;	// ÏÂÒ»´Î¼ì²é
+								ptCurrentClient->NextCheckTime = CurrentTick;	// ä¸‹ä¸€æ¬¡æ£€æŸ¥
 								ptCurrentClient->NextTimeout = CurrentTick+15000;
 
 try_update_targetxy:
@@ -1677,7 +1677,7 @@ try_update_targetxy:
 									
 								if (ptCurrentClient->MissMatchEModeCounter != 0xFF)
 								{
-									// NECÌ××°BUG£¬ÔÚ³ÇÄÚ£¬server¶ËÊÇ5£¬¶ø¿Í»§¶ËÊÇ1....
+									// NECå¥—è£…BUGï¼Œåœ¨åŸå†…ï¼Œserverç«¯æ˜¯5ï¼Œè€Œå®¢æˆ·ç«¯æ˜¯1....
 									if (ServerPlayerEMode != ClientEMode && ServerPlayerEMode != 5 && ServerPlayerEMode != 1)
 										ptCurrentClient->MissMatchEModeCounter++;
 								}
@@ -1694,7 +1694,7 @@ try_update_targetxy:
 								
 								if (ClientPlayerTargetXY == 0 && ServerPlayerTargetXY != 0)
 								{
-									// ·şÎñÆ÷µÄTargetXYÒÑ¾­¸üĞÂ£¬¶ø¿Í»§¶Ë»¹Ã»ÓĞ¸üĞÂ¡£Íæ¼ÒÓÃÁË·ÇÊó±ê²Ù×÷µÄHack»òÕßBot
+									// æœåŠ¡å™¨çš„TargetXYå·²ç»æ›´æ–°ï¼Œè€Œå®¢æˆ·ç«¯è¿˜æ²¡æœ‰æ›´æ–°ã€‚ç©å®¶ç”¨äº†éé¼ æ ‡æ“ä½œçš„Hackæˆ–è€…Bot
 									ptCurrentClient->PlayerZeroTargetCounter++;
 									if (0)//ptCurrentClient->PlayerZeroTargetCounter > 1)
 									{
@@ -1708,8 +1708,8 @@ try_update_targetxy:
 									else
 									if (ptCurrentClient->PlayerZeroTargetCounter == 1)
 									{
-										// Èç¹ûÓĞÒ»´ÎÍ¬²½Ê§Ğ§£¬Á¢¿Ì½øĞĞµÚ¶ş´Î¼ì²â
-										ptCurrentClient->NextCheckTime = CurrentTick+50;	// ÏÂÒ»´Î¼ì²é
+										// å¦‚æœæœ‰ä¸€æ¬¡åŒæ­¥å¤±æ•ˆï¼Œç«‹åˆ»è¿›è¡Œç¬¬äºŒæ¬¡æ£€æµ‹
+										ptCurrentClient->NextCheckTime = CurrentTick+50;	// ä¸‹ä¸€æ¬¡æ£€æŸ¥
 										ptCurrentClient->NextTimeout = CurrentTick + 15000;
 										goto try_update_targetxy;
 									}
@@ -1725,7 +1725,7 @@ try_update_targetxy:
 									UPDATE_WARDEN_RIGHTNOW(WARDEN_CHECK_HACKS);
 								}
 				
-								ptCurrentClient->NextCheckTime = CurrentTick;	// Á¢¿Ì¼ì²é
+								ptCurrentClient->NextCheckTime = CurrentTick;	// ç«‹åˆ»æ£€æŸ¥
 								ptCurrentClient->NextTimeout = CurrentTick + 15000;
 						}
 					}
@@ -1762,7 +1762,7 @@ try_update_targetxy:
 							if (ptCurrentClient->NewMsg)
 							{
 								ptCurrentClient->NewMsg = 0;
-								// ¼ì²éChatĞÅÏ¢
+								// æ£€æŸ¥Chatä¿¡æ¯
 								for (i=0;i<MAX_CHAT_MSG_BUF;i++)
 								{
 									if (WardenHackCheckArray[ptCurrentClient->NextHackCheck].MsgOffset>=0)
@@ -1779,7 +1779,7 @@ try_update_targetxy:
 									}
 									else
 									{
-										// Ìøµ½·ÖºÅÖ®ºó
+										// è·³åˆ°åˆ†å·ä¹‹å
 										int j;
 										for (j=0;j<40;j++)
 										{
@@ -1807,11 +1807,11 @@ try_update_targetxy:
 							{
 								ptCurrentClient->NextHackCheck = 0;
 								ptCurrentClient->CheckTimes++;
-								ptCurrentClient->NextCheckTime = SlowTick;	// ÏÂÒ»ÂÖ¼ì²é
+								ptCurrentClient->NextCheckTime = SlowTick;	// ä¸‹ä¸€è½®æ£€æŸ¥
 								ptCurrentClient->NextTimeout = SlowTick+15000;
 								if (ptCurrentClient->EnablePlayerMouseCheck)
 								{
-//									ptCurrentClient->NextCheckTime = CurrentTick;	// ÏÂÒ»ÂÖ¼ì²é
+//									ptCurrentClient->NextCheckTime = CurrentTick;	// ä¸‹ä¸€è½®æ£€æŸ¥
 //									ptCurrentClient->NextTimeout = CurrentTick+15000;
 									goto try_update_targetxy;
 								}
@@ -1852,11 +1852,11 @@ NextCheck:
 								{
 									ptCurrentClient->NextHackCheck = 0;
 									ptCurrentClient->CheckTimes++;
-									ptCurrentClient->NextCheckTime = SlowTick;	// ÏÂÒ»ÂÖ¼ì²é
+									ptCurrentClient->NextCheckTime = SlowTick;	// ä¸‹ä¸€è½®æ£€æŸ¥
 									ptCurrentClient->NextTimeout = SlowTick+15000;
 									if (ptCurrentClient->EnablePlayerMouseCheck)
 									{
-//										ptCurrentClient->NextCheckTime = CurrentTick;	// ÏÂÒ»ÂÖ¼ì²é
+//										ptCurrentClient->NextCheckTime = CurrentTick;	// ä¸‹ä¸€è½®æ£€æŸ¥
 //										ptCurrentClient->NextTimeout = CurrentTick+15000;
 										goto try_update_targetxy;
 									}
@@ -1929,12 +1929,12 @@ HackChatDetected:
 						}
 						if (ptCurrentClient->WardenStatus == WARDEN_CHECK_HACKS && ptCurrentClient->NextHackCheck == 0)
 						{
-							ptCurrentClient->NextCheckTime = SlowTick;	// ÏÂÒ»ÂÖ¼ì²é
+							ptCurrentClient->NextCheckTime = SlowTick;	// ä¸‹ä¸€è½®æ£€æŸ¥
 							ptCurrentClient->NextTimeout = SlowTick+15000;
 						}
 						else
 						{
-							ptCurrentClient->NextCheckTime = CurrentTick;	// ÏÂÒ»´Î¼ì²é
+							ptCurrentClient->NextCheckTime = CurrentTick;	// ä¸‹ä¸€æ¬¡æ£€æŸ¥
 							ptCurrentClient->NextTimeout = CurrentTick+15000;
 						}
 						Log(LOG_DEBUG,"WardenLoop: WARDEN_ClientReturnHackCheck ClientID=%04d\n",ptCurrentClient->ClientID);
@@ -1991,9 +1991,9 @@ HackChatDetected:
 							/*
 							if (CurrentNumberOfMsgInBuffer<2) 
 							{
-								// ²»¿ÉÄÜÒ»ÌõÏûÏ¢¶¼Ã»ÓĞ£¬¿Ï¶¨ÊÇAnti WardenµÄ±£»¤
+								// ä¸å¯èƒ½ä¸€æ¡æ¶ˆæ¯éƒ½æ²¡æœ‰ï¼Œè‚¯å®šæ˜¯Anti Wardençš„ä¿æŠ¤
 								ptCurrentClient->WardenStatus = WARDEN_ERROR_RESPONSE;
-								ptCurrentClient->NextCheckTime = CurrentTick+50;	// ÏÂÒ»´Î¼ì²é
+								ptCurrentClient->NextCheckTime = CurrentTick+50;	// ä¸‹ä¸€æ¬¡æ£€æŸ¥
 								ptCurrentClient->NextTimeout = CurrentTick + 15000;
 								ptCurrentClient->ErrorResponseReason = 7;
 								Log(LOG_HACK,"Hack: Player %s(*%s) use anti warden hack,maybe cGuard?(%d chat)\n",ptCurrentClient->CharName,ptCurrentClient->AccountName,CurrentNumberOfMsgInBuffer);
@@ -2037,7 +2037,7 @@ HackChatDetected:
 							UPDATE_WARDEN_RIGHTNOW(WARDEN_ERROR_RESPONSE);
 							ptCurrentClient->ErrorResponseReason = 8;
 						}
-						ptCurrentClient->NextCheckTime = CurrentTick;	// ÏÂÒ»´Î¼ì²é
+						ptCurrentClient->NextCheckTime = CurrentTick;	// ä¸‹ä¸€æ¬¡æ£€æŸ¥
 						ptCurrentClient->NextTimeout = CurrentTick+15000;
 					}
 					else
@@ -2077,7 +2077,7 @@ HackChatDetected:
 							UPDATE_WARDEN_RIGHTNOW(WARDEN_ERROR_RESPONSE);
 							ptCurrentClient->ErrorResponseReason = 9;
 						}
-						ptCurrentClient->NextCheckTime = CurrentTick;	// ÏÂÒ»´Î¼ì²é
+						ptCurrentClient->NextCheckTime = CurrentTick;	// ä¸‹ä¸€æ¬¡æ£€æŸ¥
 						ptCurrentClient->NextTimeout = CurrentTick+15000;
 					}
 					else
@@ -2127,7 +2127,7 @@ HackChatDetected:
 						ptCurrentClient->ChatMsgIndex++;
 						if (ptCurrentClient->ChatMsgIndex == MAX_CHAT_MSG_BUF)
 							ptCurrentClient->ChatMsgIndex = 0;
-						ptCurrentClient->NextCheckTime = CurrentTick;	// ÏÂÒ»´Î¼ì²é
+						ptCurrentClient->NextCheckTime = CurrentTick;	// ä¸‹ä¸€æ¬¡æ£€æŸ¥
 						ptCurrentClient->NextTimeout = CurrentTick+15000;
 					}
 					else
@@ -2179,7 +2179,7 @@ HackChatDetected:
 extern "C" DWORD  __fastcall d2warden_0X66Handler(DWORD ptGame, DWORD ptPlayer, unsigned char *ptPacket, DWORD PacketLen)
 {
 	// 66 xxl xxh ....
-	// xxh:xxl = Ê£ÓàPacket³¤¶È
+	// xxh:xxl = å‰©ä½™Packeté•¿åº¦
 	
 	struct Client_Data_Struct *ptWarden_Client_Data;
 	DWORD ClientID;
@@ -2194,7 +2194,7 @@ extern "C" DWORD  __fastcall d2warden_0X66Handler(DWORD ptGame, DWORD ptPlayer, 
 	
 	if (InternalLen <= 0 || InternalLen >= MAX66LEN)
 	{
-		// ´íÎóµÄ66±¨ÎÄ³¤¶È£¡
+		// é”™è¯¯çš„66æŠ¥æ–‡é•¿åº¦ï¼
 		return 3;
 	}
 
@@ -2206,11 +2206,11 @@ extern "C" DWORD  __fastcall d2warden_0X66Handler(DWORD ptGame, DWORD ptPlayer, 
 		{
 			if (ptWarden_Client_Data->CanRecv66Packet == 1)
 			{
-				// Ê¹ÓÃRC4½âÃÜÊı¾İ
+				// ä½¿ç”¨RC4è§£å¯†æ•°æ®
 				memcpy(ptWarden_Client_Data->ThePacket,ptPacket+3,InternalLen);
 				rc4_crypt(ptWarden_Client_Data->RC4_KEY_0X66,ptWarden_Client_Data->ThePacket,InternalLen);
 				ptWarden_Client_Data->Packet66_ReceiveTime = GetTickCount();
-				ptWarden_Client_Data->CanRecv66Packet = 0;	// Ò»´ÎÖ»ÄÜ½ÓÊÕÒ»¸ö0x66±¨ÎÄ
+				ptWarden_Client_Data->CanRecv66Packet = 0;	// ä¸€æ¬¡åªèƒ½æ¥æ”¶ä¸€ä¸ª0x66æŠ¥æ–‡
 				ptWarden_Client_Data->Packet66_PacketLen=InternalLen;
 //				Log(LOG_DEBUG,"0X66Handler: Got Client 0x66 Packet ClientID=%04d\n",ClientID);
 			}
@@ -2260,7 +2260,7 @@ extern "C" DWORD  __fastcall d2warden_0X68Handler(unsigned char *ClientID_Packet
 	{
 		if (ptWarden_Client_Data->ClientID == ClientID)
 		{
-			// ·Ç·¨68±¨ÎÄ
+			// éæ³•68æŠ¥æ–‡
 			ptWarden_Client_Data->ErrorCount++;
 			Log(LOG_DEBUG,"0X68Handler: Hack D2Client D2Version=%X Player=%s\n",D2Version,&ptPacket[21]);
 			return 0;
@@ -2359,11 +2359,11 @@ extern "C" struct TreasureClassNoDropTbl* __fastcall d2warden_PreCalculateTreasu
 	if (ptTCRecords==NULL || NumberOfRecords ==0) return NULL;
 	
 	
-	//1. ¸ù¾İTCRecordsµÄ»ùµØÖ·ÒÔ¼°µ±Ç°TCµÄÆ«ÒÆ£¬¼ÆËã³öµ±Ç°TCµÄĞòºÅ
-	//2. Ê¹ÓÃĞòºÅÀ´²éÕÒTreasureClassNoDropTbl
+	//1. æ ¹æ®TCRecordsçš„åŸºåœ°å€ä»¥åŠå½“å‰TCçš„åç§»ï¼Œè®¡ç®—å‡ºå½“å‰TCçš„åºå·
+	//2. ä½¿ç”¨åºå·æ¥æŸ¥æ‰¾TreasureClassNoDropTbl
 	//
-	//ÔÚ6FDF114C´¦´æ·ÅÁËptTCRecordsµÄ»ùµØÖ·£¬Ã¿2CÒ»Ìõ¼ÇÂ¼ +14=NoDrop +0C=Drop(D2X) +08=Drop(D2C)
-	//ÔÚ6FDF1150´¦´æ·ÅÁËTCµÄ×ÜÊıÄ¿
+	//åœ¨6FDF114Cå¤„å­˜æ”¾äº†ptTCRecordsçš„åŸºåœ°å€ï¼Œæ¯2Cä¸€æ¡è®°å½• +14=NoDrop +0C=Drop(D2X) +08=Drop(D2C)
+	//åœ¨6FDF1150å¤„å­˜æ”¾äº†TCçš„æ€»æ•°ç›®
 	
 	
 	pt = (struct TreasureClassNoDropTbl*)malloc(NumberOfRecords*sizeof(struct TreasureClassNoDropTbl));
@@ -2438,7 +2438,7 @@ extern void DebugFreeClientInfo(LPDEBUG_CLIENT_INFO lpClientInfo)
 	return;
 }
 
-ÕâÊÇÉêÇëºÍÊÍ·ÅµÄµØ·½
+è¿™æ˜¯ç”³è¯·å’Œé‡Šæ”¾çš„åœ°æ–¹
 #define DEBUG_ALLOC(size)	VirtualAlloc(NULL, (size), MEM_COMMIT, PAGE_READWRITE)
 #define DEBUG_FREE(ptr)		VirtualFree(ptr, 0, MEM_RELEASE)
 
