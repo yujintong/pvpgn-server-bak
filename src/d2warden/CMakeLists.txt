@@ -18,6 +18,8 @@ add_library(D2Warden SHARED
 
 target_compile_definitions(D2Warden PRIVATE D2_1_13_d)
 
+target_link_options(D2Warden PRIVATE /SAFESEH:NO)
+
 set_target_properties(D2Warden
 	PROPERTIES
 		CXX_STANDARD 98
