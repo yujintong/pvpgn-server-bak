@@ -13,7 +13,7 @@ DWORD __declspec(naked) __fastcall D2GAME_GetClient_STUB(DWORD ClientID)
 }
 
 
-DWORD __declspec(naked) __fastcall D2GAME_LeaveCriticalSection(DWORD unk)
+DWORD __declspec(naked) __fastcall D2GAME_LeaveCriticalSection_STUB(DWORD unk)
 {
 	__asm {
 		push eax
