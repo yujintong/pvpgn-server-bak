@@ -1,29 +1,21 @@
-// 这是使用应用程序向导生成的 VC++ 
-// 应用程序项目的主项目文件。
-
-#include "stdafx.h"
-
-#using <mscorlib.dll>
-
-using namespace System;
-
+#include <iostream>
 #include <stdlib.h>
 #include <stdio.h>
 
 
-int _tmain()
+int main()
 {
     // TODO: 请用您自己的代码替换下面的示例代码。
 	char buf[40960];
 	char *targetbuf;
 	int num,num2;
-    Console::WriteLine(S"Hello World");
+    std::cout << "Hello World" << '\n';
 
 	FILE *fp,*d2server;
 	fp = fopen("1.exe","rb");
 	if (fp==NULL)
 	{
-		Console::WriteLine(S"Can't open 1.exe to read");
+		std::cout <<  "Can't open 1.exe to read" << '\n';
 		return 0;
 	}
 
@@ -35,7 +27,7 @@ int _tmain()
 	d2server = fopen("d2server.dll","rb");
 	if (d2server==NULL)
 	{
-		Console::WriteLine(S"Can't open d2server.dll to read");
+		std::cout <<  "Can't open d2server.dll to read" << '\n';
 		return 0;
 	}
 
@@ -48,7 +40,7 @@ int _tmain()
 	if (d2server==NULL)
 	{
 		free(targetbuf);
-		Console::WriteLine(S"Can't open d2server.dll to write");
+		std::cout << "Can't open d2server.dll to write" << '\n';
 		return 0;
 	}
 
@@ -62,11 +54,11 @@ int _tmain()
 	}
 	else
 	{
-		Console::WriteLine(S"Error, patch code less than 512 bytes!");
+		std::cout << "Error, patch code less than 512 bytes!" << '\n';
 	}
 	free(targetbuf);
 	fclose(d2server);
-    Console::WriteLine(S"Done");
+	std::cout << "Done" << '\n';
 
 	return 0;
 }
