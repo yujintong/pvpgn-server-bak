@@ -28,7 +28,7 @@ unk2	db 256 dup(0)
 	
 	loc_18C28BD:                            ; CODE XREF: sub_18C2891+25j
 	push    [ebp+arg_0]						; Warden_GameSeed Offset
-	mov     eax, [ebp+arg_4]			; 4 £¬²ÎÊıpush 4
+	mov     eax, [ebp+arg_4]			; 4 ï¼Œå‚æ•°push 4
 	lea     esi, [ebp+var_54]
 	call    sub_18C1098
 
@@ -287,7 +287,7 @@ Call_BSHA_Process proc near                   ; CODE XREF: sub_18C1112+18p
 	mov     [ebp+var_4], eax
 	jb      short loc_18C22F5
 	jmp     short loc_18C22A7
-	; ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ?
+	; å“ªå“ªå“ªå“ªå“ªå“ªå“ªå“ªå“ªå“ªå“ªå“ªå“ªå“ªå“ªå“ªå“ªå“ªå“ªå“ªå“ªå“ªå“ªå“ªå“ªå“ªå“ªå“ªå“ªå“ªå“ªå“ªå“ªå“ªå“ªå“ªå“ª?
 	
 	loc_18C229C:                            ; CODE XREF: Call_BSHA_Process+40j
 	mov     eax, [ebp+var_4]
@@ -322,7 +322,7 @@ Call_BSHA_Process proc near                   ; CODE XREF: sub_18C1112+18p
 	dec     [ebp+var_8]
 	jnz     short loc_18C22D3
 	jmp     short loc_18C22F5
-	; ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ?
+	; å“ªå“ªå“ªå“ªå“ªå“ªå“ªå“ªå“ªå“ªå“ªå“ªå“ªå“ªå“ªå“ªå“ªå“ªå“ªå“ªå“ªå“ªå“ªå“ªå“ªå“ªå“ªå“ªå“ªå“ªå“ªå“ªå“ªå“ªå“ªå“ªå“ª?
 	
 	loc_18C22EA:                            ; CODE XREF: Call_BSHA_Process+8Ej
 	mov     eax, [ebp+var_4]
@@ -888,7 +888,7 @@ BSHA_OP4 endp
 	mov     eax, [ebx]
 	push    0FFFFFFF7h
 	pop     ecx
-	shr     eax, 3							; Íê±Ïºóeax=mod³¤¶È
+	shr     eax, 3							; å®Œæ¯•åeax=modé•¿åº¦
 	sub     ecx, eax
 	and     ecx, 3Fh
 	inc     ecx
