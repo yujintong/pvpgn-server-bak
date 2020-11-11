@@ -62,10 +62,6 @@ for example, the BNETIP=127.0.0.1, this should known as a Redvex hack.
 dword_6FF3D8D4 : inet_addr结果"127.0.0.1;"
 */
 
-//#define D2_1_11_b
-//#define D2_1_13_a
-#define D2_1_13_d
-
 #define MAX66LEN 1024
 #define MAX_WARDEN_CMD_RETRY 3
 
