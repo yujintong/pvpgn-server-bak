@@ -6,5 +6,5 @@ project(
 
 add_subdirectory(src/d2gs/)
 add_subdirectory(src/d2server_patches/)
-#add_subdirectory(src/d2warden/)
+add_subdirectory(src/d2warden/)
 add_subdirectory(src/patch_d2server/)
