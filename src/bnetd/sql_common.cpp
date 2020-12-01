@@ -66,10 +66,6 @@ namespace pvpgn
 		unsigned int sql_defacct;
 		t_sql_engine *sql = NULL;
 
-#ifndef SQL_ON_DEMAND
-		char const *sql_tables[] = { "BNET", "emailverification", "Record", "profile", "friend", "Team", NULL };
-#endif	/* SQL_ON_DEMAND */
-
 		const char* tab_prefix = SQL_DEFAULT_PREFIX;
 
 		static char query[1024];
