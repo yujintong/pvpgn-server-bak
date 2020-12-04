@@ -81,6 +81,7 @@ namespace pvpgn
 			{
 				*(symbol++) = std::toupper(static_cast<unsigned char>(*(source++)));
 			}
+			*(symbol++) = '\0';
 
 			if (!((password_ == NULL) ^ (salt_ == NULL))) {
 				eventlog(eventlog_level_error, __FUNCTION__, "need to init with EITHER password_ OR salt_");
@@ -96,6 +97,7 @@ namespace pvpgn
 				{
 					*(symbol++) = std::toupper(static_cast<unsigned char>(*(source++)));
 				}
+				*(symbol++) = '\0';
 				a = BigInt::random(32) % N;
 				s = BigInt::random(32);
 			}
