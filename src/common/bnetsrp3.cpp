@@ -79,7 +79,7 @@ namespace pvpgn
 			symbol = username;
 			for (i = 0; i < username_length; i++)
 			{
-				*(symbol++) = safe_toupper(*(source++));
+				*(symbol++) = std::toupper(static_cast<unsigned char>(*(source++)));
 			}
 
 			if (!((password_ == NULL) ^ (salt_ == NULL))) {
@@ -94,7 +94,7 @@ namespace pvpgn
 				symbol = password;
 				for (i = 0; i < password_length; i++)
 				{
-					*(symbol++) = safe_toupper(*(source++));
+					*(symbol++) = std::toupper(static_cast<unsigned char>(*(source++)));
 				}
 				a = BigInt::random(32) % N;
 				s = BigInt::random(32);
