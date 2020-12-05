@@ -2316,8 +2316,6 @@ namespace pvpgn
 
 				if (conn_set_channel(c, text) < 0)
 					conn_set_channel(c, CHANNEL_NAME_BANNED); /* should not fail */
-				if ((conn_get_clienttag(c) == CLIENTTAG_WARCRAFT3_UINT) || (conn_get_clienttag(c) == CLIENTTAG_WAR3XP_UINT))
-					conn_update_w3_playerinfo(c);
 				command_set_flags(c);
 			}
 			else
@@ -2331,8 +2329,6 @@ namespace pvpgn
 
 			if (channel_rejoin(c) != 0)
 				message_send_text(c, message_type_error, c, localize(c, "You are not in a channel."));
-			if ((conn_get_clienttag(c) == CLIENTTAG_WARCRAFT3_UINT) || (conn_get_clienttag(c) == CLIENTTAG_WAR3XP_UINT))
-				conn_update_w3_playerinfo(c);
 			command_set_flags(c);
 
 			return 0;
@@ -4574,8 +4570,6 @@ namespace pvpgn
 			{
 				unsigned int oldflags = conn_get_flags(c);
 				conn_set_clienttag(c, clienttag);
-				if ((clienttag == CLIENTTAG_WARCRAFT3_UINT) || (clienttag == CLIENTTAG_WAR3XP_UINT))
-					conn_update_w3_playerinfo(c);
 				channel_rejoin(c);
 				conn_set_flags(c, oldflags);
 				channel_update_userflags(c);

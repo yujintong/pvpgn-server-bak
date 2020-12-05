@@ -428,7 +428,6 @@ namespace pvpgn
 			temp->protocol.d2.character = NULL;
 			temp->protocol.d2.realminfo = NULL;
 			temp->protocol.d2.charname = NULL;
-			temp->protocol.w3.w3_playerinfo = NULL;
 			temp->protocol.w3.routeconn = NULL;
 			temp->protocol.w3.anongame = NULL;
 			temp->protocol.w3.anongame_search_starttime = 0;
@@ -661,10 +660,6 @@ namespace pvpgn
 
 			if (c->protocol.wol.anongame_player)
 				anongame_wol_destroy(c);
-
-			/* ADDED BY UNDYING SOULZZ 4/8/02 */
-			if (c->protocol.w3.w3_playerinfo)
-				xfree((void *)c->protocol.w3.w3_playerinfo); /* avoid warning */
 
 			if (c->protocol.w3.client_proof)
 				xfree((void *)c->protocol.w3.client_proof); /* avoid warning */
@@ -2503,7 +2498,7 @@ namespace pvpgn
 			return 0;
 		}
 
-		/* Player icon that displayed in a channel in all games (except Warcraft 3) */
+		/* Player icon that displayed in a channel in all games */
 		extern nonstd::optional<std::string> conn_get_playerinfo(t_connection const * c)
 		{
 			if (c == nullptr)
@@ -2547,23 +2542,27 @@ namespace pvpgn
 					{
 						icon = usericon;
 					}
-					else if (prefs_get_custom_icons() == 1 && customicons_allowed_by_client(client_tag) && (custom_icon != nullptr))
+					else if (prefs_get_custom_icons() == 1 && customicons_allowed_by_client(client_tag) && (custom_icon != nullptr) && (custom_icon->icon_code != nullptr))
 					{
 						// if custom_icons is enabled then set a custom client tag by player rating
-
-						// just in case
-						if (custom_icon->icon_code == nullptr)
-						{
-							icon = reversed_client_tag;
-						}
-						else
-						{
-							icon = custom_icon->icon_code;
-						}
+						icon = custom_icon->icon_code;
 					}
 					else
 					{
-						icon = reversed_client_tag;
+						// default icon code for WAR3 and W3XP is different than all other clients, which simply use their reversed client tag
+						if (client_tag == CLIENTTAG_WARCRAFT3_UINT || client_tag == CLIENTTAG_WAR3XP_UINT)
+						{
+							char raceicon = '\0'; // appeared in 1.03
+							unsigned int raceiconnumber = 0;
+							unsigned int wins = 0;
+							account_get_raceicon(account, &raceicon, &raceiconnumber, &wins, client_tag);
+
+							icon = fmt::format("{}{}{}", raceiconnumber, raceicon, "3W");
+						}
+						else
+						{
+							icon = reversed_client_tag;
+						}
 					}
 
 #ifdef WITH_LUA
@@ -2671,6 +2670,36 @@ namespace pvpgn
 						// std::sprintf(realminfo, "%4s%s,%s,%s", revtag, realmname, charname, portrait);
 						playerinfo = fmt::format("{}",
 							conn_get_realminfo(c));
+					}
+				}
+				else if (client_tag == CLIENTTAG_WARCRAFT3_UINT || client_tag == CLIENTTAG_WAR3XP_UINT)
+				{
+					t_clantag clantag = 0;
+					t_clan* clan = account_get_clan(account);
+					if (clan != nullptr)
+					{
+						clantag = clan_get_clantag(clan);
+					}
+
+					if (clantag == 0)
+					{
+						// account is not in a clan
+						playerinfo = fmt::format("{} {} {}",
+							reversed_client_tag,
+							icon,
+							account_get_highestladderlevel(account, client_tag));
+					}
+					else
+					{
+						// account is in a clan
+						char reversed_clan_tag[5] = {};
+						tag_uint_to_revstr(reversed_clan_tag, clantag);
+
+						playerinfo = fmt::format("{} {} {} {}",
+							reversed_client_tag,
+							icon,
+							account_get_highestladderlevel(account, client_tag),
+							reversed_clan_tag);
 					}
 				}
 				else
@@ -3111,37 +3140,6 @@ namespace pvpgn
 				return;
 			}
 			c->protocol.cflags |= conn_flags_welcomed;
-		}
-
-		/* ADDED BY UNDYING SOULZZ 4/7/02 */
-		extern int conn_set_w3_playerinfo(t_connection * c, const char * w3_playerinfo)
-		{
-			const char * temp;
-
-			if (!c)
-			{
-				eventlog(eventlog_level_error, __FUNCTION__, "got NULL connection");
-				return -1;
-			}
-
-			temp = xstrdup(w3_playerinfo);
-
-			if (c->protocol.w3.w3_playerinfo)
-				xfree((void *)c->protocol.w3.w3_playerinfo);
-
-			c->protocol.w3.w3_playerinfo = temp;
-
-			return 1;
-		}
-
-		extern const char * conn_get_w3_playerinfo(t_connection * c)
-		{
-			if (!c)
-			{
-				eventlog(eventlog_level_error, __FUNCTION__, "got NULL connection");
-				return NULL;
-			}
-			return c->protocol.w3.w3_playerinfo;
 		}
 
 
@@ -3714,111 +3712,6 @@ namespace pvpgn
 			}
 
 			return count;
-		}
-
-		/* Warcraft 3 icon that displayed in a channel */
-		extern int conn_update_w3_playerinfo(t_connection * c)
-		{
-			t_account * 	account;
-			t_clienttag		clienttag;
-			t_clan * 		user_clan;
-			int 		clantag = 0;
-			unsigned int	acctlevel;
-			char		tempplayerinfo[40];
-			char		raceicon; /* appeared in 1.03 */
-			unsigned int	raceiconnumber;
-			unsigned int    	wins;
-			char 		clantag_str_tmp[5];
-			const char * 	clantag_str = NULL;
-			char        	revtag[5];
-			char		clienttag_str[5];
-
-			if (c == NULL) {
-				eventlog(eventlog_level_error, __FUNCTION__, "got NULL connection");
-				return -1;
-			}
-
-			account = conn_get_account(c);
-
-			if (account == NULL) {
-				eventlog(eventlog_level_error, __FUNCTION__, "got NULL account");
-				return -1;
-			}
-
-			clienttag = c->protocol.client.clienttag;
-
-			if (!((clienttag == CLIENTTAG_WARCRAFT3_UINT) ||
-				(clienttag == CLIENTTAG_WAR3XP_UINT))){
-				return 0;
-			}
-
-			std::strncpy(revtag, tag_uint_to_str(clienttag_str, conn_get_fake_clienttag(c)), 5); revtag[4] = '\0';
-			strreverse(revtag);
-
-			acctlevel = account_get_highestladderlevel(account, clienttag);
-			account_get_raceicon(account, &raceicon, &raceiconnumber, &wins, clienttag);
-
-			if ((user_clan = account_get_clan(account)) != NULL)
-				clantag = clan_get_clantag(user_clan);
-
-			if (clantag) {
-				std::sprintf(clantag_str_tmp, "%c%c%c%c", clantag & 0xff, (clantag >> 8) & 0xff, (clantag >> 16) & 0xff, clantag >> 24);
-				clantag_str = clantag_str_tmp;
-				while ((*clantag_str) == 0) clantag_str++;
-			}
-
-			const char* usericon = account_get_user_icon(account, clienttag);
-			// allow set icon to a user directly from the database (override default icon always if not null)
-			if (usericon)
-			{
-				if (clantag)
-					std::sprintf(tempplayerinfo, "%s %s %u %s", revtag, usericon, acctlevel, clantag_str);
-				else
-					std::sprintf(tempplayerinfo, "%s %s %u", revtag, usericon, acctlevel);
-				eventlog(eventlog_level_info, __FUNCTION__, "[{}] {} using user-selected icon [{}]", conn_get_socket(c), revtag, usericon);
-			}
-			// default icon "WAR3" or "W3XP"
-			else if (acctlevel == 0)
-			{
-				if (clantag)
-					std::sprintf(tempplayerinfo, "%s %s 0 %s", revtag, revtag, clantag_str);
-				else
-					std::strcpy(tempplayerinfo, revtag);
-				eventlog(eventlog_level_info, __FUNCTION__, "[{}] {}", conn_get_socket(c), revtag);
-			}
-			// display race icon with a level number
-			else 
-			{
-				if (clantag)
-					std::sprintf(tempplayerinfo, "%s %1u%c3W %u %s", revtag, raceiconnumber, raceicon, acctlevel, clantag_str);
-				else
-					std::sprintf(tempplayerinfo, "%s %1u%c3W %u", revtag, raceiconnumber, raceicon, acctlevel);
-				eventlog(eventlog_level_info, __FUNCTION__, "[{}] {} using generated icon [{}{}3W]", conn_get_socket(c), revtag, raceiconnumber, raceicon);
-			}
-
-			// if custom stats is enabled then set a custom client icon by player rating
-			// do not override user selected icon if any
-			if (!usericon && prefs_get_custom_icons() == 1 && customicons_allowed_by_client(clienttag))
-			{
-				if (t_icon_info* icon = customicons_get_icon_by_account(account, clienttag))
-				{
-					if (clantag)
-						std::sprintf(tempplayerinfo, "%s %s %u %s", revtag, icon->icon_code, 0, clantag_str);
-					else
-						std::sprintf(tempplayerinfo, "%s %s %u", revtag, icon->icon_code, 0);
-				}
-			}
-
-#ifdef WITH_LUA
-			// change icon info from Lua
-			if (const char * iconinfo = lua_handle_user_icon(c, tempplayerinfo))
-			{
-				conn_set_w3_playerinfo(c, iconinfo);
-				return 0;
-			}
-#endif
-			conn_set_w3_playerinfo(c, tempplayerinfo);
-			return 0;
 		}
 
 

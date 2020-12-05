@@ -3686,7 +3686,6 @@ namespace pvpgn
 			std::string tmpstr;
 			clienttag = conn_get_clienttag(c);
 			if ((clienttag == CLIENTTAG_WARCRAFT3_UINT) || (clienttag == CLIENTTAG_WAR3XP_UINT)) {
-				conn_update_w3_playerinfo(c);
 				switch (bn_int_get(packet->u.client_joinchannel.channelflag)) {
 				case CLIENT_JOINCHANNEL_NORMAL:
 					eventlog(eventlog_level_info, __FUNCTION__, "[{}] CLIENT_JOINCHANNEL_NORMAL channel \"{}\"", conn_get_socket(c), cname);
@@ -5211,7 +5210,6 @@ namespace pvpgn
 						t_packet *rpacket2;
 						if (dest_conn) {
 							clan_close_status_window(dest_conn);
-							conn_update_w3_playerinfo(dest_conn);
 							channel_rejoin(dest_conn);
 						}
 						if ((rpacket2 = packet_create(packet_class_bnet)) != NULL) {
@@ -5419,7 +5417,6 @@ namespace pvpgn
 						clanmember_set_fullmember(member, 1);
 						if (conn_get_channel(c))
 						{
-							conn_update_w3_playerinfo(c);
 							channel_set_userflags(c);
 
 							std::string channelname("Clan " + std::string(clantag_to_str(clan_get_clantag(clan))));

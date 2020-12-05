@@ -601,7 +601,6 @@ namespace pvpgn
 			//FIXME: Still need a way to 'refresh the user/channel'
 			//_handle_rejoin_command(conn_get_account(c),"");
 			/* ??? channel_update_userflags() */
-			conn_update_w3_playerinfo(c);
 
 			channel_rejoin(c);
 			return 0;

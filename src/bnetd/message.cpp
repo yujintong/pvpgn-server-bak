@@ -1026,23 +1026,12 @@ namespace pvpgn
 					conn_unget_chatcharname(me, tname);
 
 					std::string playerinfo;
-					if ((conn_get_clienttag(me) == CLIENTTAG_WARCRAFT3_UINT) || (conn_get_clienttag(me) == CLIENTTAG_WAR3XP_UINT))
+					auto temp = conn_get_playerinfo(me);
+					if (temp.has_value())
 					{
-						if (conn_get_w3_playerinfo(me))
-						{
-							playerinfo = conn_get_w3_playerinfo(me);
-						}
+						playerinfo = temp.value();
 					}
 					else
-					{
-						auto temp = conn_get_playerinfo(me);
-						if (temp.has_value())
-						{
-							playerinfo = temp.value();
-						}
-					}
-
-					if (playerinfo.empty())
 					{
 						// just send reversed client tag, it's better than nothing
 
@@ -1076,23 +1065,12 @@ namespace pvpgn
 					conn_unget_chatcharname(me, tname);
 
 					std::string playerinfo;
-					if ((conn_get_clienttag(me) == CLIENTTAG_WARCRAFT3_UINT) || (conn_get_clienttag(me) == CLIENTTAG_WAR3XP_UINT))
+					auto temp = conn_get_playerinfo(me);
+					if (temp.has_value())
 					{
-						if (conn_get_w3_playerinfo(me))
-						{
-							playerinfo = conn_get_w3_playerinfo(me);
-						}
+						playerinfo = temp.value();
 					}
 					else
-					{
-						auto temp = conn_get_playerinfo(me);
-						if (temp.has_value())
-						{
-							playerinfo = temp.value();
-						}
-					}
-
-					if (playerinfo.empty())
 					{
 						// just send reversed client tag, it's better than nothing
 
@@ -1246,23 +1224,12 @@ namespace pvpgn
 					conn_unget_chatcharname(me, tname);
 
 					std::string playerinfo;
-					if ((conn_get_clienttag(me) == CLIENTTAG_WARCRAFT3_UINT) || (conn_get_clienttag(me) == CLIENTTAG_WAR3XP_UINT))
+					auto temp = conn_get_playerinfo(me);
+					if (temp.has_value())
 					{
-						if (conn_get_w3_playerinfo(me))
-						{
-							playerinfo = conn_get_w3_playerinfo(me);
-						}
+						playerinfo = temp.value();
 					}
 					else
-					{
-						auto temp = conn_get_playerinfo(me);
-						if (temp.has_value())
-						{
-							playerinfo = temp.value();
-						}
-					}
-
-					if (playerinfo.empty())
 					{
 						// just send reversed client tag, it's better than nothing
 

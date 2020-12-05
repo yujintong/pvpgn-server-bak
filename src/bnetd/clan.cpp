@@ -221,7 +221,6 @@ namespace pvpgn
 
 					if (conn_get_channel(conn))
 					{
-						conn_update_w3_playerinfo(conn);
 						channel_set_userflags(conn);
 						if (conn_set_channel(conn, channelname) < 0)
 							conn_set_channel(conn, CHANNEL_NAME_BANNED);	/* should not fail */
@@ -274,7 +273,6 @@ namespace pvpgn
 						continue;			// online but wrong client
 
 					conn_push_outqueue(conn, rpacket);
-					conn_update_w3_playerinfo(conn);
 				}
 				packet_del_ref(rpacket);
 			}

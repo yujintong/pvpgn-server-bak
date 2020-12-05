@@ -189,7 +189,6 @@ namespace pvpgn
 					char const *		charname;
 				} d2;
 				struct {
-					char const *		w3_playerinfo; /* ADDED BY UNDYING SOULZZ 4/7/02 */
 					std::time_t			anongame_search_starttime;
 					/* [zap-zero] 20020527 - matching w3route connection for game connection /
 					 matching game connection for w3route connection */
@@ -399,9 +398,6 @@ namespace pvpgn
 		extern int conn_get_welcomed(t_connection const * c);
 		extern void conn_set_welcomed(t_connection * c, int welcomed);
 
-		extern int conn_set_w3_playerinfo(t_connection * c, char const * w3_playerinfo);
-		extern const char * conn_get_w3_playerinfo(t_connection * c);
-
 		extern int conn_get_crtime(t_connection *c);
 
 		extern int conn_set_w3_loginreq(t_connection * c, char const * loginreq);
@@ -434,8 +430,6 @@ namespace pvpgn
 		extern int conn_get_user_count_by_clienttag(t_clienttag ct);
 
 		extern unsigned int connlist_count_connections(unsigned int addr);
-
-		extern int conn_update_w3_playerinfo(t_connection * c);
 
 		extern int conn_get_passfail_count(t_connection * c);
 		extern int conn_set_passfail_count(t_connection * c, unsigned int failcount);
