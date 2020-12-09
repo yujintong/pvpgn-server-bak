@@ -245,6 +245,7 @@ namespace pvpgn
 													if (hash_eq(trypasshash1, oldpasshash1) != 1)
 													{
 														eventlog(eventlog_level_info, __FUNCTION__, "[{}] bot login for \"{}\" refused (wrong password)", conn_get_socket(c), account_get_name(account));
+														conn_increment_passfail_count(c);
 														conn_set_state(c, conn_state_bot_username);
 
 														if (!(rpacket = packet_create(packet_class_raw)))
