@@ -58,6 +58,11 @@ if(WITH_BNETD)
 endif(WITH_BNETD)
 
 if(WITH_LUA)
+	if (WIN32 AND (NOT DEFINED LUA_LIBRARIES OR NOT DEFINED LUA_INCLUDE_DIR))
+		set(LUA_LIBRARIES ${CMAKE_SOURCE_DIR}/lib/lua/5.1/lua5.1.lib)
+		set(LUA_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/include/lua/5.1)
+	endif()
+
     find_package(Lua REQUIRED)
 endif(WITH_LUA)
 
