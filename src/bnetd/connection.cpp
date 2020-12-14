@@ -406,7 +406,6 @@ namespace pvpgn
 			temp->protocol.client.clientexe = NULL;
 			temp->protocol.client.owner = NULL;
 			temp->protocol.client.cdkey = NULL;
-			temp->protocol.client.versioncheck = nullptr;
 			temp->protocol.account = NULL;
 			temp->protocol.chat.channel = NULL;
 			temp->protocol.chat.last_message = now;
@@ -3236,31 +3235,6 @@ namespace pvpgn
 			return c->protocol.chat.lastsender;
 		}
 
-
-		const VersionCheck *conn_get_versioncheck(t_connection *c)
-		{
-			if (!c)
-			{
-				eventlog(eventlog_level_error, __FUNCTION__, "got NULL connection");
-				return nullptr;
-			}
-
-			return c->protocol.client.versioncheck;
-		}
-
-
-		bool conn_set_versioncheck(t_connection *c, const VersionCheck* versioncheck)
-		{
-			if (!c)
-			{
-				eventlog(eventlog_level_error, __FUNCTION__, "got NULL connection");
-				return false;
-			}
-
-			c->protocol.client.versioncheck = versioncheck;
-
-			return true;
-		}
 
 		extern int conn_get_echoback(t_connection * c)
 		{

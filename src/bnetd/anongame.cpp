@@ -838,8 +838,8 @@ namespace pvpgn
 							continue;
 						}
 
-						const VersionCheck* const md_c_vc = conn_get_versioncheck(md->c);
-						const VersionCheck* const c_vc = conn_get_versioncheck(c);
+						const VersionCheck* const md_c_vc = select_versioncheck(conn_get_archtag(md->c), conn_get_clienttag(md->c), conn_get_versionid(md->c), conn_get_gameversion(md->c), conn_get_checksum(md->c));
+						const VersionCheck* const c_vc = select_versioncheck(conn_get_archtag(c), conn_get_clienttag(c), conn_get_versionid(c), conn_get_gameversion(c), conn_get_checksum(c));
 						if (md_c_vc == nullptr || c_vc == nullptr)
 						{
 							eventlog(eventlog_level_error, __FUNCTION__, "got NULL versioncheck");

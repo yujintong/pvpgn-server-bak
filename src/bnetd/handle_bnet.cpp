@@ -1082,10 +1082,9 @@ namespace pvpgn
 
 			
 			const VersionCheck* vc = select_versioncheck(conn_get_archtag(c), conn_get_clienttag(c), conn_get_versionid(c), conn_get_gameversion(c), conn_get_checksum(c));
-			conn_set_versioncheck(c, vc);
 			if (vc)
 			{
-				eventlog(eventlog_level_info, __FUNCTION__, "[{}] client matches versiontag \"{}\"", conn_get_socket(c), conn_get_versioncheck(c)->get_version_tag());
+				eventlog(eventlog_level_info, __FUNCTION__, "[{}] client matches versiontag \"{}\"", conn_get_socket(c), vc->get_version_tag());
 			}
 			else
 			{
@@ -1117,7 +1116,7 @@ namespace pvpgn
 				// Only handle updates when there is an update file available.
 				if (mpqfilename)
 				{
-					eventlog(eventlog_level_info, __FUNCTION__, "[{}] an upgrade for version {} is available \"{}\"", conn_get_socket(c), conn_get_versioncheck(c)->get_version_tag(), mpqfilename);
+					eventlog(eventlog_level_info, __FUNCTION__, "[{}] an upgrade for version {} is available \"{}\"", conn_get_socket(c), vc->get_version_tag(), mpqfilename);
 					bn_int_set(&rpacket->u.server_authreply1.message, SERVER_AUTHREPLY1_MESSAGE_UPDATE);
 					packet_append_string(rpacket, mpqfilename);
 					
@@ -1210,10 +1209,9 @@ namespace pvpgn
 
 
 				const VersionCheck* vc = select_versioncheck(conn_get_archtag(c), conn_get_clienttag(c), conn_get_versionid(c), conn_get_gameversion(c), conn_get_checksum(c));
-				conn_set_versioncheck(c, vc);
 				if (vc)
 				{
-					eventlog(eventlog_level_info, __FUNCTION__, "[{}] client matches versiontag \"{}\"", conn_get_socket(c), conn_get_versioncheck(c)->get_version_tag());
+					eventlog(eventlog_level_info, __FUNCTION__, "[{}] client matches versiontag \"{}\"", conn_get_socket(c), vc->get_version_tag());
 				}
 				else
 				{
@@ -1234,13 +1232,13 @@ namespace pvpgn
 				char *mpqfilename = nullptr;
 				if (vc)
 				{
-					mpqfilename = autoupdate_check(conn_get_archtag(c), conn_get_clienttag(c), conn_get_gamelang(c), conn_get_versioncheck(c)->get_version_tag().c_str(), NULL);
+					mpqfilename = autoupdate_check(conn_get_archtag(c), conn_get_clienttag(c), conn_get_gamelang(c), vc->get_version_tag().c_str(), NULL);
 				}
 
 				// Only handle updates when there is an update file available.
 				if (mpqfilename)
 				{
-					eventlog(eventlog_level_info, __FUNCTION__, "[{}] an upgrade for {} is available \"{}\"", conn_get_socket(c), conn_get_versioncheck(c)->get_version_tag(), mpqfilename);
+					eventlog(eventlog_level_info, __FUNCTION__, "[{}] an upgrade for {} is available \"{}\"", conn_get_socket(c), vc->get_version_tag(), mpqfilename);
 					bn_int_set(&rpacket->u.server_authreply_109.message, SERVER_AUTHREPLY_109_MESSAGE_UPDATE);
 					packet_append_string(rpacket, mpqfilename);
 
@@ -2542,8 +2540,10 @@ namespace pvpgn
 					continue;
 				}
 
-				const std::string my_version_tag = conn_get_versioncheck(c) ? conn_get_versioncheck(c)->get_version_tag() : "";
-				const std::string friend_version_tag = conn_get_versioncheck(friend_connection) ? conn_get_versioncheck(friend_connection)->get_version_tag() : "";
+				const VersionCheck* const my_vc = select_versioncheck(conn_get_archtag(c), conn_get_clienttag(c), conn_get_versionid(c), conn_get_gameversion(c), conn_get_checksum(c));
+				const VersionCheck* const friend_vc = select_versioncheck(conn_get_archtag(friend_connection), conn_get_clienttag(friend_connection), conn_get_versionid(friend_connection), conn_get_gameversion(friend_connection), conn_get_checksum(friend_connection));
+				std::string my_version_tag = my_vc ? my_vc->get_version_tag() : "";
+				std::string friend_version_tag = friend_vc ? friend_vc->get_version_tag() : "";
 				// friend is using another game or is on a different version
 				if (my_version_tag != friend_version_tag)
 				{
@@ -2599,8 +2599,10 @@ namespace pvpgn
 						continue;
 					}
 
-					const std::string my_version_tag = conn_get_versioncheck(c) ? conn_get_versioncheck(c)->get_version_tag() : "";
-					const std::string user_version_tag = conn_get_versioncheck(user_connection) ? conn_get_versioncheck(user_connection)->get_version_tag() : "";
+					const VersionCheck* const my_vc = select_versioncheck(conn_get_archtag(c), conn_get_clienttag(c), conn_get_versionid(c), conn_get_gameversion(c), conn_get_checksum(c));
+					const VersionCheck* const user_vc = select_versioncheck(conn_get_archtag(user_connection), conn_get_clienttag(user_connection), conn_get_versionid(user_connection), conn_get_gameversion(user_connection), conn_get_checksum(user_connection));
+					std::string my_version_tag = my_vc ? my_vc->get_version_tag() : "";
+					std::string user_version_tag = user_connection ? user_vc->get_version_tag() : "";
 					// user is using another game or is on a different version
 					if (my_version_tag != user_version_tag)
 					{
@@ -3793,9 +3795,12 @@ namespace pvpgn
 				eventlog(eventlog_level_debug, __FUNCTION__, "[{}] not listing because game is wrong type", conn_get_socket(cbdata->c));
 				return 0;
 			}
-			if (conn_get_versioncheck(cbdata->c) &&
-				conn_get_versioncheck(game_get_owner(game)) &&
-				conn_get_versioncheck(cbdata->c)->get_version_tag() != conn_get_versioncheck(game_get_owner(game))->get_version_tag())
+			const VersionCheck* const cbdata_c_vc = select_versioncheck(conn_get_archtag(cbdata->c), conn_get_clienttag(cbdata->c), conn_get_versionid(cbdata->c), conn_get_gameversion(cbdata->c), conn_get_checksum(cbdata->c));
+			t_connection* gowner_c = game_get_owner(game);
+			const VersionCheck* const gowner_c_vc = select_versioncheck(conn_get_archtag(gowner_c), conn_get_clienttag(gowner_c), conn_get_versionid(gowner_c), conn_get_gameversion(gowner_c), conn_get_checksum(gowner_c));
+			if (cbdata_c_vc != nullptr &&
+				gowner_c_vc != nullptr &&
+				cbdata_c_vc->get_version_tag() != gowner_c_vc->get_version_tag())
 			{
 				eventlog(eventlog_level_debug, __FUNCTION__, "[{}] not listing because game is wrong versiontag", conn_get_socket(cbdata->c));
 				return 0;
