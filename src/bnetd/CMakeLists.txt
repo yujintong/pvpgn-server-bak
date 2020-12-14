@@ -54,14 +54,18 @@ target_include_directories(bnetd
 		$<INSTALL_INTERFACE:include/>
 		${ZLIB_INCLUDE_DIRS}
 		${CURL_INCLUDE_DIRS}
-		${LUA_INCLUDE_DIR}
 		${MYSQL_INCLUDE_DIR}
 		${SQLITE3_INCLUDE_DIR}
 		${PGSQL_INCLUDE_DIR}
 		${ODBC_INCLUDE_DIR}
 )
 
-target_link_libraries(bnetd PRIVATE common compat fmt Threads::Threads win32 ${NETWORK_LIBRARIES} ${ZLIB_LIBRARIES} ${CURL_LIBRARIES} ${MYSQL_LIBRARIES} ${SQLITE3_LIBRARIES} ${PGSQL_LIBRARIES} ${ODBC_LIBRARIES} ${LUA_LIBRARIES})
+target_link_libraries(bnetd PRIVATE common compat fmt Threads::Threads win32 ${NETWORK_LIBRARIES} ${ZLIB_LIBRARIES} ${CURL_LIBRARIES} ${MYSQL_LIBRARIES} ${SQLITE3_LIBRARIES} ${PGSQL_LIBRARIES} ${ODBC_LIBRARIES})
+
+if (WITH_LUA)
+	target_include_directories(bnetd PRIVATE ${LUA_INCLUDE_DIR})
+	target_link_libraries(bnetd PRIVATE ${LUA_LIBRARIES})
+endif()
 
 install(TARGETS bnetd DESTINATION ${SBINDIR})
 
