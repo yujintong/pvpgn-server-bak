@@ -3296,7 +3296,6 @@ namespace pvpgn
 			t_elem const * curr;
 			t_connection * conn;
 			char           name[19];
-			char const *   channel_name;
 			char           clienttag_str[5];
 
 			if (!prefs_get_enable_conn_all() && !(account_get_command_groups(conn_get_account(c)) & command_get_group("/admin-con"))) /* default to false */
@@ -3335,10 +3334,15 @@ namespace pvpgn
 				conn = (t_connection*)elem_get_data(curr);
 				std::snprintf(name, sizeof name, "%s", conn_get_account(conn) ? conn_get_username(conn) : "(none)");
 
-				if (conn_get_channel(conn) != NULL)
+				std::string channel_name;
+				if (conn_get_channel(conn) != NULL && channel_get_name(conn_get_channel(conn)) != nullptr)
+				{
 					channel_name = channel_get_name(conn_get_channel(conn));
+				}
 				else
-					channel_name = localize(c, "none").c_str();
+				{
+					channel_name = localize(c, "none");
+				}
 
 				std::string game_name;
 				if (conn_get_game(conn) != NULL)
@@ -3352,7 +3356,7 @@ namespace pvpgn
 					tag_uint_to_str(clienttag_str, conn_get_fake_clienttag(conn)),
 					name,
 					conn_get_latency(conn),
-					channel_name,
+					channel_name.c_str(),
 					game_name.c_str());
 				else
 				if (prefs_get_hide_addr() && !(account_get_command_groups(conn_get_account(c)) & command_get_group("/admin-addr"))) /* default to false */
@@ -3365,7 +3369,7 @@ namespace pvpgn
 					conn_get_sessionkey(conn),
 					conn_get_flags(conn),
 					conn_get_latency(conn),
-					channel_name,
+					channel_name.c_str(),
 					game_name.c_str());
 				else
 					std::snprintf(msgtemp0, sizeof(msgtemp0), " %3d %-6.6s %-12.12s %4.4s %-15.15s 0x%08x 0x%04x %9u %-16.16s %-8.8s %.16s",
@@ -3377,7 +3381,7 @@ namespace pvpgn
 					conn_get_sessionkey(conn),
 					conn_get_flags(conn),
 					conn_get_latency(conn),
-					channel_name,
+					channel_name.c_str(),
 					game_name.c_str(),
 					addr_num_to_addr_str(conn_get_addr(conn), conn_get_port(conn)));
 
@@ -3706,20 +3710,25 @@ namespace pvpgn
 			message_send_text(c, message_type_info, c, msgtemp);
 
 			{
-				t_account *  owner;
-				char const * tname;
-				char const * namestr;
+				std::string namestr;
 
-				if (!(owner = conn_get_account(game_get_owner(game))))
+				t_account* owner = conn_get_account(game_get_owner(game));
+				if (owner != nullptr)
 				{
-					tname = NULL;
-					namestr = localize(c, "none").c_str();
+					char const* tname = conn_get_loggeduser(game_get_owner(game));
+					if (tname != nullptr)
+					{
+						namestr = tname;
+					}
+					else
+					{
+						namestr = localize(c, "unknown");
+					}
 				}
 				else
-				if (!(tname = conn_get_loggeduser(game_get_owner(game))))
-					namestr = localize(c, "unknown").c_str();
-				else
-					namestr = tname;
+				{
+					namestr = localize(c, "none");
+				}
 
 				msgtemp = localize(c, "Owner: {}", namestr);
 
@@ -3792,10 +3801,18 @@ namespace pvpgn
 			message_send_text(c, message_type_info, c, msgtemp);
 
 			{
-				char const * mapname;
+				std::string mapname;
 
-				if (!(mapname = game_get_mapname(game)))
-					mapname = localize(c, "unknown").c_str();
+				if (game_get_mapname(game) != nullptr)
+				{
+					mapname = game_get_mapname(game);
+					
+				}
+				else
+				{
+					mapname = localize(c, "unknown");
+				}
+
 				msgtemp = localize(c, "Map: {}", mapname);
 				message_send_text(c, message_type_info, c, msgtemp);
 			}
