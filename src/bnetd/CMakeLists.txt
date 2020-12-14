@@ -34,7 +34,6 @@ set(BNETD_SOURCES
 	luaobjects.cpp luaobjects.h luawrapper.cpp luawrapper.h
 	i18n.cpp i18n.h userlog.cpp userlog.h
 	../win32/winmain.cpp ../win32/winmain.h
-	../json/json.hpp
 	)
 	
 set(BNETD_CONSOLE_RESOURCES
@@ -51,6 +50,8 @@ endif(WITH_WIN32_GUI)
 
 target_include_directories(bnetd
     PRIVATE
+		$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include/>
+		$<INSTALL_INTERFACE:include/>
 		${ZLIB_INCLUDE_DIRS}
 		${CURL_INCLUDE_DIRS}
 		${LUA_INCLUDE_DIR}

@@ -27,7 +27,7 @@
 #include <utility>
 
 #include <optional.hpp>
-#include "json/json.hpp"
+#include <nlohmann/json.hpp>
 
 #include "compat/strcasecmp.h"
 
