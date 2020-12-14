@@ -231,7 +231,7 @@ namespace pvpgn
 #include <ctime>
 #include <string>
 
-#include <optional.hpp>
+#include <nonstd/optional.hpp>
 
 #define JUST_NEED_TYPES
 #include "common/packet.h"

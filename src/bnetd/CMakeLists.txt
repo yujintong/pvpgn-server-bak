@@ -76,7 +76,7 @@ endif()
 if (WIN32 AND USE_INCLUDED_ZLIB_LIBRARY)
 	install(
 		FILES
-			"${PROJECT_SOURCE_DIR}/lib/zlib/1.2.11/zlib1.dll"
+			"${PROJECT_SOURCE_DIR}/lib/zlib/zlib1.dll"
 		DESTINATION
 			${SBINDIR}
 	)

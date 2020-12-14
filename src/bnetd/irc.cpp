@@ -30,7 +30,7 @@
 #include <string>
 
 #include <fmt/format.h>
-#include <optional.hpp>
+#include <nonstd/optional.hpp>
 
 #include "compat/strcasecmp.h"
 

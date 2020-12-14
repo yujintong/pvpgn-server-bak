@@ -26,7 +26,7 @@
 #include <unordered_map>
 #include <utility>
 
-#include <optional.hpp>
+#include <nonstd/optional.hpp>
 #include <nlohmann/json.hpp>
 
 #include "compat/strcasecmp.h"

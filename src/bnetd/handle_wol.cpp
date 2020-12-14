@@ -28,7 +28,7 @@
 #include <cstring>
 #include <string>
 
-#include <optional.hpp>
+#include <nonstd/optional.hpp>
 
 #include "compat/strcasecmp.h"
 #include "common/irc_protocol.h"

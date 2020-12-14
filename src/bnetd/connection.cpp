@@ -27,7 +27,7 @@
 #include <string>
 
 #include <fmt/format.h>
-#include <optional.hpp>
+#include <nonstd/optional.hpp>
 
 #ifdef WIN32_GUI
 #include <win32/winmain.h>

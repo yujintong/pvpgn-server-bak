@@ -37,8 +37,8 @@ set(USE_INCLUDED_ZLIB_LIBRARY OFF)
 
 if(WITH_BNETD)
 	if (WIN32)
-		set(CURL_LIBRARY ${CMAKE_SOURCE_DIR}/lib/curl/7.70.0/libcurl.lib)
-		set(CURL_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/include/curl/7.70.0)
+		set(CURL_LIBRARY ${CMAKE_SOURCE_DIR}/lib/curl/libcurl.lib)
+		set(CURL_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/include/)
 	endif()
 	find_package(CURL REQUIRED)
 	
@@ -51,7 +51,7 @@ if(WITH_BNETD)
 
 	if (NOT DEFINED ZLIB_ROOT)
 		set(USE_INCLUDED_ZLIB_LIBRARY ON)
-		set(ZLIB_ROOT ${CMAKE_SOURCE_DIR}/include/zlib/1.2.11 ${CMAKE_SOURCE_DIR}/lib/zlib/1.2.11)
+		set(ZLIB_ROOT ${CMAKE_SOURCE_DIR}/include/zlib/ ${CMAKE_SOURCE_DIR}/lib/zlib/)
 	endif()
 
 	find_package(ZLIB REQUIRED)
@@ -59,8 +59,8 @@ endif(WITH_BNETD)
 
 if(WITH_LUA)
 	if (WIN32 AND (NOT DEFINED LUA_LIBRARIES OR NOT DEFINED LUA_INCLUDE_DIR))
-		set(LUA_LIBRARIES ${CMAKE_SOURCE_DIR}/lib/lua/5.1/lua5.1.lib)
-		set(LUA_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/include/lua/5.1)
+		set(LUA_LIBRARIES ${CMAKE_SOURCE_DIR}/lib/lua/lua5.1.lib)
+		set(LUA_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/include/lua/)
 	endif()
 
     find_package(Lua REQUIRED)
