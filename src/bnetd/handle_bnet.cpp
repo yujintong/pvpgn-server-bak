@@ -4532,7 +4532,6 @@ namespace pvpgn
 				bn_int_set(&rpacket->u.server_ladderreply.id, idnum);
 				bn_int_set(&rpacket->u.server_ladderreply.type, type);
 				bn_int_set(&rpacket->u.server_ladderreply.startplace, start);
-				bn_int_set(&rpacket->u.server_ladderreply.count, count);
 
 				switch (type){
 				case CLIENT_LADDERREQ_TYPE_HIGHESTRATED:
@@ -4621,6 +4620,8 @@ namespace pvpgn
 					else
 						packet_append_string(rpacket, " ");	/* use a space so the client won't show the user's own account when double-clicked on */
 				}
+
+				bn_int_set(&rpacket->u.server_ladderreply.count, i - start);
 
 				conn_push_outqueue(c, rpacket);
 				packet_del_ref(rpacket);
