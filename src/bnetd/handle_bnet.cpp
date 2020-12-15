@@ -4501,7 +4501,6 @@ namespace pvpgn
 				t_bnettime bt;
 				t_ladder_id id;
 				t_ladder_sort sort;
-				bool error = false;
 
 				clienttag = conn_get_clienttag(c);
 
@@ -4548,31 +4547,25 @@ namespace pvpgn
 				default:
 					sort = ladder_sort_default;
 					eventlog(eventlog_level_error, __FUNCTION__, "[{}] got unknown value for ladderreq.type={}", conn_get_socket(c), type);
-					error = true;
 				}
 
-				LadderList* ladderList_active = NULL;
-				LadderList* ladderList_current = NULL;
-
-				if (!error)
-				{
-					ladderList_active = ladders.getLadderList(LadderKey(id, clienttag, sort, ladder_time_active));
-					ladderList_current = ladders.getLadderList(LadderKey(id, clienttag, sort, ladder_time_current));
-				}
-				if (!ladderList_active || ladderList_current)
-					error = true;
+				LadderList* ladderList_active = ladders.getLadderList(LadderKey(id, clienttag, sort, ladder_time_active));
+				LadderList* ladderList_current = ladders.getLadderList(LadderKey(id, clienttag, sort, ladder_time_current));
 
 				for (i = start; i < start + count; i++) {
-
-
 					const LadderReferencedObject* referencedObject = NULL;
-					account = NULL;
-					if (!error){
 
-						if (!(referencedObject = ladderList_active->getReferencedObject(i + 1)))
-							referencedObject = ladderList_current->getReferencedObject(i + 1);
+					if (ladderList_active)
+					{
+						referencedObject = ladderList_active->getReferencedObject(i + 1);
 					}
 
+					if (!referencedObject && ladderList_current)
+					{
+						referencedObject = ladderList_current->getReferencedObject(i + 1);
+					}
+
+					account = NULL;
 					if ((referencedObject) && (account = referencedObject->getAccount()))
 					{
 						bn_int_set(&entry.active.wins, account_get_ladder_active_wins(account, clienttag, id));
