@@ -335,7 +335,7 @@ namespace pvpgn
 
 			Mailbox mbox(account_get_uid(recv));
 			if (get_mail_quota(recv) <= mbox.size()) {
-				message_send_text(c, message_type_error, c, localize(c, "Receiver has reached his mail quota. Your message will NOT be sent."));
+				message_send_text(c, message_type_error, c, localize(c, "Receiver has reached their mail quota. Your message will NOT be sent."));
 				return;
 			}
 

@@ -2013,7 +2013,7 @@
       <translate></translate>
     </item>
     <item id="433" file="mail.cpp" function="mail_func_send">
-      <original>Receiver has reached his mail quota. Your message will NOT be sent.</original>
+      <original>Receiver has reached their mail quota. Your message will NOT be sent.</original>
       <translate></translate>
     </item>
     <item id="434" file="mail.cpp" function="mail_func_send">
