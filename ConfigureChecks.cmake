@@ -36,7 +36,7 @@ message(STATUS "*** {fmt} ***")
 set(USE_INCLUDED_ZLIB_LIBRARY OFF)
 
 if(WITH_BNETD)
-	if (WIN32)
+	if (WIN32 AND (NOT DEFINED CURL_LIBRARY OR NOT DEFINED CURL_INCLUDE_DIR))
 		set(CURL_LIBRARY ${CMAKE_SOURCE_DIR}/lib/curl/libcurl.lib)
 		set(CURL_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/include/)
 	endif()
