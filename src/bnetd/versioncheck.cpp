@@ -227,7 +227,7 @@ namespace pvpgn
 			const std::string& checksum, t_tag architecture, t_tag client, const std::string& version_tag)
 		: m_version_id(version_id), m_architecture(architecture), m_client(client)
 		{
-			if (verstr_to_vernum(game_version.c_str(), reinterpret_cast<unsigned long *>(&this->m_game_version)) < 0)
+			if (verstr_to_vernum(game_version.c_str(), &this->m_game_version) < 0)
 			{
 				throw std::runtime_error("Invalid version \"" + game_version + "\" in entry \"" + title + "\"");
 			}
