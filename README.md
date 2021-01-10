@@ -21,6 +21,7 @@ There isn't a single source that documents all known packets.
 - https://github.com/MephisTools/diablo2-protocol/wiki/packets
 - https://bnetdocs.org/packet/index?order=packet-id-asc&pktapplayer%5B%5D=4
 - https://d2mods.info/forum/viewtopic.php?t=62821
+- https://blizzhackers.github.io/Diablo2PacketsData/
 
 
 ## A Message From Onlyer
