@@ -1,5 +1,5 @@
 # Diablo II Game Server (D2GS)
-This repository contains changes to [pvpgn/d2gs109](https://github.com/pvpgn/d2gs109) to make it compatible the with current d2cs-d2gs protocol and with recent versions of `D2Server.dll`.
+This repository contains changes to [pvpgn/d2gs109](https://github.com/pvpgn/d2gs109) to make it compatible the with current d2cs-d2gs protocol and with a modified version of `D2Server.dll` that is located in the `bin` directory.
 
 Compile with Visual Studio 2019 in *Debug* mode and run the resulting binary using compatibility mode for *Windows 8*.
 
@@ -9,11 +9,9 @@ The game server application loads `D2Server.dll`, calls `QueryInterface()`, and 
 ## History
 Blizzard accidentally included `D2Server.dll` in distributions of Diablo II 1.00, but have removed the file in subsequent installers and patches. Using `D2Server.dll`, Onlyer developed a working game server in late 2000 and eventually released D2GS in 2001. D2GS was actively developed between 2001 and 2002, adding support for patches 1.09c and 1.09d. Several months after Diablo II patch 1.10 was released, Onlyer released the final D2GS version, D2GS 1.10 - Build 6 on March 4, 2004.
 
-Because Onlyer didn't release the source code for D2GS, D2GS servers were stuck with supporting patch 1.10 as patches 1.11 and 1.11b became released in 2005. In 2007, Marsgod began distributing D2GS with support for patch 1.11b and eventually supported patches 1.13a and 1.13c.
+Because Onlyer didn't release the source code for D2GS, D2GS servers were stuck with supporting patch 1.10 as patches 1.11 and 1.11b became released in 2005. In 2007, Marsgod began distributing D2GS with support for patch 1.11b and eventually supported patches 1.13a and 1.13c. Marsgod achieved support for these patches by compiling hand written assembly and copying the code section of the compiled program into `D2Server.dll`.
 
-Marsgod technique was to compile hand written assembly and copy the code section of the compiled program into `D2Server.dll`.
-
-At some point, the source code for D2GS 1.09d was released at [d2dev.dlg.cn](http://d2dev.dlg.cn). Mirrors have been uploaded at https://github.com/pvpgn/d2gs109 and http://www.pudn.com/Download/item/id/884918.html. Despite the release of the source code, most D2GS servers still rely on Marsgod's distributions because of the lack of development using the source code. Only one person, [tesseract2048](https://github.com/tesseract2048/), has been known to [update the source code](https://github.com/tesseract2048/d2gs) and use it in production, though its known to be buggy and it requires a customized version of `d2cs` and `d2dbs`.
+At some point, the source code for D2GS 1.09d was released at [d2dev.dlg.cn](http://d2dev.dlg.cn). Mirrors have been uploaded at https://github.com/pvpgn/d2gs109 and http://www.pudn.com/Download/item/id/884918.html. Despite the release of the source code, virtually all D2GS servers still rely on Marsgod's distributions because of the lack of development using the source code. Only one person, [tesseract2048](https://github.com/tesseract2048/), has been known to [update the source code](https://github.com/tesseract2048/d2gs) and use it in production, though its known to be buggy and it requires a customized version of `d2cs` and `d2dbs`.
 
 ## Protocol Documentation
 There isn't a single source that documents all known packets.
