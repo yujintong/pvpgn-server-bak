@@ -1,0 +1,14 @@
+version: "3"
+
+services:
+  pvpgn:
+    image: pvpgn-server
+    restart: unless-stopped
+    ports:
+      - 6112:6112/udp
+      - 6112:6112
+      - 6200:6200/udp
+      - 6200:6200
+    volumes:
+      - ./your/config/dir/bnetd.conf:/usr/local/etc/pvpgn/bnetd.conf
+      # - ./your/config/dir/:/usr/local/etc/pvpgn

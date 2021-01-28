@@ -138,7 +138,48 @@ First open *Developer PowerShell for VS ...* or *Developer Command Prompt for VS
 ```
 msbuild pvpgn.sln -target:ALL_BUILD;INSTALL /p:Configuration="RelWithDebInfo"
 ```
+#### Docker
+To quickly deploy a PVPGN server, using Docker is one of the best choices. You can gain some benefits using this:
+- Small in size: approx 110MiB Uncompressed image size
+- Quick deploy, easy to scale out
+- Simple to use and config
 
+There are some supported build arguments:
+
+| Build Argument | Original Option | Default Value |
+|----------------|-----------------|---------------|
+| with_bnetd     | WITH_BNETD      | true          |
+| with_d2cs      | WITH_D2CS       | false         |
+| with_d2dbs     | WITH_D2DBS      | false         |
+| with_lua       | WITH_LUA        | false         |
+| with_mysql     | WITH_MYSQL      | true          |
+| with_sqlite3   | WITH_SQLITE3    | false         |
+| with_pgsql     | WITH_PGSQL      | false         |
+| with_odbc      | WITH_ODBC       | false         |
+
+##### How to build and run:
+
+Enable features by adding above build args to get desired docker image:
+
+```bash
+# This build will generate default PVPGN docker image with only battle.net and mysql support
+docker build . -t pvpgn-server 
+
+# This build will generate PVPGN with only d2cs, sqlite3 support.
+docker build . -t pvpgn-server --build-arg with_d2cs=true --build-arg with_bnetd=false --build-arg with_mysql=false --build-arg with_sqlite3=true
+```
+
+To run the image, you will need to mount existed configuration files, which is located at `/usr/local/etc/pvpgn` in the container. The command below will mount configuration directory:
+```bash
+docker run -p 6112:6112 -p 6112:6112/udp -p 6200:6200 -p 6200:6200/udp -v /your/config/dir:/usr/local/etc/pvpgn pvpgn-server
+```
+
+But most of the time, you just need to mount some specific configuration files, then just mount those to your container and the remain config files remain unchanged.
+```bash
+docker run -p 6112:6112 -p 6112:6112/udp -p 6200:6200 -p 6200:6200/udp -v /your/config/dir/bnetd.conf:/usr/local/etc/pvpgn/bnetd.conf pvpgn-server
+```
+
+To simplify the deployment step, you can use the provided `docker-compose.yml` file.
 
 ## Hosting on LAN or VPS with private IP address
 Some VPS providers do not assign your server a direct public IP. If that is the case or you host at home behind NAT you need to setup the route translation in `address_translation.conf`. The public address is pushed as the route server address to game clients when seeking games. Failure to push the correct address to game clients results in players not being able to match and join games (long game search and error).
