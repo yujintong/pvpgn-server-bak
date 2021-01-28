@@ -16,6 +16,9 @@ ARG with_bnetd=true
 ARG with_d2cs=false
 ARG with_d2dbs=false
 
+ARG git_repo=https://github.com/pvpgn/pvpgn-server.git
+ARG git_branch=master
+
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
         git \
@@ -32,7 +35,7 @@ RUN apt-get update && \
         $(if ${with_pgsql}; then echo "libpq-dev libpq5"; fi) \
         $(if ${with_odbc}; then echo "unixodbc-dev libodbc1"; fi) \
         $(if ${with_lua}; then echo "liblua5.1-0-dev liblua5.1-0"; fi) && \
-    git clone https://github.com/pvpgn/pvpgn-server.git && \
+    git clone ${git_repo} && git checkout ${git_branch} && \
     cd pvpgn-server && \
     cmake -G "Unix Makefiles" -S./ -B./build \
           -DWITH_BNETD=${with_bnetd} \

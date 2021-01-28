@@ -146,16 +146,23 @@ To quickly deploy a PVPGN server, using Docker is one of the best choices. You c
 
 There are some supported build arguments:
 
-| Build Argument | Original Option | Default Value |
-|----------------|-----------------|---------------|
-| with_bnetd     | WITH_BNETD      | true          |
-| with_d2cs      | WITH_D2CS       | false         |
-| with_d2dbs     | WITH_D2DBS      | false         |
-| with_lua       | WITH_LUA        | false         |
-| with_mysql     | WITH_MYSQL      | true          |
-| with_sqlite3   | WITH_SQLITE3    | false         |
-| with_pgsql     | WITH_PGSQL      | false         |
-| with_odbc      | WITH_ODBC       | false         |
+| Build Argument | Original CMAKE Option | Default Value |
+|----------------|-----------------------|---------------|
+| with_bnetd     | WITH_BNETD            | true          |
+| with_d2cs      | WITH_D2CS             | false         |
+| with_d2dbs     | WITH_D2DBS            | false         |
+| with_lua       | WITH_LUA              | false         |
+| with_mysql     | WITH_MYSQL            | true          |
+| with_sqlite3   | WITH_SQLITE3          | false         |
+| with_pgsql     | WITH_PGSQL            | false         |
+| with_odbc      | WITH_ODBC             | false         |
+
+And some extra build args which is not related to CMAKE:
+
+| Build Argument | Description                       | Default Value |
+|----------------|-----------------------------------|---------------|
+| git_repo       | The repository you want to clone  | this repo     |
+| git_branch     | The branch you want to build from | master        |
 
 ##### How to build and run:
 
@@ -165,16 +172,16 @@ Enable features by adding above build args to get desired docker image:
 # This build will generate default PVPGN docker image with only battle.net and mysql support
 docker build . -t pvpgn-server 
 
-# This build will generate PVPGN with only d2cs, sqlite3 support.
-docker build . -t pvpgn-server --build-arg with_d2cs=true --build-arg with_bnetd=false --build-arg with_mysql=false --build-arg with_sqlite3=true
+# This build will generate PVPGN with only d2cs, sqlite3 support and using develop branch
+docker build . -t pvpgn-server --build-arg with_d2cs=true --build-arg with_bnetd=false --build-arg with_mysql=false --build-arg with_sqlite3=true --build-arg git_branch=develop
 ```
 
-To run the image, you will need to mount existed configuration files, which is located at `/usr/local/etc/pvpgn` in the container. The command below will mount configuration directory:
+To run the image, you will need to mount existed configuration files and assets which is located at `/usr/local/etc/pvpgn` and `/usr/local/var/pvpgn` inside the container. The command below will mount configuration directory:
 ```bash
 docker run -p 6112:6112 -p 6112:6112/udp -p 6200:6200 -p 6200:6200/udp -v /your/config/dir:/usr/local/etc/pvpgn pvpgn-server
 ```
 
-But most of the time, you just need to mount some specific configuration files, then just mount those to your container and the remain config files remain unchanged.
+But most of the time, you just need to mount some specific configuration files and let the rest unchange, then just mount what you want.
 ```bash
 docker run -p 6112:6112 -p 6112:6112/udp -p 6200:6200 -p 6200:6200/udp -v /your/config/dir/bnetd.conf:/usr/local/etc/pvpgn/bnetd.conf pvpgn-server
 ```

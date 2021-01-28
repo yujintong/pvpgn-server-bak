@@ -11,4 +11,5 @@ services:
       - 6200:6200
     volumes:
       - ./your/config/dir/bnetd.conf:/usr/local/etc/pvpgn/bnetd.conf
-      # - ./your/config/dir/:/usr/local/etc/pvpgn
+      # - ./your/config/dir:/usr/local/etc/pvpgn
+      # - ./your/asset/dir:/usr/local/var/pvpgn
