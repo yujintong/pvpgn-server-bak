@@ -181,7 +181,7 @@ To run the image, you will need to mount existed configuration files and assets 
 docker run -p 6112:6112 -p 6112:6112/udp -p 6200:6200 -p 6200:6200/udp -v /your/config/dir:/usr/local/etc/pvpgn pvpgn-server
 ```
 
-But most of the time, you just need to mount some specific configuration files and let the rest unchange, then just mount what you want.
+But most of the time, you just need to mount some specific configuration files and let the rest remain unchanged, then just mount the files you want.
 ```bash
 docker run -p 6112:6112 -p 6112:6112/udp -p 6200:6200 -p 6200:6200/udp -v /your/config/dir/bnetd.conf:/usr/local/etc/pvpgn/bnetd.conf pvpgn-server
 ```
