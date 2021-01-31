@@ -90,10 +90,12 @@ namespace pvpgn
 			catch (const std::exception& e)
 			{
 				eventlog(eventlog_level_error, __FUNCTION__, "{}", e.what());
+				return -1;
 			}
 			catch (...)
 			{
 				eventlog(eventlog_level_error, __FUNCTION__, "lua exception\n");
+				return -1;
 			}
 
 			// get user connections
