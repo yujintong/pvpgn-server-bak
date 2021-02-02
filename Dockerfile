@@ -1,4 +1,4 @@
-FROM ubuntu:bionic
+FROM ubuntu:focal
 
 LABEL maintainer="Aperture <aperture147@gmail.com>"
 
@@ -30,7 +30,7 @@ RUN apt-get update && \
         zlib1g-dev zlib1g \
         libcurl4-openssl-dev libcurl4 \
         cmake make \
-        $(if ${with_mysql}; then echo "libmysqlclient-dev libmysqlclient20"; fi) \
+        $(if ${with_mysql}; then echo "libmysqlclient-dev libmysqlclient21"; fi) \
         $(if ${with_sqlite3}; then echo "libsqlite3-dev libsqlite3-0"; fi) \
         $(if ${with_pgsql}; then echo "libpq-dev libpq5"; fi) \
         $(if ${with_odbc}; then echo "unixodbc-dev libodbc1"; fi) \
@@ -65,9 +65,14 @@ RUN apt-get update && \
 
 WORKDIR /usr/local/sbin
 
+# Expose for bnetd
 EXPOSE 6112
 EXPOSE 6112/udp
-EXPOSE 6200
-EXPOSE 6200/udp
+# Expose for d2cs
+EXPOSE 6113
+EXPOSE 6113/udp
+# Expose for d2dbs
+EXPOSE 6114
+EXPOSE 6114/udp
 
 CMD ["bnetd", "-f"]
