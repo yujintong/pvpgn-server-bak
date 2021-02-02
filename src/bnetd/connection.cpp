@@ -550,6 +550,15 @@ namespace pvpgn
 				return;
 			}
 
+
+#ifdef WITH_LUA
+			if (c->protocol.account)
+			{
+				lua_handle_user(c, NULL, NULL, luaevent_user_disconnect);
+			}
+#endif
+
+
 			classstr = conn_class_get_str(c->protocol.cclass);
 
 			if (list_remove_data(conn_head, c, (conn_or_dead_list) ? &curr : elem) < 0)
@@ -692,10 +701,6 @@ namespace pvpgn
 					if (account_save(conn_get_account(c), FS_FORCE) < 0)
 						eventlog(eventlog_level_error, __FUNCTION__, "cannot sync account (sync_on_logoff)");
 				}
-
-#ifdef WITH_LUA
-				lua_handle_user(c, NULL, NULL, luaevent_user_disconnect);
-#endif
 
 				if (account_get_conn(c->protocol.account) == c)  /* make sure you don't set this when already on new conn (relogin with same account) */
 					account_set_conn(c->protocol.account, NULL);
