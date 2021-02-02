@@ -63,7 +63,7 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/* /build/pvpgn-server && \
     apt-get clean
 
-WORKDIR /usr/local/etc/pvpg
+WORKDIR /usr/local/sbin
 
 EXPOSE 6112
 EXPOSE 6112/udp
