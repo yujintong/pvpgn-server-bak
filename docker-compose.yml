@@ -1,19 +1,36 @@
 version: "3"
 
 services:
-  pvpgn:
-    image: pvpgn-server
+  bnetd:
+    image: pvpgn-server:bnetd
     restart: unless-stopped
     ports:
       - 6112:6112/udp
       - 6112:6112
-      - 6200:6200/udp
-      - 6200:6200
     volumes:
-      - /your/config/dir/bnetd.conf:/usr/local/etc/pvpgn/bnetd.conf
-      # - /your/config/dir:/usr/local/etc/pvpgn
-      # - /your/asset/dir:/usr/local/var/pvpgn
+      - /your/config/dir:/usr/local/etc/pvpgn
+      - /your/asset/dir:/usr/local/var/pvpgn
   
+  d2cs:
+    image: pvpgn-server:d2cs
+    restart: unless-stopped
+    ports:
+      - 6113:6113/udp
+      - 6113:6113
+    volumes:
+      - /your/config/dir:/usr/local/etc/pvpgn
+      - /your/asset/dir:/usr/local/var/pvpgn
+
+  d2dbs:
+    image: pvpgn-server:d2dbs
+    restart: unless-stopped
+    ports:
+      - 6114:6114/udp
+      - 6114:6114
+    volumes:
+      - /your/config/dir:/usr/local/etc/pvpgn
+      - /your/asset/dir:/usr/local/var/pvpgn
+
   mysql:
     image: mysql:8.0.23
     command: --default-authentication-plugin=mysql_native_password

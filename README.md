@@ -186,7 +186,31 @@ But most of the time, you just need to mount some specific configuration files a
 docker run -p 6112:6112 -p 6112:6112/udp -p 6200:6200 -p 6200:6200/udp -v /your/config/dir/bnetd.conf:/usr/local/etc/pvpgn/bnetd.conf pvpgn-server
 ```
 
-To simplify the deployment step, you can use the provided `docker-compose.yml` file.
+To simplify the managing process, we should use `docker-compose`. The step-by-step example below will help you to create a system of 3 different containers running `bnetd`, `d2cs` and `d2dbs` with `mysql` storage:
+
+1. Preparing images:
+```bash
+# build bnetd image
+docker build . -t pvpgn-server:bnetd
+# build d2cs image
+docker build . -t pvpgn-server:d2cs --build-arg with_d2cs=true --build-arg with_bnetd=false
+# build d2dbs image
+docker build . -t pvpgn-server:d2dbs --build-arg with_d2dbs=true --build-arg with_bnetd=false
+
+```
+
+2. Copy sample configuration files from the image (if you already have configuration files, skip this step):
+```bash
+docker run -v /your/config/dir:/tmp/conf --rm --entrypoint cp pvpgn-server:bnetd /usr/local/etc/pvpgn/* /tmp/conf
+docker run -v /your/assets/dir:/tmp/assets --rm --entrypoint cp pvpgn-server:bnetd /usr/local/var/pvpgn/* /tmp/assets
+```
+
+3. Modify your configuration files which is copied from above. More information could be found in [this link](https://pvpgn.pro/pvpgn_installation.html)
+
+4. Copy the sample `docker-compose.yml` file from this repository and modify it to suit you (like changing volume mounting)
+
+5. Finally, hit `docker-compose up -d` to turn up all containers
+
 
 ## Hosting on LAN or VPS with private IP address
 Some VPS providers do not assign your server a direct public IP. If that is the case or you host at home behind NAT you need to setup the route translation in `address_translation.conf`. The public address is pushed as the route server address to game clients when seeking games. Failure to push the correct address to game clients results in players not being able to match and join games (long game search and error).
