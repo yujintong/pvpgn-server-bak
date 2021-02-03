@@ -139,10 +139,17 @@ First open *Developer PowerShell for VS ...* or *Developer Command Prompt for VS
 msbuild pvpgn.sln -target:ALL_BUILD;INSTALL /p:Configuration="RelWithDebInfo"
 ```
 #### Docker
-To quickly deploy a PVPGN server, using Docker is one of the best choices. You can gain some benefits using this:
-- Small in size: approx 110MiB Uncompressed image size
-- Quick deploy, easy to scale out
+To quickly deploy a PVPGN server on linux, using Docker is one of the best choices. You can gain some benefits using this:
+- Small image size: approx 234MB uncompressed, 57MB compressed image size
+- Quick deploy, easy to scale out, manage and update
 - Simple to use and config
+
+##### Prequisite:
+- `docker` (Check [this link](https://docs.docker.com/engine/install/) for installation manual) 
+  - you can use `podman` instead of `docker`, but in this manual we will use `docker` cli so you may need `podman` with `docker` cli support
+- (optionally) `docker-compose` for better configuration, deployment and logging managing
+
+##### How to build and run:
 
 There are some supported build arguments:
 
@@ -164,53 +171,115 @@ And some extra build args which is not related to CMAKE:
 | git_repo       | The repository you want to clone  | this repo     |
 | git_branch     | The branch you want to build from | master        |
 
-##### How to build and run:
+Adding above build arguments to enable/disable features (Image tagging will helps you distinguish image capabilities/features)
 
-Enable features by adding above build args to get desired docker image:
+Below are a some sample build commands:
 
 ```bash
-# This build will generate default PVPGN docker image with only battle.net and mysql support
-docker build . -t pvpgn-server 
+# This command will use all default build arguments and build PVPGN docker image with only bnetd and mysql support using master branch
+docker build . -t pvpgn-server:bnetd-mysql
 
-# This build will generate PVPGN with only d2cs, sqlite3 support and using develop branch
-docker build . -t pvpgn-server --build-arg with_d2cs=true --build-arg with_bnetd=false --build-arg with_mysql=false --build-arg with_sqlite3=true --build-arg git_branch=develop
+# This command will build a PVPGN with only d2cs and sqlite3 support using develop branch
+docker build . \
+  --build-arg with_d2cs=true \     # enable d2cs support (disable by default)
+  --build-arg with_bnetd=false \   # enable d2cs support (disable by default)
+  --build-arg with_mysql=false \   # enable d2cs support (disable by default)
+  --build-arg with_sqlite3=true \  # enable d2cs support (disable by default)
+  --build-arg git_branch=develop \ # enable d2cs support (disable by default)
+  -t pvpgn-server:d2cs-sqlite      # tag the image 
 ```
 
-To run the image, you will need to mount existed configuration files and assets which is located at `/usr/local/etc/pvpgn` and `/usr/local/var/pvpgn` inside the container. The command below will mount configuration directory:
+To run the image, you will need to mount existed configuration files and assets which is located at `/usr/local/etc/pvpgn` and `/usr/local/var/pvpgn` inside the container. The example bellow shows how to obtain configuration files and turn up some pvpgn servers and mysql:
+
 ```bash
-docker run -p 6112:6112 -p 6112:6112/udp -p 6200:6200 -p 6200:6200/udp -v /your/config/dir:/usr/local/etc/pvpgn pvpgn-server
+# prepare images
+docker build . -t pvpgn-server:bnetd-mysql
+docker build . --build-arg with_d2cs=true --build-arg with_bnetd=false -t pvpgn-server:d2cs-mysql
+docker build . --build-arg with_d2dbs=true --build-arg with_bnetd=false -t pvpgn-server:d2dbs-mysql
+
+# copy configuration files and base assets from an image
+# skip this if you already have configuration and assets directories
+# all base configuration files are the same, modify it to fit your needs
+# check [this link](https://pvpgn.pro/pvpgn_installation.html) to get more info of configuration files
+docker run -v /your/config/dir:/tmp/conf --rm --entrypoint cp pvpgn-server:bnetd-mysql /usr/local/etc/pvpgn/* /tmp/conf
+docker run -v /your/assets/dir:/tmp/assets --rm --entrypoint cp pvpgn-server:bnetd-mysql /usr/local/var/pvpgn/* /tmp/assets
+
+# start mysql to store data
+docker run -d \              # run detached
+  --name mysql \             # set a name for mysql
+  --restart unless-stopped \ # auto restart the container if it crash, unless you stop it by yourself
+  -v /your/db/storage:/var/lib/mysql \ # mount database storage to the host
+  mysql:8.0.23 --default-authentication-plugin=mysql_native_password # use native password instead of default "caching_sha2_password" authentication plugin, which is not supported by php and some legacy software
+
+# run pvpgn with bnetd and mysql support
+docker run -d \                   # run detached
+  --name pvpgn-bnetd \            # set a name for the container
+  --restart unless-stopped \      # auto restart the container if it crash, unless you stop it by yourself
+  -p 6112:6112 -p 6112:6112/udp \ # forwarding default bnetd port with both tcp and udp protocol
+  -v /your/config/dir:/usr/local/etc/pvpgn \ # configuration mounting
+  -v /your/assets/dir:/usr/local/var/pvpgn \ # assets mounting
+  pvpgn-server:bnetd-mysql                   # bnetd with mysql support image
+
+# run pvpgn with d2cs and mysql support
+docker run -d \                   
+  --name pvpgn-d2cs \            
+  --restart unless-stopped \      
+  -p 6113:6113 -p 6113:6113/udp \ # forwarding default d2cs port
+  -v /your/config/dir:/usr/local/etc/pvpgn \ 
+  -v /your/assets/dir:/usr/local/var/pvpgn \ 
+  pvpgn-server:d2cs-mysql # d2cs with mysql support image
+
+# run pvpgn with d2dbs and mysql support
+docker run -d \                   
+  --name pvpgn-d2dbs \            
+  --restart unless-stopped \      
+  -p 6114:6114 -p 6114:6114/udp \ # forwarding default d2cdb port
+  -v /your/config/dir:/usr/local/etc/pvpgn \ 
+  -v /your/assets/dir:/usr/local/var/pvpgn \ 
+  pvpgn-server:d2dbs-mysql # d2dbs with mysql support image
 ```
 
-But most of the time, you just need to mount some specific configuration files and let the rest remain unchanged, then just mount the files you want.
+To obtain logs of the container, run this command:
+
 ```bash
-docker run -p 6112:6112 -p 6112:6112/udp -p 6200:6200 -p 6200:6200/udp -v /your/config/dir/bnetd.conf:/usr/local/etc/pvpgn/bnetd.conf pvpgn-server
+docker logs -f \ # view container logs continuously, ommit "-f" option if you don't want to keep seeing the logs
+  --tail 1000 \  # get last 1000 lines of log
+  pvpgn-bnetd    # name of the container which are set above
+```
+
+Sometimes you just need a simple server for a small group of friends and just want to mount some specific configuration files and let the rest remain unchanged, then just mount the configuration files you want:
+
+```bash
+# Prepare image with sqlite support
+docker build . --build-arg with_sqlite3=true --build-arg with_mysql=false -t pvpgn-server:bnetd-sqlite
+
+docker run -d \
+  --name pvpgn-bnetd \
+  -p 6112:6112 -p 6112:6112/udp \
+  -v /your/config/dir/bnetd.conf:/usr/local/etc/pvpgn/bnetd.conf \ # just mount the bnetd configuration files
+  pvpgn-server:bnetd-sqlite
 ```
 
 To simplify the managing process, we should use `docker-compose`. The step-by-step example below will help you to create a system of 3 different containers running `bnetd`, `d2cs` and `d2dbs` with `mysql` storage:
 
-1. Preparing images:
-```bash
-# build bnetd image
-docker build . -t pvpgn-server:bnetd
-# build d2cs image
-docker build . -t pvpgn-server:d2cs --build-arg with_d2cs=true --build-arg with_bnetd=false
-# build d2dbs image
-docker build . -t pvpgn-server:d2dbs --build-arg with_d2dbs=true --build-arg with_bnetd=false
+1. Prepare image and configs:
 
-```
-
-2. Copy sample configuration files from the image (if you already have configuration files, skip this step):
 ```bash
+# preparing images
+docker build . -t pvpgn-server:bnetd-mysql
+docker build . --build-arg with_d2cs=true --build-arg with_bnetd=false -t pvpgn-server:d2cs-mysql
+docker build . --build-arg with_d2dbs=true --build-arg with_bnetd=false -t pvpgn-server:d2dbs-mysql
+
+# copy sample configuration files from the image and modify it
 docker run -v /your/config/dir:/tmp/conf --rm --entrypoint cp pvpgn-server:bnetd /usr/local/etc/pvpgn/* /tmp/conf
 docker run -v /your/assets/dir:/tmp/assets --rm --entrypoint cp pvpgn-server:bnetd /usr/local/var/pvpgn/* /tmp/assets
 ```
 
-3. Modify your configuration files which is copied from above. More information could be found in [this link](https://pvpgn.pro/pvpgn_installation.html)
+2. Copy the sample `docker-compose.yml` file from this repository and modify it to suit you (like changing volume mounting)
 
-4. Copy the sample `docker-compose.yml` file from this repository and modify it to suit you (like changing volume mounting)
+3. Finally, hit `docker-compose up -d` to turn up all containers
 
-5. Finally, hit `docker-compose up -d` to turn up all containers
-
+To obtain logs from `docker-compose`, use this 
 
 ## Hosting on LAN or VPS with private IP address
 Some VPS providers do not assign your server a direct public IP. If that is the case or you host at home behind NAT you need to setup the route translation in `address_translation.conf`. The public address is pushed as the route server address to game clients when seeking games. Failure to push the correct address to game clients results in players not being able to match and join games (long game search and error).
