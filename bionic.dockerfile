@@ -1,4 +1,4 @@
-FROM ubuntu:bionic
+FROM quay.io/aperture147/ubuntu:bionic
 
 LABEL maintainer="Aperture <aperture147@gmail.com>"
 
@@ -35,8 +35,9 @@ RUN apt-get update && \
         $(if ${with_pgsql}; then echo "libpq-dev libpq5"; fi) \
         $(if ${with_odbc}; then echo "unixodbc-dev libodbc1"; fi) \
         $(if ${with_lua}; then echo "liblua5.1-0-dev liblua5.1-0"; fi) && \
-    git clone ${git_repo} && git checkout ${git_branch} && \
+    git clone --depth=1 ${git_repo} pvpgn-server && \
     cd pvpgn-server && \
+    git checkout ${git_branch} && \
     cmake -G "Unix Makefiles" -S./ -B./build \
           -DWITH_BNETD=${with_bnetd} \
           -DWITH_D2CS=${with_d2cs} \
