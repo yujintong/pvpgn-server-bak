@@ -38,7 +38,7 @@ RUN apt-get update && \
     git clone --depth=1 ${git_repo} pvpgn-server && \
     cd pvpgn-server && \
     git checkout ${git_branch} && \
-    cmake -G "Unix Makefiles" -S./ -B./build \
+    cmake -G "Unix Makefiles" -H./ -B./build \
           -DWITH_BNETD=${with_bnetd} \
           -DWITH_D2CS=${with_d2cs} \
           -DWITH_D2DBS=${with_d2dbs} \
