@@ -35,9 +35,8 @@ RUN apt-get update && \
         $(if ${with_pgsql}; then echo "libpq-dev libpq5"; fi) \
         $(if ${with_odbc}; then echo "unixodbc-dev libodbc1"; fi) \
         $(if ${with_lua}; then echo "liblua5.1-0-dev liblua5.1-0"; fi) && \
-    git clone --depth=1 ${git_repo} pvpgn-server && \
+    git clone --single-branch --branch ${git_branch} --depth=1 ${git_repo} pvpgn-server && \
     cd pvpgn-server && \
-    git checkout ${git_branch} && \
     cmake -G "Unix Makefiles" -S./ -B./build \
           -DWITH_BNETD=${with_bnetd} \
           -DWITH_D2CS=${with_d2cs} \
@@ -66,14 +65,12 @@ RUN apt-get update && \
 
 WORKDIR /usr/local/sbin
 
-# Expose for bnetd
-EXPOSE 6112
-EXPOSE 6112/udp
-# Expose for d2cs
-EXPOSE 6113
-EXPOSE 6113/udp
-# Expose for d2dbs
-EXPOSE 6114
-EXPOSE 6114/udp
+# Expose ports for bnetd, d2cs and d2dbs
+EXPOSE 6112 \
+       6112/udp \
+       6113 \
+       6113/udp \
+       6114 \
+       6114/udp
 
 CMD ["bnetd", "-f"]
