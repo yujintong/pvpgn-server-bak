@@ -182,10 +182,10 @@ docker build . -t pvpgn-server:bnetd-mysql
 # This command will build a PVPGN with only d2cs and sqlite3 support using develop branch
 docker build . \
   --build-arg with_d2cs=true \     # enable d2cs support (disable by default)
-  --build-arg with_bnetd=false \   # enable d2cs support (disable by default)
-  --build-arg with_mysql=false \   # enable d2cs support (disable by default)
-  --build-arg with_sqlite3=true \  # enable d2cs support (disable by default)
-  --build-arg git_branch=develop \ # enable d2cs support (disable by default)
+  --build-arg with_bnetd=false \   # enable bnetd support (enable by default)
+  --build-arg with_mysql=false \   # enable mysql support (enable by default)
+  --build-arg with_sqlite3=true \  # enable sqlite3 support (disable by default)
+  --build-arg git_branch=develop \ # switch to develop branch (master branch by default)
   -t pvpgn-server:d2cs-sqlite      # tag the image 
 ```
 
