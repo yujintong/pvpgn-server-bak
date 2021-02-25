@@ -199,10 +199,10 @@ docker build . --build-arg with_d2dbs=true --build-arg with_bnetd=false -t pvpgn
 
 # copy configuration files and base assets from an image
 # skip this if you already have configuration and assets directories
-# all base configuration files are the same, modify it to fit your needs
+# all base configuration files in any image are the same, modify it to fit your needs
 # check [this link](https://pvpgn.pro/pvpgn_installation.html) to get more info of configuration files
-docker run -v /your/config/dir:/tmp/conf --rm --entrypoint cp pvpgn-server:bnetd-mysql /usr/local/etc/pvpgn/* /tmp/conf
-docker run -v /your/assets/dir:/tmp/assets --rm --entrypoint cp pvpgn-server:bnetd-mysql /usr/local/var/pvpgn/* /tmp/assets
+docker run -v /your/config/dir:/tmp/conf --rm --entrypoint cp pvpgn-server:bnetd-mysql -r /usr/local/etc/pvpgn /tmp/conf
+docker run -v /your/assets/dir:/tmp/assets --rm --entrypoint cp pvpgn-server:bnetd-mysql -r /usr/local/etc/pvpgn /tmp/assets
 
 # start mysql to store data
 docker run -d \              # run detached
@@ -271,9 +271,9 @@ docker build . --build-arg with_d2cs=true --build-arg with_bnetd=false -t pvpgn-
 docker build . --build-arg with_d2dbs=true --build-arg with_bnetd=false -t pvpgn-server:d2dbs-mysql
 
 # copy sample configuration files from the image and modify it
-# all sample config files is the same in every container
-docker run -v /your/config/dir:/tmp/conf --rm --entrypoint cp /usr/local/etc/pvpgn/* /tmp/conf pvpgn-server:bnetd 
-docker run -v /your/assets/dir:/tmp/assets --rm --entrypoint cp /usr/local/var/pvpgn/* /tmp/assets pvpgn-server:bnetd 
+# all base configuration files in any image are the same, modify it to fit your needs
+docker run -v /your/config/dir:/tmp/conf --rm --entrypoint cp pvpgn-server:bnetd-mysql -r /usr/local/etc/pvpgn /tmp/conf
+docker run -v /your/assets/dir:/tmp/assets --rm --entrypoint cp pvpgn-server:bnetd-mysql -r /usr/local/etc/pvpgn /tmp/assets
 ```
 
 2. Copy the sample `docker-compose.yml` file from this repository and modify it to suit you (like changing volume mounting)
