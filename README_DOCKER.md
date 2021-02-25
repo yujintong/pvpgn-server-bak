@@ -91,7 +91,7 @@ docker run -d \              # run detached
   --name mysql \             # set a name for mysql
   --restart unless-stopped \ # auto restart the container if it crash or server restart, unless you manually stop it
   -v /your/db/storage:/var/lib/mysql \ # mount database storage to the host
-  mysql:8.0.23 --default-authentication-plugin=mysql_native_password # use native password instead of default "caching_sha2_password" authentication plugin, which is not supported by php and some legacy software
+  mysql:8.0 --default-authentication-plugin=mysql_native_password # use native password instead of default "caching_sha2_password" authentication plugin, which is not supported by php and some legacy software
 ```
 
 3. Start services:
@@ -194,7 +194,7 @@ docker run -d \
   pvpgn-server:bnetd-sqlite
 ```
 
-### Optimize networking:
+### Optimize networking performance:
 
 Disable `userland-proxy` is recommended to run a big PVPGN server due to [performance degradation](https://franckpachot.medium.com/high-cpu-usage-in-docker-proxy-with-chatty-database-application-disable-userland-proxy-415ffa064955).
 
