@@ -73,4 +73,5 @@ EXPOSE 6112 \
        6114 \
        6114/udp
 
-CMD ["bnetd", "-f"]
+ENV SERVER_TYPE bnetd
+CMD $SERVER_TYPE -f

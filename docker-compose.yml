@@ -2,7 +2,7 @@ version: "3"
 
 services:
   bnetd:
-    image: pvpgn-server:bnetd
+    image: pvpgn-server:bnetd-mysql
     restart: unless-stopped
     ports:
       - 6112:6112/udp
@@ -12,21 +12,25 @@ services:
       - /your/asset/dir:/usr/local/var/pvpgn
   
   d2cs:
-    image: pvpgn-server:d2cs
+    image: pvpgn-server:d2cs-mysql
     restart: unless-stopped
     ports:
       - 6113:6113/udp
       - 6113:6113
+    environment: 
+      SERVER_TYPE: d2cs 
     volumes:
       - /your/config/dir:/usr/local/etc/pvpgn
       - /your/asset/dir:/usr/local/var/pvpgn
 
   d2dbs:
-    image: pvpgn-server:d2dbs
+    image: pvpgn-server:d2dbs-mysql
     restart: unless-stopped
     ports:
       - 6114:6114/udp
       - 6114:6114
+    environment:
+      SERVER_TYPE: d2dbs 
     volumes:
       - /your/config/dir:/usr/local/etc/pvpgn
       - /your/asset/dir:/usr/local/var/pvpgn

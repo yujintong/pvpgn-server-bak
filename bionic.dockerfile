@@ -66,14 +66,13 @@ RUN apt-get update && \
 
 WORKDIR /usr/local/sbin
 
-# Expose for bnetd
-EXPOSE 6112
-EXPOSE 6112/udp
-# Expose for d2cs
-EXPOSE 6113
-EXPOSE 6113/udp
-# Expose for d2dbs
-EXPOSE 6114
-EXPOSE 6114/udp
+# Expose ports for bnetd, d2cs and d2dbs
+EXPOSE 6112 \
+       6112/udp \
+       6113 \
+       6113/udp \
+       6114 \
+       6114/udp
 
-CMD ["bnetd", "-f"]
+ENV SERVER_TYPE bnetd
+CMD $SERVER_TYPE -f
