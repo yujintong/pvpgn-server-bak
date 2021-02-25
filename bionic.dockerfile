@@ -1,4 +1,4 @@
-FROM quay.io/aperture147/ubuntu:bionic
+FROM ubuntu:bionic
 
 LABEL maintainer="Aperture <aperture147@gmail.com>"
 

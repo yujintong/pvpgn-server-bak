@@ -1,4 +1,4 @@
-FROM quay.io/aperture147/ubuntu:focal
+FROM ubuntu:focal
 
 LABEL maintainer="Aperture <aperture147@gmail.com>"
 
