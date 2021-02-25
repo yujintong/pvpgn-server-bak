@@ -219,6 +219,5 @@ If this file does not exist, just create it and add this to the file and restart
 ```json
 {
     "userland-proxy": false
-    // some more options
 }
 ```
