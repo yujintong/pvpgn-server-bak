@@ -173,6 +173,14 @@ And some extra build args which is not related to CMAKE:
 
 Adding above build arguments to enable/disable features (Image tagging will helps you distinguish image capabilities/features)
 
+There are some enviroment variables you might want to override:
+
+| Env Var     | Description                                             | Default Value |
+|-------------|---------------------------------------------------------|---------------|
+| SERVER_TYPE | Server type, choose between `d2cs`, `d2dbs` and `bnetd` | `bnetd`       |
+
+Choose the appropriate `SERVER_TYPE` base on your image build
+
 Below are a some sample build commands:
 
 ```bash
@@ -207,14 +215,14 @@ docker run -v /your/assets/dir:/tmp/assets --rm --entrypoint cp pvpgn-server:bne
 # start mysql to store data
 docker run -d \              # run detached
   --name mysql \             # set a name for mysql
-  --restart unless-stopped \ # auto restart the container if it crash, unless you stop it by yourself
+  --restart unless-stopped \ # auto restart the container if it crash or server restart, unless you manually stop it
   -v /your/db/storage:/var/lib/mysql \ # mount database storage to the host
   mysql:8.0.23 --default-authentication-plugin=mysql_native_password # use native password instead of default "caching_sha2_password" authentication plugin, which is not supported by php and some legacy software
 
 # run pvpgn with bnetd and mysql support
-docker run -d \                   # run detached
-  --name pvpgn-bnetd \            # set a name for the container
-  --restart unless-stopped \      # auto restart the container if it crash, unless you stop it by yourself
+docker run -d \
+  --name pvpgn-bnetd \
+  --restart unless-stopped \
   -p 6112:6112 -p 6112:6112/udp \ # forwarding default bnetd port with both tcp and udp protocol
   -v /your/config/dir:/usr/local/etc/pvpgn \ # configuration mounting
   -v /your/assets/dir:/usr/local/var/pvpgn \ # assets mounting
@@ -223,16 +231,18 @@ docker run -d \                   # run detached
 # run pvpgn with d2cs and mysql support
 docker run -d \                   
   --name pvpgn-d2cs \            
-  --restart unless-stopped \      
+  --restart unless-stopped \
+  -e SERVER_TYPE=d2cs \ # override bnetd server type to d2cs
   -p 6113:6113 -p 6113:6113/udp \ # forwarding default d2cs port
   -v /your/config/dir:/usr/local/etc/pvpgn \ 
   -v /your/assets/dir:/usr/local/var/pvpgn \ 
   pvpgn-server:d2cs-mysql # d2cs with mysql support image
 
 # run pvpgn with d2dbs and mysql support
-docker run -d \                   
-  --name pvpgn-d2dbs \            
-  --restart unless-stopped \      
+docker run -d \
+  --name pvpgn-d2dbs \
+  --restart unless-stopped \
+  -e SERVER_TYPE=d2dbs \ # override bnetd server type to d2dbs
   -p 6114:6114 -p 6114:6114/udp \ # forwarding default d2cdb port
   -v /your/config/dir:/usr/local/etc/pvpgn \ 
   -v /your/assets/dir:/usr/local/var/pvpgn \ 
