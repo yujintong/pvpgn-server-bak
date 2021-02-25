@@ -249,13 +249,15 @@ docker run -d \
   pvpgn-server:d2dbs-mysql # d2dbs with mysql support image
 ```
 
-To obtain logs of the container, run this command:
+To obtain logs of the container, example to get `pvpgn-bnetd` log, run this command:
 
 ```bash
 docker logs -f \ # view container logs continuously, ommit "-f" option if you don't want to keep seeing the logs
-  --tail 1000 \  # get last 1000 lines of log
-  pvpgn-bnetd    # name of the container which are set above
+  --tail 1000 \  # get last 1000 lines of log ommit this or decrease to 500 or 200 if you don't want to see more log
+  pvpgn-bnetd    # name of the container which is set above
 ```
+
+Change `pvpgn-bnetd` to `pvpgn-d2cs` or `pvpgn-d2dbs` to get corresponding container log
 
 Sometimes you just need a simple server for a small group of friends and just want to mount some specific configuration files and let the rest remain unchanged, then just mount the configuration files you want:
 
