@@ -271,8 +271,9 @@ docker build . --build-arg with_d2cs=true --build-arg with_bnetd=false -t pvpgn-
 docker build . --build-arg with_d2dbs=true --build-arg with_bnetd=false -t pvpgn-server:d2dbs-mysql
 
 # copy sample configuration files from the image and modify it
-docker run -v /your/config/dir:/tmp/conf --rm --entrypoint cp pvpgn-server:bnetd /usr/local/etc/pvpgn/* /tmp/conf
-docker run -v /your/assets/dir:/tmp/assets --rm --entrypoint cp pvpgn-server:bnetd /usr/local/var/pvpgn/* /tmp/assets
+# all sample config files is the same in every container
+docker run -v /your/config/dir:/tmp/conf --rm --entrypoint cp /usr/local/etc/pvpgn/* /tmp/conf pvpgn-server:bnetd 
+docker run -v /your/assets/dir:/tmp/assets --rm --entrypoint cp /usr/local/var/pvpgn/* /tmp/assets pvpgn-server:bnetd 
 ```
 
 2. Copy the sample `docker-compose.yml` file from this repository and modify it to suit you (like changing volume mounting)
