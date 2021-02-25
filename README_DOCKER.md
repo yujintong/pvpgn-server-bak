@@ -198,7 +198,7 @@ docker run -d \
 
 Disable `userland-proxy` is recommended to run a big PVPGN server due to [performance degradation](https://franckpachot.medium.com/high-cpu-usage-in-docker-proxy-with-chatty-database-application-disable-userland-proxy-415ffa064955).
 
-<span style="color:red">WARNING: After turning off `userland-proxy`, docker can manipulate your iptables without asking you. Use it with cares.</span>.
+<span style="color:red">#### WARNING: After turning off `userland-proxy`, docker can manipulate your iptables without asking you. Use it with cares!</span>.
 
 To achieve this, add `"userland-proxy": false` to `/etc/docker/daemon.json`:
 ```json
