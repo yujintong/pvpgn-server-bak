@@ -36,6 +36,7 @@
 #include <iostream>
 #include <string>
 
+#include "compat/gmtime_s.h"
 #include "compat/strcasecmp.h"
 #include "common/tag.h"
 #include "common/util.h"
@@ -232,8 +233,6 @@ namespace pvpgn
 			{
 				t_account * dest_a;
 				t_bnettime btlogin;
-				std::time_t ulogin;
-				struct std::tm * tmlogin;
 
 				if (!(dest_a = accountlist_find_account(dest))) {
 					message_send_text(c, message_type_error, c, localize(c, "Unknown user."));
@@ -243,11 +242,12 @@ namespace pvpgn
 				if (conn_get_class(c) == conn_class_bnet) {
 					btlogin = time_to_bnettime((std::time_t)account_get_ll_time(dest_a), 0);
 					btlogin = bnettime_add_tzbias(btlogin, conn_get_tzbias(c));
-					ulogin = bnettime_to_time(btlogin);
-					if (!(tmlogin = std::gmtime(&ulogin)))
+					std::time_t ulogin = bnettime_to_time(btlogin);
+					struct std::tm tmlogin = {};
+					if (pvpgn::gmtime_s(&ulogin, &tmlogin) == nullptr)
 						std::strcpy(msgtemp0, "?");
 					else
-						std::strftime(msgtemp0, sizeof(msgtemp0), "%a %b %d %H:%M:%S", tmlogin);
+						std::strftime(msgtemp0, sizeof(msgtemp0), "%a %b %d %H:%M:%S", &tmlogin);
 					msgtemp = localize(c, "User was last seen on: {}", msgtemp0);
 				}
 				else
@@ -2255,28 +2255,27 @@ namespace pvpgn
 		{
 			t_bnettime  btsystem;
 			t_bnettime  btlocal;
-			std::time_t      now;
-			struct std::tm * tmnow;
 
 			btsystem = bnettime();
 
 			/* Battle.net time: Wed Jun 23 15:15:29 */
 			btlocal = bnettime_add_tzbias(btsystem, local_tzbias());
-			now = bnettime_to_time(btlocal);
-			if (!(tmnow = std::gmtime(&now)))
+			std::time_t now = bnettime_to_time(btlocal);
+			struct std::tm tmnow = {};
+			if (pvpgn::gmtime_s(&now, &tmnow) == nullptr)
 				std::strcpy(msgtemp0, "?");
 			else
-				std::strftime(msgtemp0, sizeof(msgtemp0), "%a %b %d %H:%M:%S", tmnow);
+				std::strftime(msgtemp0, sizeof(msgtemp0), "%a %b %d %H:%M:%S", &tmnow);
 			msgtemp = localize(c, "Server Time: {}", msgtemp0);
 			message_send_text(c, message_type_info, c, msgtemp);
 			if (conn_get_class(c) == conn_class_bnet)
 			{
 				btlocal = bnettime_add_tzbias(btsystem, conn_get_tzbias(c));
 				now = bnettime_to_time(btlocal);
-				if (!(tmnow = std::gmtime(&now)))
+				if (pvpgn::gmtime_s(&now, &tmnow) == nullptr)
 					std::strcpy(msgtemp0, "?");
 				else
-					std::strftime(msgtemp0, sizeof(msgtemp0), "%a %b %d %H:%M:%S", tmnow);
+					std::strftime(msgtemp0, sizeof(msgtemp0), "%a %b %d %H:%M:%S", &tmnow);
 				msgtemp = localize(c, "Your local time: {}", msgtemp0);
 				message_send_text(c, message_type_info, c, msgtemp);
 			}
