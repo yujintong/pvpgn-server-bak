@@ -23,6 +23,7 @@
 #include <cstring>
 #include <ctime>
 
+#include "compat/localtime_s.h"
 #include "common/wol_gameres_protocol.h"
 #include "common/packet.h"
 #include "common/eventlog.h"
@@ -1271,9 +1272,9 @@ namespace pvpgn
 			{
 				// PELISH: Time when was game started. This time is WOL STARTG packet time +-2 sec
 				std::time_t time = (std::time_t)bn_int_nget(*((bn_int*)data));
-				struct tm* calendartime = std::localtime(&time);
+				struct std::tm calendartime = {};
 				char buffer[256] = {};
-				if (calendartime && std::strftime(buffer, sizeof(buffer), "%c", calendartime))
+				if (pvpgn::localtime_s(&time, &calendartime) != nullptr && std::strftime(buffer, sizeof(buffer), "%c", &calendartime))
 				{
 					DEBUG1("Game was start at {} ", buffer);
 				}

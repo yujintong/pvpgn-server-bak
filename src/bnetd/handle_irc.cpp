@@ -28,6 +28,7 @@
 
 #include <nonstd/optional.hpp>
 
+#include "compat/localtime_s.h"
 #include "compat/strcasecmp.h"
 #include "common/irc_protocol.h"
 #include "common/eventlog.h"
@@ -143,7 +144,7 @@ namespace pvpgn
 		extern int handle_irc_welcome(t_connection * conn)
 		{
 			char temp[MAX_IRC_MESSAGE_LEN];
-			std::time_t temptime;
+			
 			char const * tempname;
 
 			if (!conn) {
@@ -165,11 +166,11 @@ namespace pvpgn
 				std::sprintf(temp, ":Maximum length exceeded");
 			irc_send(conn, RPL_YOURHOST, temp);
 
-			temptime = server_get_starttime(); /* FIXME: This should be build time */
 			char temptimestr[256] = {};
 			{
-				struct tm* calendartime = std::localtime(&temptime);
-				if (!calendartime || std::strftime(temptimestr, sizeof(temptimestr), "%c", calendartime) == 0)
+				std::time_t temptime = server_get_starttime(); /* FIXME: This should be build time */;
+				struct std::tm calendartime = {};
+				if (pvpgn::localtime_s(&temptime, &calendartime) == nullptr || std::strftime(temptimestr, sizeof(temptimestr), "%c", &calendartime) == 0)
 				{
 					std::strcpy(temptimestr, "?");
 				}
