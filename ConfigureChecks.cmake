@@ -169,10 +169,64 @@ check_function_exists(getopt HAVE_GETOPT)
 check_function_exists(getpid HAVE_GETPID)
 check_function_exists(getpwnam HAVE_GETPWNAME)
 check_function_exists(getrlimit HAVE_GETRLIMIT)
+check_cxx_source_compiles("
+#include <ctime>
+int main() {
+	std::time_t t = std::time(nullptr);
+	struct tm buf;
+	errno_t err = gmtime_s(&buf, &t);
+	return 0;
+}
+" HAVE_MICROSOFT_GMTIME_S)
+check_cxx_source_compiles("
+#include <ctime>
+int main() {
+	std::time_t t = std::time(nullptr);
+	struct tm buf;
+	struct tm* retbuf = gmtime_s(&t, &buf);
+	return 0;
+}
+" HAVE_GMTIME_S)
+check_cxx_source_compiles("
+#include <ctime>
+int main() {
+	std::time_t t = std::time(nullptr);
+	struct tm buf;
+	struct tm* retbuf = gmtime_r(&t, &buf);
+	return 0;
+}
+" HAVE_GMTIME_R)
 check_function_exists(gettimeofday HAVE_GETTIMEOFDAY)
 check_function_exists(getuid HAVE_GETUID)
 check_function_exists(ioctl HAVE_IOCTL)
 check_function_exists(kqueue HAVE_KQUEUE)
+check_cxx_source_compiles("
+#include <ctime>
+int main() {
+	std::time_t t = std::time(nullptr);
+	struct tm buf;
+	errno_t err = localtime_s(&buf, &t);
+	return 0;
+}
+" HAVE_MICROSOFT_LOCALTIME_S)
+check_cxx_source_compiles("
+#include <ctime>
+int main() {
+	std::time_t t = std::time(nullptr);
+	struct tm buf;
+	struct tm* retbuf = localtime_s(&t, &buf);
+	return 0;
+}
+" HAVE_LOCALTIME_S)
+check_cxx_source_compiles("
+#include <ctime>
+int main() {
+	std::time_t t = std::time(nullptr);
+	struct tm buf;
+	struct tm* retbuf = localtime_r(&t, &buf);
+	return 0;
+}
+" HAVE_LOCALTIME_R)
 check_function_exists(_mkdir HAVE__MKDIR)
 check_function_exists(mkdir HAVE_MKDIR)
 check_function_exists(mmap HAVE_MMAP)
