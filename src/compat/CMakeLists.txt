@@ -8,4 +8,4 @@ set(COMPAT_SOURCES access.h gethostname.h gettimeofday.cpp gettimeofday.h gmtime
 
 add_library(compat STATIC ${COMPAT_SOURCES})
 
-target_link_libraries(compat PRIVATE common fmt::fmt)
+target_link_libraries(compat PRIVATE fmt::fmt)
