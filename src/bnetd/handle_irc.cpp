@@ -145,7 +145,6 @@ namespace pvpgn
 			char temp[MAX_IRC_MESSAGE_LEN];
 			std::time_t temptime;
 			char const * tempname;
-			char const * temptimestr;
 
 			if (!conn) {
 				eventlog(eventlog_level_error, __FUNCTION__, "got NULL connection");
@@ -167,9 +166,16 @@ namespace pvpgn
 			irc_send(conn, RPL_YOURHOST, temp);
 
 			temptime = server_get_starttime(); /* FIXME: This should be build time */
-			temptimestr = std::ctime(&temptime);
+			char temptimestr[256] = {};
+			{
+				struct tm* calendartime = std::localtime(&temptime);
+				if (!calendartime || std::strftime(temptimestr, sizeof(temptimestr), "%c", calendartime) == 0)
+				{
+					std::strcpy(temptimestr, "?");
+				}
+			}
 			if ((25 + std::strlen(temptimestr) + 1) <= MAX_IRC_MESSAGE_LEN)
-				std::sprintf(temp, ":This server was created %s", temptimestr); /* FIXME: is ctime() portable? */
+				std::sprintf(temp, ":This server was created %s", temptimestr);
 			else
 				std::sprintf(temp, ":Maximum length exceeded");
 			irc_send(conn, RPL_CREATED, temp);
