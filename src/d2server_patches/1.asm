@@ -107,13 +107,13 @@ free					dd	6800B18Ch
 
 GetModuleHandleA	dd 6800B028h
 LoadLibraryA	dd 6800B018h
-FreeLibrary	dd 0040C060h
+FreeLibrary	dd 6800B024h
 CreateEventA	dd 0040C024h
 SetEvent	dd 6800B010h
 WaitForSingleObject	dd 0040C014h
 CreateMutexA	dd 0040C044h
 CloseHandle	dd 0040C07Ch
-CreateThread	dd 0040C018h
+CreateThread	dd 680250B4h
 GetExitCodeThread	dd 0040C02Ch
 TerminateThread	dd 0040C04Ch
 Sleep	dd 0040C01Ch
