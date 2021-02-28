@@ -502,7 +502,7 @@ PortalConditionCheck proc
 ; Check player finished a5q3?
 								push		edi
 								call		D2Common_10920_GetpPlayerDataFromUnit
-								movzx   ecx, byte ptr [esi+6Dh] ; ÄÑ¶È£¬hell=2   
+								movzx   ecx, byte ptr [esi+6Dh] ; éš¾åº¦ï¼Œhell=2   
 								mov     eax, [eax+ecx*4+10h]	; Player's Quest Structure
 								push    0
 								push    40	; Eve of Destruction
@@ -671,7 +671,7 @@ OpenningPortalToLevel endp
 ;   DWORD   unk8;            // +1C 
 ;};
 
-; ptUnit+0x64=ÏÂÒ»´ÎSpawnÊ±¼ä
+; ptUnit+0x64=ä¸‹ä¸€æ¬¡Spawnæ—¶é—´
 ; ptUnit+0x68=Spawn Counter
 ;
 ;ecx=ptGame
@@ -682,12 +682,12 @@ UberDiablo_AI0 proc
 	push		ecx
 ;	mov     eax, [esp+arg_0+4] ; pPar
 ;	mov     eax, [eax]      ; pPar->hControl
-	mov     ecx, [ecx+0A8h] ; ÓÎÏ·µ±Ç°Ê±¼ä
-	mov     [edx+64h], ecx  ; ÏÂÒ»´ÎSpawnÊ±¼ä
+	mov     ecx, [ecx+0A8h] ; æ¸¸æˆå½“å‰æ—¶é—´
+	mov     [edx+64h], ecx  ; ä¸‹ä¸€æ¬¡Spawnæ—¶é—´
 ;	mov     dword ptr [edx+68h], 0 ; Spawn Counter
 	pop			ecx	; ptGame
 	
-	; ³õÊ¼»¯Ëæ»úÊıÖÖ×Ó£¬ÓÃÓÚËæ»úSpawn¹ÖÎï
+	; åˆå§‹åŒ–éšæœºæ•°ç§å­ï¼Œç”¨äºéšæœºSpawnæ€ªç‰©
 	push		esi
 	push		edx
 	push		ecx
@@ -702,20 +702,20 @@ UberDiablo_AI0 proc
 	retn    4
 UberDiablo_AI0 endp
 
-; +14 = ×Ü¼ÆÊı£¿
-; +18 = µ±Ç°´ÎÊı£¿
+; +14 = æ€»è®¡æ•°ï¼Ÿ
+; +18 = å½“å‰æ¬¡æ•°ï¼Ÿ
 ; +1C = next State
 UberMephisto_AI0 proc
 	arg_0           = dword ptr  4
 	push		ecx
 ;	mov     eax, [esp+arg_0+4] ; pPar
 ;	mov     eax, [eax]      ; pPar->hControl
-	mov     ecx, [ecx+0A8h] ; ÓÎÏ·µ±Ç°Ê±¼ä
-	mov     [edx+64h], ecx  ; ÏÂÒ»´ÎSpawnÊ±¼ä
+	mov     ecx, [ecx+0A8h] ; æ¸¸æˆå½“å‰æ—¶é—´
+	mov     [edx+64h], ecx  ; ä¸‹ä¸€æ¬¡Spawnæ—¶é—´
 ;	mov     dword ptr [edx+68h], 0 ; Spawn Counter
 	pop			ecx	; ptGame
 	
-	; ³õÊ¼»¯Ëæ»úÊıÖÖ×Ó£¬ÓÃÓÚËæ»úSpawn¹ÖÎï
+	; åˆå§‹åŒ–éšæœºæ•°ç§å­ï¼Œç”¨äºéšæœºSpawnæ€ªç‰©
 	push		esi
 	push		edx
 	push		ecx
@@ -734,7 +734,7 @@ UberMephisto_AI0 endp
 ;edx=pMonster
 ;arg_0=pPar
 UberMephisto_AI proc
-; Ê×ÏÈ´´½¨Ò»¸öËæ»úÊı£¬È»ºó¾ö¶¨ÊÇSpawnÒ»¸öËæ»ú¹ÖÎï£¬»¹ÊÇ¼ÌĞøÔ­À´µÄMephisto_AI
+; é¦–å…ˆåˆ›å»ºä¸€ä¸ªéšæœºæ•°ï¼Œç„¶åå†³å®šæ˜¯Spawnä¸€ä¸ªéšæœºæ€ªç‰©ï¼Œè¿˜æ˜¯ç»§ç»­åŸæ¥çš„Mephisto_AI
 	push	ecx	; save ecx
 	push	edx	; save edx
 	
@@ -771,7 +771,7 @@ call_orig_Mephisto_AI:
 UberMephisto_AI endp
 
 UberDiablo_AI proc
-; Ê×ÏÈ´´½¨Ò»¸öËæ»úÊı£¬È»ºó¾ö¶¨ÊÇSpawnÒ»¸öËæ»ú¹ÖÎï£¬»¹ÊÇ¼ÌĞøÔ­À´µÄDiablo_AI
+; é¦–å…ˆåˆ›å»ºä¸€ä¸ªéšæœºæ•°ï¼Œç„¶åå†³å®šæ˜¯Spawnä¸€ä¸ªéšæœºæ€ªç‰©ï¼Œè¿˜æ˜¯ç»§ç»­åŸæ¥çš„Diablo_AI
 	push	ecx	; save ecx
 	push	edx ; save edx
 	
@@ -812,16 +812,16 @@ MaxSpawnNum_D dd 40
 SpawnInterv_D	dd 5
 ActivArea_D		dd 30
 StallTime_D		dd 2
-TypeOfSpawns_D	dd 3 ; ×î¶à10ÖÖ
-SpawnMonsters_D	dd 712,731,732,0,0,0,0,0,0,0 ; 10ÖÖ¹ÖÎïµÄHCIDX
+TypeOfSpawns_D	dd 3 ; æœ€å¤š10ç§
+SpawnMonsters_D	dd 712,731,732,0,0,0,0,0,0,0 ; 10ç§æ€ªç‰©çš„HCIDX
 
 SpawnProbability_M dd 30
 MaxSpawnNum_M dd 30
 SpawnInterv_M	dd 5
 ActivArea_M		dd 30
 StallTime_M		dd 2
-TypeOfSpawns_M	dd 6 ; ×î¶à10ÖÖ
-SpawnMonsters_M	dd 725,726,727,728,729,730,0,0,0,0 ; 10ÖÖ¹ÖÎïµÄHCIDX
+TypeOfSpawns_M	dd 6 ; æœ€å¤š10ç§
+SpawnMonsters_M	dd 725,726,727,728,729,730,0,0,0,0 ; 10ç§æ€ªç‰©çš„HCIDX
 
 ; ecx = ptGame
 ; edx = pMonster
@@ -841,11 +841,11 @@ arg_0           = dword ptr  4
                 push    esi
                 push    edi
                 mov     esi, edx        ; pMonster
-                mov     edx, ActivArea_M ; ¼¤»îÇøÓò
+                mov     edx, ActivArea_M ; æ¿€æ´»åŒºåŸŸ
                 cmp     [eax+14h], edx  ; pPar->DistanceToTarget
                 jg      short Meph_6FC886C2
-                mov     edx, [ebx+0A8h] ; ÓÎÏ·µ±Ç°Ê±¼ä
-                cmp     edx, [esi+64h]  ; ÏÂÒ»¸öSpawnµÄÊ±¼ä
+                mov     edx, [ebx+0A8h] ; æ¸¸æˆå½“å‰æ—¶é—´
+                cmp     edx, [esi+64h]  ; ä¸‹ä¸€ä¸ªSpawnçš„æ—¶é—´
                 jge     short Meph_6FC886D9
 
 Meph_6FC886C2:
@@ -860,12 +860,12 @@ Meph_6FC886D9:
                 push    offset D2GAME_GetAreaSpawnUnitNumUberMeph_CheckFunc
                 push    esi             ; pMonster
                 lea     ecx, [esp+40h+var_28]
-                mov     eax, 1          ; ±¾´Î¼ì²éÀàĞÍ£¬1=monster
+                mov     eax, 1          ; æœ¬æ¬¡æ£€æŸ¥ç±»å‹ï¼Œ1=monster
                 mov     edx, ebx        ; ptGame
                 mov     [esp+40h+var_28], 0
                 call    D2GAME_GetAreaSpawnUnitNum
-                mov     ecx, MaxSpawnNum_M ; ÏàÓ¦ÄÑ¶ÈÏÂµÄAI Par2£¬¸ÃAreaµÄSpawn×î´óÊıÄ¿
-                cmp     [esp+38h+var_28], ecx ; Spawn×î´óÊıÄ¿
+                mov     ecx, MaxSpawnNum_M ; ç›¸åº”éš¾åº¦ä¸‹çš„AI Par2ï¼Œè¯¥Areaçš„Spawnæœ€å¤§æ•°ç›®
+                cmp     [esp+38h+var_28], ecx ; Spawnæœ€å¤§æ•°ç›®
                 jge     Meph_6FC8874F
 
 								push		ebx
@@ -885,11 +885,11 @@ Meph_6FC886D9:
                 mov			edx,esi
                 call		MySpawnAMonster
                 
-                mov     edx, SpawnInterv_M ; ÏàÓ¦ÄÑ¶ÈÏÂµÄAI Par3£¬SpawnÑÓ³Ù
-                mov     ecx, [ebx+0A8h] ; ÓÎÏ·µ±Ç°Ê±¼ä
+                mov     edx, SpawnInterv_M ; ç›¸åº”éš¾åº¦ä¸‹çš„AI Par3ï¼ŒSpawnå»¶è¿Ÿ
+                mov     ecx, [ebx+0A8h] ; æ¸¸æˆå½“å‰æ—¶é—´
                 add     edx, ecx
-                mov     [esi+64h], edx  ; ¸üĞÂÏÂÒ»¸öSpawnµÄÊ±¼ä
-                mov     eax, StallTime_M ; ÏàÓ¦ÄÑ¶ÈÏÂµÄAI Par2£¬Í£¶ÙÊ±¼ä
+                mov     [esi+64h], edx  ; æ›´æ–°ä¸‹ä¸€ä¸ªSpawnçš„æ—¶é—´
+                mov     eax, StallTime_M ; ç›¸åº”éš¾åº¦ä¸‹çš„AI Par2ï¼Œåœé¡¿æ—¶é—´
                 push    eax
                 mov     eax, ebx
                 call    D2GAME_StallSomeTime
@@ -925,11 +925,11 @@ arg_0           = dword ptr  4
                 push    esi
                 push    edi
                 mov     esi, edx        ; pMonster
-                mov     edx, ActivArea_D ; ¼¤»îÇøÓò
+                mov     edx, ActivArea_D ; æ¿€æ´»åŒºåŸŸ
                 cmp     [eax+14h], edx  ; pPar->DistanceToTarget
                 jg      short Diablo_6FC886C2
-                mov     edx, [ebx+0A8h] ; ÓÎÏ·µ±Ç°Ê±¼ä
-                cmp     edx, [esi+64h]  ; ÏÂÒ»¸öSpawnµÄÊ±¼ä
+                mov     edx, [ebx+0A8h] ; æ¸¸æˆå½“å‰æ—¶é—´
+                cmp     edx, [esi+64h]  ; ä¸‹ä¸€ä¸ªSpawnçš„æ—¶é—´
                 jge     short Diablo_6FC886D9
 
 Diablo_6FC886C2:
@@ -944,12 +944,12 @@ Diablo_6FC886D9:
                 push    offset D2GAME_GetAreaSpawnUnitNumUberDiablo_CheckFunc
                 push    esi             ; pMonster
                 lea     ecx, [esp+40h+var_28]
-                mov     eax, 1          ; ±¾´Î¼ì²éÀàĞÍ£¬1=monster
+                mov     eax, 1          ; æœ¬æ¬¡æ£€æŸ¥ç±»å‹ï¼Œ1=monster
                 mov     edx, ebx        ; ptGame
                 mov     [esp+40h+var_28], 0
                 call    D2GAME_GetAreaSpawnUnitNum
-                mov     ecx, MaxSpawnNum_D ; ÏàÓ¦ÄÑ¶ÈÏÂµÄAI Par2£¬¸ÃAreaµÄSpawn×î´óÊıÄ¿
-                cmp     [esp+38h+var_28], ecx ; Spawn×î´óÊıÄ¿
+                mov     ecx, MaxSpawnNum_D ; ç›¸åº”éš¾åº¦ä¸‹çš„AI Par2ï¼Œè¯¥Areaçš„Spawnæœ€å¤§æ•°ç›®
+                cmp     [esp+38h+var_28], ecx ; Spawnæœ€å¤§æ•°ç›®
                 jge     Diablo_6FC8874F
 
 								push		ebx
@@ -969,11 +969,11 @@ Diablo_6FC886D9:
                 mov			edx,esi
                 call		MySpawnAMonster
                 
-                mov     edx, SpawnInterv_D ; ÏàÓ¦ÄÑ¶ÈÏÂµÄAI Par3£¬SpawnÑÓ³Ù
-                mov     ecx, [ebx+0A8h] ; ÓÎÏ·µ±Ç°Ê±¼ä
+                mov     edx, SpawnInterv_D ; ç›¸åº”éš¾åº¦ä¸‹çš„AI Par3ï¼ŒSpawnå»¶è¿Ÿ
+                mov     ecx, [ebx+0A8h] ; æ¸¸æˆå½“å‰æ—¶é—´
                 add     edx, ecx
-                mov     [esi+64h], edx  ; ¸üĞÂÏÂÒ»¸öSpawnµÄÊ±¼ä
-                mov     eax, StallTime_D ; ÏàÓ¦ÄÑ¶ÈÏÂµÄAI Par2£¬Í£¶ÙÊ±¼ä
+                mov     [esi+64h], edx  ; æ›´æ–°ä¸‹ä¸€ä¸ªSpawnçš„æ—¶é—´
+                mov     eax, StallTime_D ; ç›¸åº”éš¾åº¦ä¸‹çš„AI Par2ï¼Œåœé¡¿æ—¶é—´
                 push    eax
                 mov     eax, ebx
                 call    D2GAME_StallSomeTime
@@ -1004,7 +1004,7 @@ arg_0           = dword ptr  8
                 cmp     dword ptr [esi], 1
                 jnz     short loc_6FC859E6
 
-	; eax=HCIDX       ; ¼ì²éÊÇ·ñÊÇminion1£¨453=1C5£©µ½minion8£¨460=1CC£©
+	; eax=HCIDX       ; æ£€æŸ¥æ˜¯å¦æ˜¯minion1ï¼ˆ453=1C5ï¼‰åˆ°minion8ï¼ˆ460=1CCï¼‰
 	push ebx
 	push ecx
 	
@@ -1063,7 +1063,7 @@ arg_0           = dword ptr  8
                 cmp     dword ptr [esi], 1
                 jnz     short loc_6FC859E6
 
-	; eax=HCIDX       ; ¼ì²éÊÇ·ñÊÇminion1£¨453=1C5£©µ½minion8£¨460=1CC£©
+	; eax=HCIDX       ; æ£€æŸ¥æ˜¯å¦æ˜¯minion1ï¼ˆ453=1C5ï¼‰åˆ°minion8ï¼ˆ460=1CCï¼‰
 	push ebx
 	push ecx
 	
@@ -1143,7 +1143,7 @@ MySpawnAMonster proc
 	test ecx,ecx
 	jz over
 	mov ecx,[eax+0C4h]
-	or ecx,4020020h				; É±ËÀ¹ÖÎï²»»ñµÃ¾­ÑéÖµ£¬²»µôÂä£¬Ê¬ÌåÏûÊ§
+	or ecx,4020020h				; æ€æ­»æ€ªç‰©ä¸è·å¾—ç»éªŒå€¼ï¼Œä¸æ‰è½ï¼Œå°¸ä½“æ¶ˆå¤±
 	mov [eax+0C4h],ecx
 over:
 	pop edx
@@ -1153,7 +1153,7 @@ over:
 	retn 4
 MySpawnAMonster endp
 
-;¸øsgptDataTables´ò²¹¶¡£¬¶Ô¶àÈËÓÎÏ·µÄTC NoDrop½øĞĞÔ¤¼ÆËã
+;ç»™sgptDataTablesæ‰“è¡¥ä¸ï¼Œå¯¹å¤šäººæ¸¸æˆçš„TC NoDropè¿›è¡Œé¢„è®¡ç®—
 Patch_sgptDataTables proc
 	push eax
 	push ecx

@@ -1,10 +1,10 @@
 ;TODO:
 ; 1. Fix diablowall skill cpu usage bug
 ; 2. Tiny Warden enchance
-; 3. Treasure Class¼ÆËãÓÅ»¯£¬ÓÈÆäÊÇNoDrop¸¡µãÔËËã
-; 4. ÉËº¦¼ÆËã¹ı³ÌÓÅ»¯
-; 5. UberÀïÃæµÄÕÙ»½Îï£¬±»É±ËÀºó£¬Ê¬ÌåÓ¦µ±¾¡¿ìÏûÊ§µô
-; 6. ËùÓĞÇúÏßµÄMissile¾ùµ÷ÓÃD2COMMON_10945½øĞĞ¸¡µãÔËËã£¬ÓÅ»¯£¿
+; 3. Treasure Classè®¡ç®—ä¼˜åŒ–ï¼Œå°¤å…¶æ˜¯NoDropæµ®ç‚¹è¿ç®—
+; 4. ä¼¤å®³è®¡ç®—è¿‡ç¨‹ä¼˜åŒ–
+; 5. Uberé‡Œé¢çš„å¬å”¤ç‰©ï¼Œè¢«æ€æ­»åï¼Œå°¸ä½“åº”å½“å°½å¿«æ¶ˆå¤±æ‰
+; 6. æ‰€æœ‰æ›²çº¿çš„Missileå‡è°ƒç”¨D2COMMON_10945è¿›è¡Œæµ®ç‚¹è¿ç®—ï¼Œä¼˜åŒ–ï¼Ÿ
 
         .486
         .model flat, stdcall
@@ -27,18 +27,18 @@ dummy7 dd 0
 dummy8 dd 0
 dummy9 dd 0
 
-;LevelGame CallbackÔÚ1.10ÖĞÓµÓĞ15¸ö²ÎÊı£¬¶øÏÖÔÚ1.11bÖĞ£¬ÓµÓĞ20¸ö²ÎÊı£¡ĞèÒªĞŞÕı£¡
+;LevelGame Callbackåœ¨1.10ä¸­æ‹¥æœ‰15ä¸ªå‚æ•°ï¼Œè€Œç°åœ¨1.11bä¸­ï¼Œæ‹¥æœ‰20ä¸ªå‚æ•°ï¼éœ€è¦ä¿®æ­£ï¼
 ;d2server.dll : 68007558
 cb_leavegame proc
 	mov eax,[esp+48h] ; esi+190
-	mov [esp+34h],eax ; µÚ5¸öÁã ´æ·Åesi+190
+	mov [esp+34h],eax ; ç¬¬5ä¸ªé›¶ å­˜æ”¾esi+190
 	pop eax ; retaddr
-	mov [esp+34h],eax ; µÚ4¸öÁã ´æ·Åretaddr
-	call cb_leavegame_orig ; µ÷ÓÃÔ­À´µÄ»Øµ÷º¯Êı
-	ret 10h	 ; ×¢ÒâĞŞÕı·µ»Ø¶ÑÕ»£¡£¡
+	mov [esp+34h],eax ; ç¬¬4ä¸ªé›¶ å­˜æ”¾retaddr
+	call cb_leavegame_orig ; è°ƒç”¨åŸæ¥çš„å›è°ƒå‡½æ•°
+	ret 10h	 ; æ³¨æ„ä¿®æ­£è¿”å›å †æ ˆï¼ï¼
 cb_leavegame endp
 
-;ÊÍ·ÅµôExtendGameInfoStruct
+;é‡Šæ”¾æ‰ExtendGameInfoStruct
 ;d2server.dll : 6800109C
 MyCleanupHandler proc
 	pushad
@@ -287,7 +287,7 @@ start:
 MyPatchInit proc
 
 	xor eax,eax
-	mov D2GamePatched,eax		; ³õÊ¼»¯D2GamePatchedÎªFalse£¬·ÀÖ¹¶à´Î¶ÔD2Game½øĞĞ²¹¶¡
+	mov D2GamePatched,eax		; åˆå§‹åŒ–D2GamePatchedä¸ºFalseï¼Œé˜²æ­¢å¤šæ¬¡å¯¹D2Gameè¿›è¡Œè¡¥ä¸
 
 	; Announce my version first
 	pushad
@@ -581,7 +581,7 @@ MyPatchInit2 proc
 	push 68001054h
 	ret
 continue:
-	;½«CallBackº¯ÊıÉèÖÃÎªNULL
+	;å°†CallBackå‡½æ•°è®¾ç½®ä¸ºNULL
 	push ebx
 	mov eax,680135A0h
 	xor ebx,ebx
@@ -956,7 +956,7 @@ no_DisableBugMF:
 	call ProtectDLL2
 	
 	mov eax,1
-	mov D2GamePatched,eax		; ÉèÖÃ±êÖ¾£¬·ÀÖ¹ÔÙ´ÎPatch
+	mov D2GamePatched,eax		; è®¾ç½®æ ‡å¿—ï¼Œé˜²æ­¢å†æ¬¡Patch
 	popad
 	ret
 D2GamePatch endp
@@ -1168,7 +1168,7 @@ cont_106:
 	call    eax
 	add     esp, 8
 	
-	; ´´½¨WardenÏß³Ì
+	; åˆ›å»ºWardençº¿ç¨‹
 	call InitWardenThread
 cont1:
 	mov esi,offset aUberMephisto
@@ -1253,8 +1253,8 @@ continue_M:
 	
 	xor ebp,ebp
 again_UberMephisto:
-	mov eax,[esi] ; eax=Êı×Ö´®µÄÆ«ÒÆ
-	push 10 ; Ê®½øÖÆ
+	mov eax,[esi] ; eax=æ•°å­—ä¸²çš„åç§»
+	push 10 ; åè¿›åˆ¶
 	push 0
 	push eax
 	call edi ; strtoul
@@ -1368,8 +1368,8 @@ continue_D:
 	
 	xor ebp,ebp
 again_UberDiablo:
-	mov eax,[esi] ; eax=Êı×Ö´®µÄÆ«ÒÆ
-	push 10 ; Ê®½øÖÆ
+	mov eax,[esi] ; eax=æ•°å­—ä¸²çš„åç§»
+	push 10 ; åè¿›åˆ¶
 	push 0
 	push eax
 	call edi ; strtoul
@@ -1451,10 +1451,10 @@ stub_func00 proc
 stub_func00 endp
 
 ;6FC31C74 4 000576A8(ecx,edx,arg_0,arg_4)			6FC903B6 4 FFFBD3F6 4(arg_0,esi,ebx,arg_4)(void)
-;¶ÑÕ»ÍêÕû
-;¿ÉÒÔ¸Ä±äEAX¡¢ECX¡¢EDX£¬ÆäËû²»ÄÜ±ä
+;å †æ ˆå®Œæ•´
+;å¯ä»¥æ”¹å˜EAXã€ECXã€EDXï¼Œå…¶ä»–ä¸èƒ½å˜
 ;MessageHandler
-; eax·µ»ØÖµ£¡£¡
+; eaxè¿”å›å€¼ï¼ï¼
 ;
 ;
 ;          ecx
@@ -1483,8 +1483,8 @@ stub_func01 proc
 stub_func01 endp
 
 ;6FC38551 4 FFFF93BB(ecx,edx)			6FD0832F 4 FFF8809D(arg_0,eax) packet handler!!(void)
-;¶ÑÕ»ÍêÕû
-;¿ÉÒÔ¸Ä±äEAX¡¢ECX¡¢EDX£¬ÆäËû²»ÄÜ±ä
+;å †æ ˆå®Œæ•´
+;å¯ä»¥æ”¹å˜EAXã€ECXã€EDXï¼Œå…¶ä»–ä¸èƒ½å˜
 	; for warden patch 0x68,0x66 packet handler
 ;	mov ecx,68003815h	; system packet handler
 ;	mov eax,offset MyPacket0X68Handler
@@ -1532,11 +1532,11 @@ over:
 	retn
 stub_func02 endp
 
-;6FC394E0 6 57E98B565553(ecx)							6FD04A30 6 FFF25912E856(esi)	;Ğè½øÒ»²½¼ì²é(=eax)
+;6FC394E0 6 57E98B565553(ecx)							6FD04A30 6 FFF25912E856(esi)	;éœ€è¿›ä¸€æ­¥æ£€æŸ¥(=eax)
 ;GetClient
-;ÒÑ¾­OK
-;¶ÑÕ»ÍêÕû
-; EAX¡¢ECX¡¢EDX¿ÉÒÔ¸Ä±ä£¬ÆäËû²»ÄÜ±ä
+;å·²ç»OK
+;å †æ ˆå®Œæ•´
+; EAXã€ECXã€EDXå¯ä»¥æ”¹å˜ï¼Œå…¶ä»–ä¸èƒ½å˜
 stub_func03 proc
 	push esi
 	mov esi,ecx
@@ -1546,8 +1546,8 @@ stub_func03 proc
 stub_func03 endp
 
 ;6FC31DE0 5 681E75C985(ecx,edx)		6FCE4C40 5 681F75C085(eax,ecx)(=eax)
-;¶ÑÕ»ÍêÕû
-; EAX¡¢ECX¡¢EDX¿ÉÒÔ¸Ä±ä£¬ÆäËû²»ÄÜ±ä
+;å †æ ˆå®Œæ•´
+; EAXã€ECXã€EDXå¯ä»¥æ”¹å˜ï¼Œå…¶ä»–ä¸èƒ½å˜
 stub_func04 proc
 	mov eax,ecx
 	mov ecx,edx
@@ -1556,7 +1556,7 @@ stub_func04 proc
 stub_func04 endp
 
 ;6FC395B0 4 1E75C985(ecx)				6FD03AD0 4 0775C085(eax)(=void)
-;¶ÑÕ»ÍêÕû
+;å †æ ˆå®Œæ•´
 stub_func05 proc
 	mov eax,ecx
 	call dword_save_func05
@@ -1566,8 +1566,8 @@ stub_func05 endp
 ;6FC3C710 5 F18B565551(ecx, edx(no use), arg_0) 6FCC0D50 5 246C8B5553(eax,arg_0(no use),arg_4)(=void)
 ; eax=ptPlayer arg_0=ptPacket arg_4=PacketLen
 ; ecx=ptPlayer edx=ptPacket   arg_0=PacketLen
-;¶ÑÕ»ÍêÕû
-;¿ÉÒÔ¸Ä±äEAX¡¢ECX¡¢EDX£¬ÆäËû²»ÄÜ±ä
+;å †æ ˆå®Œæ•´
+;å¯ä»¥æ”¹å˜EAXã€ECXã€EDXï¼Œå…¶ä»–ä¸èƒ½å˜
 ;SendPacket2Client
 ;
 ;
@@ -1590,10 +1590,10 @@ stub_func06 proc
 	ret
 stub_func06 endp
 
-;6FCBC2E0 7 39831474C985(fastcall, ecx)ÒÑ¾­±»ÄÚÇ¶ÁË£¬ĞèÒªdisableÕâ¸öPatch£¬È»ºó¸ÄÎªµ÷ÓÃÈçÏÂ´úÂë
+;6FCBC2E0 7 39831474C985(fastcall, ecx)å·²ç»è¢«å†…åµŒäº†ï¼Œéœ€è¦disableè¿™ä¸ªPatchï¼Œç„¶åæ”¹ä¸ºè°ƒç”¨å¦‚ä¸‹ä»£ç 
 ;typedef LPCLIENT ( __fastcall * D2Game_UnitGetClientFunc)(LPUNIT lpUnitPlayer,
 ; 	LPCSTR szFile, DWORD dwLine);
-;¶ÑÕ»ÍêÕû
+;å †æ ˆå®Œæ•´
 stub_func07 proc
 	test    ecx, ecx
 	jz      short loc_6FCBC2F8
@@ -1609,7 +1609,7 @@ loc_6FCBC2F8:
 stub_func07 endp
 
 ;6FCBD820 8 0C24548B0424448B(arg_0,arg_4,arg_8)				6FCDE460 8 68488B0A8964488B(eax,arg_0,edx)(=eax)
-;¶ÑÕ»ÍêÕû(Ê¹ÓÃWaypoint)
+;å †æ ˆå®Œæ•´(ä½¿ç”¨Waypoint)
 ;
 ;
 ;
@@ -1631,7 +1631,7 @@ stub_func08 endp
 
 ;6FCBBB00 4 7556C985(ecx,edx,arg_0)	6FCDEF80 4 1F75C985(ecx,eax,edx)(=eax)
 ;typedef LPUNIT 	( __fastcall * D2Game_GameFindUnitFunc)(LPGAME ptGame, DWORD dwUnitType, DWORD dwUnitId);
-;Ã»·¢ÏÖµ÷ÓÃ
+;æ²¡å‘ç°è°ƒç”¨
 ;
 ;
 ;
@@ -1651,7 +1651,7 @@ stub_func09 proc
 stub_func09 endp
 
 ;d2game.dll		6FC8A200(6FC8D940) 4 0000373C(ecx,edx,arg_0,arg_4,arg_8,arg_12,arg_16)  6FC4557F 4 000037BD (edx,ecx,...)
-;½»»»ecxºÍedx£¬È»ºóÖ±½ÓÌø×ª£¬²»ÊÇcall£¡£¡
+;äº¤æ¢ecxå’Œedxï¼Œç„¶åç›´æ¥è·³è½¬ï¼Œä¸æ˜¯callï¼ï¼
 ;typedef DWORD (__fastcall * D2Game_GetPlrSaveDataFunc)(LPGAME ptGame, LPUNIT ptUnitPlayer, 
 ;		LPSTR lpBuf, DWORD * pSize, DWORD dwBufSize, BOOL bInTrade, BOOL bQuit);
 ; ecx=ptPlayer edx=ptGame arg0=var_2000? arg_4=var_25F8filename? arg_8=2000h arg_12=0 arg_16=0
@@ -1664,7 +1664,7 @@ stub_func10 proc
 stub_func10 endp
 
 ;6FC38F7A 4 FFFFF752(ecx)		6FD0818C 4 FFFFFDF0(eax)
-;¶ÑÕ»ÍêÕû
+;å †æ ˆå®Œæ•´
 ;UpdateGameEvent
 stub_func11 proc
 	mov eax,ecx
@@ -1674,7 +1674,7 @@ stub_func11 endp
 
 ;6FC39391 4 FFFFFC9B(ecx,edx,arg_0,arg_4)			6FD0744A 4 FFFFFCC2(arg_0,eax,arg_4,edx)
 ;typedef VOID	( __fastcall * D2Game_GameSendAllMsgsFunc)(LPGAME ptGame, LPCLIENT ptClient, BOOL u1, BOOL u2);
-;¶ÑÕ»ÍêÕû
+;å †æ ˆå®Œæ•´
 ;
 ;
 ;
@@ -1696,9 +1696,9 @@ stub_func12 proc
 	ret
 stub_func12 endp
 
-;6FC8A500 4 002640B8(ecx,edx,arg_0,arg_4)£¨±£´æÍæ¼Òµµ°¸£© 6FC45860 4 8538EC83(ebx,esi,arg_0,arg_4)
+;6FC8A500 4 002640B8(ecx,edx,arg_0,arg_4)ï¼ˆä¿å­˜ç©å®¶æ¡£æ¡ˆï¼‰ 6FC45860 4 8538EC83(ebx,esi,arg_0,arg_4)
 ;GameSavePlayer
-;±£´æHackÍæ¼Òµµ°¸£¿£¿£¿ĞèÒªÔÙ´Î¼ì²é£¡£¡²ÎÊıÊıÄ¿ÊÇ¶ÔµÄ£¬µ«ÊÇË³Ğò²»ÖªµÀÈçºÎ£¿
+;ä¿å­˜Hackç©å®¶æ¡£æ¡ˆï¼Ÿï¼Ÿï¼Ÿéœ€è¦å†æ¬¡æ£€æŸ¥ï¼ï¼å‚æ•°æ•°ç›®æ˜¯å¯¹çš„ï¼Œä½†æ˜¯é¡ºåºä¸çŸ¥é“å¦‚ä½•ï¼Ÿ
 ;
 ;
 ;
@@ -1728,8 +1728,8 @@ stub_func13 proc
 stub_func13 endp
 
 ;6FC31E20 4 24748B56 0 0(arg_0,arg_4)  		6FCE5600 4 1F75F685(esi,arg_0)
-; ´ÓClient»ñµÃptUnit
-;Ã»ÕÒµ½µ÷ÓÃ£¬ÒÑ¾­¼ì²éµ÷ÓÃÁË¡«
+; ä»Clientè·å¾—ptUnit
+;æ²¡æ‰¾åˆ°è°ƒç”¨ï¼Œå·²ç»æ£€æŸ¥è°ƒç”¨äº†ï½
 ;
 ;
 ;
@@ -1755,7 +1755,7 @@ stub_func14 endp
 
 ;6FC3B0E0 6 FA8B57F18B56(ecx,edx,arg_0)				6FD036D0 6 75F685F08B56(eax,edi,ebx)
 ;typedef VOID	( __fastcall * D2Game_GameTraverseClientCBFunc)(LPCLIENT lpClient,LPVOID lpData);
-;Ã»ÕÒµ½µ÷ÓÃ
+;æ²¡æ‰¾åˆ°è°ƒç”¨
 ;
 ;
 ;
@@ -1782,7 +1782,7 @@ stub_func15 endp
 
 ;6FC35840 4 57F18B56(ecx)	6FD04400 4 0125BA56(arg_0)
 ;typedef DWORD	( __fastcall * D2Game_GameHashFromIdFunc)(WORD wGameId);
-;Ã»ÕÒµ½µ÷ÓÃ
+;æ²¡æ‰¾åˆ°è°ƒç”¨
 stub_func16 proc
 	push ecx
 	call dword_save_func16
@@ -1791,7 +1791,7 @@ stub_func16 endp
 
 ;6FC397A0 4 358B5653(ecx)									6FD049A0 4 D31BE0A1(arg_0)
 ;typedef LPGAME 	( __fastcall * D2Game_GameFromHashFunc)(DWORD dwHashId);
-;Ã»ÕÒµ½µ÷ÓÃ
+;æ²¡æ‰¾åˆ°è°ƒç”¨
 stub_func17 proc
 	push ecx
 	call dword_save_func17
@@ -1801,7 +1801,7 @@ stub_func17 endp
 ;6FC51070 8 555300000430EC81(ecx=ptGame,edx,arg_0,arg_4=1)		6FCF0410 8 8B530000042CEC81(eax=ptGame,arg_0=item,NULL,arg_4=1)
 ; typedef LPUNIT  ( __fastcall * D2Game_ItemDuplicateFunc)(LPGAME lpGame,
 ;		LPUNIT lpUnitItem, LPUNIT lpUnitCreator, DWORD dwFlags);
-;Ã»ÕÒµ½µ÷ÓÃ£¬Ã»ÈËµ÷ÓÃ£¡£¡£¿
+;æ²¡æ‰¾åˆ°è°ƒç”¨ï¼Œæ²¡äººè°ƒç”¨ï¼ï¼ï¼Ÿ
 ;
 ;
 ;
@@ -1827,7 +1827,7 @@ stub_func18 endp
 ;d2game.dll		6FCC77D0 4 00054032(arg_0,arg_4,arg_8,arg_12) 6FCB2859 4 FFF77DE5(arg_0,arg_4,arg_8,arg_12)
 ;typedef BOOL (__stdcall * D2Common_ItemTestFlagFunc)(LPUNIT ptItem, DWORD dwFlag, DWORD dwLine, LPCSTR lpLine); 
 ;static BOOL __stdcall D2GameSellItemCheck(LPUNIT ptItem, DWORD dwFlag, DWORD dwLine, LPCSTR lpFile) 
-;Ã»ÕÒµ½µ÷ÓÃ
+;æ²¡æ‰¾åˆ°è°ƒç”¨
 stub_func19 proc
 	;call Send0XAEPacket
 	jmp dword_save_func19
@@ -1881,7 +1881,7 @@ stub_func20 proc
 stub_func20 endp
 
 ;6FC31C74 4 000576A8(ecx,edx,arg_0,arg_4)			6FC903B6 4 FFFBD3F6(arg_0,esi,ebx,arg_4)
-;¶ÑÕ»ÍêÕû
+;å †æ ˆå®Œæ•´
 ;MessageHandling
 ;
 ;
@@ -1905,7 +1905,7 @@ cb_stub_func00 proc
 cb_stub_func00 endp
 
 ;6FC38551 4 FFFF93BB(ecx,edx)			6FD0832F 4 FFF8809D(arg_0,eax)
-;¶ÑÕ»ÍêÕû
+;å †æ ˆå®Œæ•´
 ;
 ;
 ;
@@ -1923,7 +1923,7 @@ cb_stub_func01 proc
 cb_stub_func01 endp
 
 ;d2game.dll		6FC8A200(6FC8D940) 4 0000373C(ecx,edx,arg_0,arg_4,arg_8,arg_12,arg_16)  6FC4557F 4 000037BD (edx,ecx,...)
-;Ã»ÕÒµ½µ÷ÓÃ
+;æ²¡æ‰¾åˆ°è°ƒç”¨
 cb_stub_func02 proc
 	mov eax,ecx
 	mov ecx,edx
@@ -1932,7 +1932,7 @@ cb_stub_func02 proc
 cb_stub_func02 endp
 
 ;6FC38F7A 4 FFFFF752(ecx)			6FD0818C 4 FFFFFDF0(eax)
-;¶ÑÕ»ÍêÕû£¨ÍÆ²â£©
+;å †æ ˆå®Œæ•´ï¼ˆæ¨æµ‹ï¼‰
 cb_stub_func03 proc
 	mov ecx,eax
 	call cb_save_func03
@@ -1940,7 +1940,7 @@ cb_stub_func03 proc
 cb_stub_func03 endp
 
 ;6FC39391 4 FFFFFC9B(ecx,edx,arg_0,arg_4)			6FD0744A 4 FFFFFCC2(arg_0,eax,arg_4,edx)
-;¶ÑÕ»ÍêÕû£¨ÍÆ²â£©
+;å †æ ˆå®Œæ•´ï¼ˆæ¨æµ‹ï¼‰
 ;
 ;
 ;
@@ -1966,7 +1966,7 @@ cb_stub_func04 proc
 cb_stub_func04 endp
 
 ;d2game.dll		6FCC77D0 4 00054032(arg_0,arg_4,arg_8,arg_12) 6FCB2859 4 FFF77DE5(arg_0,arg_4,arg_8,arg_12)
-;Ã»ÕÒµ½µ÷ÓÃ
+;æ²¡æ‰¾åˆ°è°ƒç”¨
 cb_stub_func05 proc
 	jmp cb_save_func05
 cb_stub_func05 endp
@@ -2014,16 +2014,16 @@ cb_stub_func06 endp
 
 	INCLUDE UberQuest.asm
 
-;Ë«¹â»·PETµÄBUG
-;²úÉúÔ­Òò£ºµ±ÎïÆ·±»ÒÆ³ıµÄÊ±ºò£¬¹ÒÔÚPETÉíÉÏÏàÓ¦µÄ¹â»·ÊÂ¼ş²¢Ã»ÓĞ±»ÒÆ³ı£¬µ¼ÖÂÔÙ´Î×°±¸ÎïÆ·µÄÊ±ºò£¬¹â»·ÊÂ¼ş²»¶ÏÔö¶à
-;½â¾ö·½·¨£ºµ±ÎïÆ·±»ÒÆ³ıµÄÊ±ºò£¬¼ì²éPETÉíÉÏµÄÊÂ¼şÁ´£¬½«±»ÒÆ³ıÎïÆ·¶ÔÓ¦µÄ¹â»·ÊÂ¼şÒÆ³ı¡£
-;ĞÂ½â¾ö·½·¨£ºÔÚAuraSkill_related_event9_handler->UpdateAuraEventÖĞ£¬µ±Çå³ıÍê¾ÉÊÂ¼ş£¬×¼±¸´´½¨ĞÂÊÂ¼şµÄÊ±ºò£¬¼ì²éUIDÊÇ·ñÊÇºÏ·¨µÄUID
+;åŒå…‰ç¯PETçš„BUG
+;äº§ç”ŸåŸå› ï¼šå½“ç‰©å“è¢«ç§»é™¤çš„æ—¶å€™ï¼ŒæŒ‚åœ¨PETèº«ä¸Šç›¸åº”çš„å…‰ç¯äº‹ä»¶å¹¶æ²¡æœ‰è¢«ç§»é™¤ï¼Œå¯¼è‡´å†æ¬¡è£…å¤‡ç‰©å“çš„æ—¶å€™ï¼Œå…‰ç¯äº‹ä»¶ä¸æ–­å¢å¤š
+;è§£å†³æ–¹æ³•ï¼šå½“ç‰©å“è¢«ç§»é™¤çš„æ—¶å€™ï¼Œæ£€æŸ¥PETèº«ä¸Šçš„äº‹ä»¶é“¾ï¼Œå°†è¢«ç§»é™¤ç‰©å“å¯¹åº”çš„å…‰ç¯äº‹ä»¶ç§»é™¤ã€‚
+;æ–°è§£å†³æ–¹æ³•ï¼šåœ¨AuraSkill_related_event9_handler->UpdateAuraEventä¸­ï¼Œå½“æ¸…é™¤å®Œæ—§äº‹ä»¶ï¼Œå‡†å¤‡åˆ›å»ºæ–°äº‹ä»¶çš„æ—¶å€™ï¼Œæ£€æŸ¥UIDæ˜¯å¦æ˜¯åˆæ³•çš„UID
 NewDualAuraPatch proc
-	;Ê×ÏÈÌáÈ¡PET»òÕßPlayerÉíÉÏËùÓĞ×°±¸µÄUID£¬±£´æµ½Ò»¸öÊı×é£¬È»ºó¶ÔPET¡¢PlayerÉíÉÏËùÓĞµÄ¹â»·ÊÂ¼ş£¬¼ì²éÆäUIDÊÇ·ñ¾ÍÊÇ×°±¸µÄUID£¬Èç¹û²»ÊÇ£¬ÔòÒÆ³ı¹â»·
+	;é¦–å…ˆæå–PETæˆ–è€…Playerèº«ä¸Šæ‰€æœ‰è£…å¤‡çš„UIDï¼Œä¿å­˜åˆ°ä¸€ä¸ªæ•°ç»„ï¼Œç„¶åå¯¹PETã€Playerèº«ä¸Šæ‰€æœ‰çš„å…‰ç¯äº‹ä»¶ï¼Œæ£€æŸ¥å…¶UIDæ˜¯å¦å°±æ˜¯è£…å¤‡çš„UIDï¼Œå¦‚æœä¸æ˜¯ï¼Œåˆ™ç§»é™¤å…‰ç¯
 
 	;	6FC9604C push    9
 	;(ecx=ptGame,edx=?,ebx=UID,edi=ptPet)
-	; ebx,ecx,eax,edx¾ù¿ÉÒÔÆÆ»µ£¬²»±Ø±£´æ
+	; ebx,ecx,eax,edxå‡å¯ä»¥ç ´åï¼Œä¸å¿…ä¿å­˜
 	
 	test ecx,ecx
 	jz over
@@ -2037,7 +2037,7 @@ NewDualAuraPatch proc
 	mov ebx,15
 	push ecx
 
-again:							; »ñÈ¡PETÉíÉÏËùÓĞ×°±¸µÄUID£¬²¢±£´æµ½Ò»¸öÁÙÊ±Êı×éÖĞ
+again:							; è·å–PETèº«ä¸Šæ‰€æœ‰è£…å¤‡çš„UIDï¼Œå¹¶ä¿å­˜åˆ°ä¸€ä¸ªä¸´æ—¶æ•°ç»„ä¸­
 	mov edx,[edi+60h]	; ptPet->Inv
 	push ebx
 	push edx
@@ -2060,7 +2060,7 @@ again_event:
 	movzx edx,byte ptr [esi]
 	cmp edx,9		; an Aura event
 	jnz next_event_prev
-	mov eax,[esi+14h] ; the Aura Owner Item uid	¶ÔÃ¿Ò»¸ö¹â»·ÊÂ¼ş£¬¼ì²éÊÇ·ñÊôÓÚPETÉíÉÏ×°±¸µÄUID
+	mov eax,[esi+14h] ; the Aura Owner Item uid	å¯¹æ¯ä¸€ä¸ªå…‰ç¯äº‹ä»¶ï¼Œæ£€æŸ¥æ˜¯å¦å±äºPETèº«ä¸Šè£…å¤‡çš„UID
 	
 	cmp eax,0FFFFFFFFh
 	jz next_event_prev
@@ -2072,7 +2072,7 @@ again_uid:
 	dec ebx
 	jge again_uid
 
-	pushad				; ·Ç·¨¹â»·£¬Çå³ıµô
+	pushad				; éæ³•å…‰ç¯ï¼Œæ¸…é™¤æ‰
 	mov edi,ecx
 	mov eax,esi
 	call D2GAME_DestoryAEvent		; eax=the event edi=ptGame
@@ -2155,7 +2155,7 @@ over:
 	ret
 DualAuraPatch endp
 
-; ¼ì²é½»Ò×Ë«·½£¬ÊÇ·ñÓĞ¶àÓàµÄ¹â»·ÊÂ¼ş
+; æ£€æŸ¥äº¤æ˜“åŒæ–¹ï¼Œæ˜¯å¦æœ‰å¤šä½™çš„å…‰ç¯äº‹ä»¶
 TradePlayerAuraBugPatch proc
 	test edx,edx
 	jz over
@@ -2163,10 +2163,10 @@ TradePlayerAuraBugPatch proc
 	mov ebp,edx
 	call PlayerAuraCheckPatch
 	
-	mov edx,[ebp+64h]	; »ñÈ¡½»Ò×¶Ô·½µÄUnitID
+	mov edx,[ebp+64h]	; è·å–äº¤æ˜“å¯¹æ–¹çš„UnitID
 	mov ecx,[ebp+80h]	; ptGame
 	xor eax,eax				; Player Type
-	call dword_save_func09	; »ñÈ¡½»Ò×¶Ô·½µÄUnit
+	call dword_save_func09	; è·å–äº¤æ˜“å¯¹æ–¹çš„Unit
 	test eax,eax
 	jz over1
 	mov ebp,eax
@@ -2179,7 +2179,7 @@ over:
 	ret
 TradePlayerAuraBugPatch endp
 
-; ¼ì²éÍæ¼ÒÉíÉÏµÄËùÓĞ¹â»·£¬¿´ÕâĞ©¹â»·ÊÂ¼şµÄItem UIDÊÇ·ñ×°±¸ÔÚÍæ¼ÒÉíÉÏ£¬Èç¹ûÃ»×°±¸ÔÚÍæ¼ÒÉíÉÏ£¬ÔòÒÆ³ı¸ÃÊÂ¼ş
+; æ£€æŸ¥ç©å®¶èº«ä¸Šçš„æ‰€æœ‰å…‰ç¯ï¼Œçœ‹è¿™äº›å…‰ç¯äº‹ä»¶çš„Item UIDæ˜¯å¦è£…å¤‡åœ¨ç©å®¶èº«ä¸Šï¼Œå¦‚æœæ²¡è£…å¤‡åœ¨ç©å®¶èº«ä¸Šï¼Œåˆ™ç§»é™¤è¯¥äº‹ä»¶
 PlayerAuraCheckPatch proc
 	; ebp the Player
 	pushad
@@ -2198,7 +2198,7 @@ again_prev:
 	
 	mov ebx,[esi+14h] ; the Aura Owner Item uid
 	
-; Ñ­»·¼ì²éÍæ¼ÒÉíÉÏ×°±¸µÄËùÓĞÎïÆ·
+; å¾ªç¯æ£€æŸ¥ç©å®¶èº«ä¸Šè£…å¤‡çš„æ‰€æœ‰ç‰©å“
 	pushad
 	xor edi,edi
 next_inv_item1:
@@ -2243,7 +2243,7 @@ again_next:
 	jnz next_event_next
 	mov ebx,[esi+14h] ; the Aura Owner Item uid
 
-; Ñ­»·¼ì²éÍæ¼ÒÉíÉÏ×°±¸µÄËùÓĞÎïÆ·
+; å¾ªç¯æ£€æŸ¥ç©å®¶èº«ä¸Šè£…å¤‡çš„æ‰€æœ‰ç‰©å“
 	pushad
 	xor edi,edi
 next_inv_item2:
@@ -2334,9 +2334,9 @@ TPCrashBugPatch endp
 
 ExpGlitchFix proc
 	;6FC9E051
-	; esi=MonsterBaseExp=0x0039FD64(Diablo)×î´ó0x004537D4(Baal)
+	; esi=MonsterBaseExp=0x0039FD64(Diablo)æœ€å¤§0x004537D4(Baal)
 	; ecx=NumberOfPlayerShareExp=8
-	; [esp+5C] = Í¬Ò»³¡¾°ÄÚËùÓĞÍæ¼Ò¼¶±ğÖ®ºÍ
+	; [esp+5C] = åŒä¸€åœºæ™¯å†…æ‰€æœ‰ç©å®¶çº§åˆ«ä¹‹å’Œ
 
 	; eax=exp1
 	
@@ -2344,7 +2344,7 @@ ExpGlitchFix proc
 	;player_exp=exp1*CLVL/TotalCLVL
 	;exp1*CLVL=EDAAB0*99=0x5BE90210
 	
-	mov		esi,[esp+70h]	; ÒıÈë½áÃËÒòËØ£¬×Ü¾­ÑéÖµexp=0x0039FD64
+	mov		esi,[esp+70h]	; å¼•å…¥ç»“ç›Ÿå› ç´ ï¼Œæ€»ç»éªŒå€¼exp=0x0039FD64
 	lea		eax,[ecx-1]
 	imul	eax,59h			; (NumberOfPlayerShareExp-1)*89
 	mul		esi					; MonsterBaseExp*(NumberOfPlayerShareExp-1)*89
@@ -2358,7 +2358,7 @@ ExpGlitchFix proc
 	xor		esi,esi
 
 Loop_ExpGlitchFix:
-	mov		edi,[esp+esi*4+34h]	;Íæ¼Ò¼¶±ğ
+	mov		edi,[esp+esi*4+34h]	;ç©å®¶çº§åˆ«
 	mov		ebx,[esp+esi*4+14h]	;ptPlayer
 	mov		eax,[esp+5Ch+arg_8]
 	mul		edi
@@ -2374,7 +2374,7 @@ ExpGlitchFixEnd endp
 ;.text:6FC9E0A4                 fmul    dword ptr [esp+70h]
 ;.text:6FC9E0A8                 call    __ftol2       
 ;
-;ĞŞ¸ÄÎª£º
+;ä¿®æ”¹ä¸ºï¼š
 ;	mov eax,[esp+5Ch+arg_8]
 ;	mul edi
 ;	div [esp+5Ch]						; TotalCLVL
@@ -2399,7 +2399,7 @@ MyInitGameHandler	proc
 	mov eax,[eax]
 	call eax ; malloc
 	add esp,4
-	mov [esi+4],eax ; Ö¸ÏòĞÂµÄExtendGameInfoStruct
+	mov [esi+4],eax ; æŒ‡å‘æ–°çš„ExtendGameInfoStruct
 	test eax,eax
 	jz fail_over
 already_malloc:
@@ -2409,9 +2409,9 @@ already_malloc:
 	
 	mov [eax+ExtendGameInfoStruct.PortalOpenedFlag],ebx
 	
-;00300004	ÓÎÏ·Flag£¬
-;test ecx,100000h	ÓÃÓÚÅĞ¶ÏÊÇ·ñÊÇD2C»òÕßLODÓÎÏ·
-	mov ecx,[esp+2Ch];	»ñÈ¡D2C±êÖ¾
+;00300004	æ¸¸æˆFlagï¼Œ
+;test ecx,100000h	ç”¨äºåˆ¤æ–­æ˜¯å¦æ˜¯D2Cæˆ–è€…LODæ¸¸æˆ
+	mov ecx,[esp+2Ch];	è·å–D2Cæ ‡å¿—
 	test ecx,100000h
 	jz D2C_Type
 	mov [eax+ExtendGameInfoStruct.LoD_Game],1
@@ -2433,7 +2433,7 @@ MeleePetAIFix proc
 	test eax,eax
 	mov  edi,62h
 	jz over
-	xor  edi,edi	; Èç¹ûÊÇÖĞÁËIM£¬Ôò²»×ö¹¥»÷ĞĞ¶¯
+	xor  edi,edi	; å¦‚æœæ˜¯ä¸­äº†IMï¼Œåˆ™ä¸åšæ”»å‡»è¡ŒåŠ¨
 over:
 	ret
 MeleePetAIFix endp
@@ -2448,13 +2448,13 @@ NeroPetAIFix proc
 	test eax,eax
 	mov  eax,64h
 	jz over
-	mov eax,07FFFFFFFh	; Èç¹ûÊÇÖĞÁËIM£¬Ôò²»×ö¹¥»÷ĞĞ¶¯
+	mov eax,07FFFFFFFh	; å¦‚æœæ˜¯ä¸­äº†IMï¼Œåˆ™ä¸åšæ”»å‡»è¡ŒåŠ¨
 over:
 	ret
 NeroPetAIFix endp
 
 UnicodeCharNameCheck proc
-	; edi=×î´ó³¤¶È£»eax=CharName
+	; edi=æœ€å¤§é•¿åº¦ï¼›eax=CharName
 	push esi
 	push ebx
 	xor ebx,ebx
@@ -2504,7 +2504,7 @@ MonsterDamageFix proc
 	cmp	eax,1
 	jnz	fail_over
 	; Check monster emode
-	; 0,1,2,3,6,12,15~¾ù²»ĞèÒª½øĞĞMonsterDamage¼ÆËã£¡
+	; 0,1,2,3,6,12,15~å‡ä¸éœ€è¦è¿›è¡ŒMonsterDamageè®¡ç®—ï¼
 	mov eax,[ebp+10h]
 	cmp eax,14
 	jg	fail_over
@@ -2514,7 +2514,7 @@ MonsterDamageFix proc
 	jz	fail_over
 	cmp	eax,12
 	jz	fail_over
-	;Õı³££¡
+	;æ­£å¸¸ï¼
 	xor eax,eax
 	cmp eax,0
 	ret
@@ -2674,7 +2674,7 @@ UnProtectDLL2 proc
 UnProtectDLL2 endp
 
 SingleRoomDCPatch proc
-	; esi=Âô¸øNPCµÄItem
+	; esi=å–ç»™NPCçš„Item
 	
 	push	1000
 	push	0
@@ -2691,8 +2691,8 @@ SingleRoomDCPatch proc
 	mov		esi,[esi+80h]
 	test	esi,esi
 	jz		over_retn
-	push	1		;ÊÇ·ñÊÍ·ÅDiabloClone£¿
-	push	1		;ÊÇ·ñÏÔÊ¾xx¿ÅSOJÂô¸øÉÌÈË£¿
+	push	1		;æ˜¯å¦é‡Šæ”¾DiabloCloneï¼Ÿ
+	push	1		;æ˜¯å¦æ˜¾ç¤ºxxé¢—SOJå–ç»™å•†äººï¼Ÿ
 	push	esi
 	call	sub_68005A10
 	add		esp,0Ch
@@ -2883,11 +2883,11 @@ loc_10003F98:                           ; CODE XREF: PreCalculateTreasureClassNo
 PreCalculateTreasureClassNoDropTbl endp
 
 CalculateTreasureClassNoDropPatch proc
-	; edi=ÈËÊı
+	; edi=äººæ•°
 	mov	eax,EnablePreCalculateTCNoDropTbl
 	test eax,eax
 	jz orig_code
-	; Ê¹ÄÜÔ¤¼ÆËãµÄTC NoDrop
+	; ä½¿èƒ½é¢„è®¡ç®—çš„TC NoDrop
 	mov			ebx,D2COMMON
 	mov			ebx,[ebx]
 	add			ebx,0A0894h
@@ -2917,14 +2917,14 @@ CalculateTreasureClassNoDropPatch proc
 ;	test edx,edx
 ;	jnz orig_code
 	
-	;eaxÖ¸Ïò¼ÇÂ¼ĞòºÅ
-	mov ebx,[esp+30h] ;ÓÎÏ·ÀàĞÍd2x=1£¬d2c=0
+	;eaxæŒ‡å‘è®°å½•åºå·
+	mov ebx,[esp+30h] ;æ¸¸æˆç±»å‹d2x=1ï¼Œd2c=0
 	xor ecx,ecx
 	test ebx,ebx
 	jz d2c
 	mov ecx,28
 d2c:	
-	imul eax,56	;56¸ö×Ö½ÚÒ»Ìõ¼ÇÂ¼
+	imul eax,56	;56ä¸ªå­—èŠ‚ä¸€æ¡è®°å½•
 	mov ebx,PreCalculateTCNoDropTbl
 	lea ebx,[eax+ebx]
 	lea esi,[ebx+ecx]
@@ -3058,7 +3058,7 @@ orig_code:
 EthBugFix endp
 
 MFBugFix proc
-	; Ê¹ÓÃptGameµÄQuestRecord½øĞĞ¼ì²é
+	; ä½¿ç”¨ptGameçš„QuestRecordè¿›è¡Œæ£€æŸ¥
 	pop eax
 	pop ecx
 	pop ebx
@@ -3083,7 +3083,7 @@ orig_code:
 	push 0Fh
 	push eax
 	push ebx
-	call D2Common_10174_GetQuestFlag ; ÈÎÎñÒÑ¾­Íê³É£¿
+	call D2Common_10174_GetQuestFlag ; ä»»åŠ¡å·²ç»å®Œæˆï¼Ÿ
 	cmp eax,1
 	jz over
 	
@@ -3091,7 +3091,7 @@ orig_code:
 	push 1
 	push ecx
 	push ebx
-	call D2Common_10174_GetQuestFlag	; ÈÎÎñ½±ÀøÖĞ£¿
+	call D2Common_10174_GetQuestFlag	; ä»»åŠ¡å¥–åŠ±ä¸­ï¼Ÿ
 	cmp eax,1
 	jz over
 	
@@ -3100,7 +3100,7 @@ orig_code:
 	push edx
 	push ecx
 	push ebx
-	call D2Common_10174_GetQuestFlag	;¿ÉÒÔ½øĞĞÈÎÎñDrop£¿
+	call D2Common_10174_GetQuestFlag	;å¯ä»¥è¿›è¡Œä»»åŠ¡Dropï¼Ÿ
 over:
 	ret
 MFBugFix endp
@@ -3122,11 +3122,11 @@ MyCheckSpawnDiabloClone proc
                  jz not_check_level
                  push    edi
                  call    D2Common_10826_GetLevelIdFromRoom	; Get Level ID , 1 arg
-                 cmp eax,108	; ²»ÄÜÔÚ»ìãç±ÜÄÑËù´´½¨DiabloClone
+                 cmp eax,108	; ä¸èƒ½åœ¨æ··æ²Œé¿éš¾æ‰€åˆ›å»ºDiabloClone
                  jz loc_6800575C
-                 cmp eax,120	; ²»ÄÜÔÚÑÇÈğÌØÉ½ÂöáÛ·å´´½¨DiabloClone
+                 cmp eax,120	; ä¸èƒ½åœ¨äºšç‘ç‰¹å±±è„‰å·…å³°åˆ›å»ºDiabloClone
                  jz loc_6800575C
-                 cmp eax,132	; ²»ÄÜÔÚ6BOSS´¦´´½¨DiabloClone
+                 cmp eax,132	; ä¸èƒ½åœ¨6BOSSå¤„åˆ›å»ºDiabloClone
                  jg loc_6800575C
 not_check_level:
                  mov     ax, [esi+28h]
@@ -3150,7 +3150,7 @@ not_check_level:
                  mov     eax, [esp+4+arg_8]
                  push    ecx
                  mov     ecx, [esp+8+arg_4]
-                 push    14Dh            ; ³¬¼¶Diablo
+                 push    14Dh            ; è¶…çº§Diablo
                  push    edx
                  mov     edx, [esp+10h+arg_0]
                  push    eax
@@ -3199,8 +3199,8 @@ not_check_level:
 MyCheckSpawnDiabloClone endp
 end start
 
-;ÏµÍ³±¨ÎÄIDĞèÒª+1
-;Ô­À´ÊÇ-0x66£¬ÏÖÔÚÊÇ-0x67
+;ç³»ç»ŸæŠ¥æ–‡IDéœ€è¦+1
+;åŸæ¥æ˜¯-0x66ï¼Œç°åœ¨æ˜¯-0x67
 
 
 SpawnAMonster_1 6FD0F870(ecx,edx,arg_0,arg_4,arg_8,arg_C,arg_10=2.4,arg_14=42)
@@ -3209,7 +3209,7 @@ SpawnAMonster_1 6FD0F870(ecx,edx,arg_0,arg_4,arg_8,arg_C,arg_10=2.4,arg_14=42)
 
 6FCC6E40 sub_6FCC6E40 (esi,edi,arg_0,arg_4)
 
-6FC40A80 sub_6FC40A80 (ecx,edx(ptUnit?ptGame?MonSeq?),arg_0(hcidx),arg_4) Ó¦¸ÃÊÇÒ»¸ö±ê×¼µÄSpawnº¯Êı
+6FC40A80 sub_6FC40A80 (ecx,edx(ptUnit?ptGame?MonSeq?),arg_0(hcidx),arg_4) åº”è¯¥æ˜¯ä¸€ä¸ªæ ‡å‡†çš„Spawnå‡½æ•°
 
 6FD0F870 SpawnAMonster_1(ecx=hcidx,edx=monseq,arg_0,arg_4,arg_8,arg_C,0FFFFFFFFF,0)
 (ecx=1FF,edx=1,arg_0=unk1,arg_4=unk2,arg_8=1416,arg_C=13A5,arg_10=5,arg_14=0)
