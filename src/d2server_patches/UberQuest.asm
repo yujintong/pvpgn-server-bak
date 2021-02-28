@@ -19,29 +19,23 @@
 ;			bit 9--0x88 level BOSS2 spawn
 
 ;D2 export entrys
-D2Common_11166_GetMyPosition dd 0
-D2Common_10691_GetLevelIdFromRoom dd 0
-D2Common_10846_GethRoomFUnit dd 0
-D2Common_10716_GetFreeTile dd 0
-;D2Common_10193_ChangeCurrentMode dd 0
-D2Common_10040_GetPortalFlag dd 0
-D2Common_10033_UpdatePortalFlag dd 0
-D2Common_10907_UpdateRoomHavePortalFlag dd 0
-D2Common_10156_GetQuestFlag dd 0
-D2Common_10595_SetQuestFlag dd 0
-D2Common_10142_GetLevelTxt dd 0
+D2Common_10141_GetMyPosition dd 0
+D2Common_10826_GetLevelIdFromRoom dd 0
+D2Common_10331_GethRoomFUnit dd 0
+D2Common_10654_GetFreeTile dd 0
+D2Common_10258_GetPortalFlag dd 0
+D2Common_10111_UpdatePortalFlag dd 0
+D2Common_10346_UpdateRoomHavePortalFlag dd 0
+D2Common_10174_GetQuestFlag dd 0
+D2Common_10003_SetQuestFlag dd 0
+D2Common_10014_GetLevelTxt dd 0
 
-D2GAME_0X59980 dd 0
-D2GAME_0XCDE20_SpawnSuperUnique dd 0
-D2GAME_0X1340 dd 0
-D2GAME_0X6FE10 dd 0
-D2GAME_0X15F40 dd 0
-D2GAME_0X1606D dd 0
+D2GAME_0X200E0 dd 0
+D2GAME_0X24950_SpawnSuperUnique dd 0
+D2GAME_0X1280_GetFreeTitle dd 0
+D2GAME_0XE1D90_InitTheUnit dd 0
+D2GAME_0XA22E0_CreatePortalInTown dd 0
 D2GAME_RemoveMonsterCorpse dd 0
-
-D2GAME_Baal_AI dd 0
-D2GAME_Mephisto_AI dd 0
-D2GAME_Diablo_AI dd 0
 
 D2GAME_StallSomeTime dd 0
 D2GAME_GetAreaSpawnUnitNum dd 0
@@ -50,7 +44,11 @@ D2GAME_SpawnAMonster dd 0
 D2GAME_sgptDataTables dd 0
 D2GAME_GetMonstatsTxtRec dd 0
 
+D2GAME_0XA240B dd 0
 
+D2GAME_Baal_AI dd 0
+D2GAME_Mephisto_AI dd 0
+D2GAME_Diablo_AI dd 0
 
 ; Every Game should call InitUberQuestState once and only once!
 ; ecx=ptExtendGameInfoStruct
@@ -270,7 +268,7 @@ UberQuestInited:
                 lea     eax, [esp+10h+var_8]
                 push    eax
                 push    esi ; ptUnit
-                call    D2Common_11166_GetMyPosition
+                call    D2Common_10141_GetMyPosition
                 mov     ecx, [esp+0Ch]
                 mov     edx, [esp+10h+var_8]
 
@@ -308,7 +306,7 @@ arg_4           = dword ptr  8
                 push    edi
                 mov     edi, [esp+10h+4]
                 push    edi
-                call    D2Common_10691_GetLevelIdFromRoom	; Get Level ID , 1 arg
+                call    D2Common_10826_GetLevelIdFromRoom	; Get Level ID , 1 arg
                 mov     esi, [esp+0Ch+4]	; ptGame
                 add     eax, 0FFFFFF7Bh ; eax=eax-85h
                 cmp     eax, 3
@@ -403,7 +401,7 @@ loc_10018DFC:
                 mov     eax,1
                 mov     ecx,2C0h ; 704=ubermephisto
                 mov     edx,0
-                call    D2GAME_0XCDE20_SpawnSuperUnique
+                call    D2GAME_0X24950_SpawnSuperUnique
                 
                 test    eax, eax
                 jz      short loc_10018E2E
@@ -432,7 +430,7 @@ loc_10018E4D:
                 mov     eax,1
                 mov     ecx,2C1h ; 705=uberdiablo
                 mov     edx,0
-                call    D2GAME_0XCDE20_SpawnSuperUnique
+                call    D2GAME_0X24950_SpawnSuperUnique
                 test    eax, eax
                 jz      short loc_10018E7F
                 mov			eax,[esp+12]	; restore
@@ -463,7 +461,7 @@ loc_10018EB1:
                 push    esi
                 mov     eax,1
                 mov     edx,0;eax
-                call    D2GAME_0XCDE20_SpawnSuperUnique
+                call    D2GAME_0X24950_SpawnSuperUnique
                 test    eax, eax
                 jz      short loc_10018EDD
                 mov			eax,[esp+12]	; restore
@@ -473,7 +471,7 @@ loc_10018EDD:
 loc_10018EDC:
                 push    edi
                 push    esi
-                call    D2GAME_0X59980
+                call    D2GAME_0X200E0
                 pop     edi
                 pop     esi
                 add			esp,4
@@ -495,21 +493,21 @@ PortalConditionCheck proc
 
 ; Check in ACT5 town
                 push    edi
-                call    D2Common_10846_GethRoomFUnit
+                call    D2Common_10331_GethRoomFUnit
                 push    eax
-                call    D2Common_10691_GetLevelIdFromRoom
+                call    D2Common_10826_GetLevelIdFromRoom
                 cmp     eax, 6Dh
                 jnz     short over
 
 ; Check player finished a5q3?
 								push		edi
-								call		D2COMMON_11103_GetpPlayerDataFromUnit
-								movzx   ecx, byte ptr [esi+6Dh] ; éš¾åº¦ï¼Œhell=2   
+								call		D2Common_10920_GetpPlayerDataFromUnit
+								movzx   ecx, byte ptr [esi+6Dh] ; ÄÑ¶È£¬hell=2   
 								mov     eax, [eax+ecx*4+10h]	; Player's Quest Structure
 								push    0
 								push    40	; Eve of Destruction
 								push    eax
-								call    D2Common_10156_GetQuestFlag
+								call    D2Common_10174_GetQuestFlag
 								test		eax,eax
 								jz			over             
 								mov			eax,1
@@ -540,16 +538,16 @@ arg_8           = dword ptr  0Ch
                 push    edi
                 mov     edi, [esp+1Ch]
                 push    edi
-                call    D2Common_10846_GethRoomFUnit
+                call    D2Common_10331_GethRoomFUnit
                 mov     esi, eax
                 push    esi
-                call    D2Common_10691_GetLevelIdFromRoom
+                call    D2Common_10826_GetLevelIdFromRoom
                 cmp     eax, 6Dh
                 jnz     short loc_10018A97
                 lea     eax, [esp+0Ch]
                 push    eax
                 push    edi
-                call    D2Common_11166_GetMyPosition
+                call    D2Common_10141_GetMyPosition
                 push    0
                 push    0C01h
                 push    3E01h
@@ -559,14 +557,14 @@ arg_8           = dword ptr  0Ch
                 lea     edx, [esp+20h]
                 push    edx
                 push    esi
-                call    D2Common_10716_GetFreeTile
+                call    D2Common_10654_GetFreeTile
                 test    eax, eax
                 jz      short loc_10018A97
                 mov     eax, [esp+10h]
                 mov     edx, [esp+0Ch]
                 push    eax
                 mov     ecx, esi
-                call    D2GAME_0X1340
+                call    D2GAME_0X1280_GetFreeTitle_1
 
                 mov     edi, eax
                 test    edi, edi
@@ -594,32 +592,32 @@ loc_10018AA0:
                 push    edx
                 mov     edx, 3Ch
                 mov     ecx, 2
-                call    D2GAME_0X6FE10
+                call    D2GAME_0XE1D90_InitTheUnit
                 mov     esi, eax
                 mov     eax, [esi+14h]
                 push    1
                 push    esi
                 mov     [eax+4], bl
-                call    D2Common_10193_ChangeCurrentMode
+                call    D2Common_11090_ChangeCurrentMode
                 push    6Dh
                 push    ebx
                 push    esi
                 push    ebp
-                call    D2GAME_0X15F40
+                call    D2GAME_0XA22E0_CreatePortalInTown
                 push    esi
-                call    D2Common_10040_GetPortalFlag
+                call    D2Common_10258_GetPortalFlag
                 or      eax, 3
                 push    eax
                 push    esi
-                call    D2Common_10033_UpdatePortalFlag
+                call    D2Common_10111_UpdatePortalFlag
                 push    0
                 push    edi
-                call    D2Common_10907_UpdateRoomHavePortalFlag
+                call    D2Common_10346_UpdateRoomHavePortalFlag
                 push    0
                 push    esi
-                call    D2Common_10846_GethRoomFUnit
+                call    D2Common_10331_GethRoomFUnit
                 push    eax
-                call    D2Common_10907_UpdateRoomHavePortalFlag
+                call    D2Common_10346_UpdateRoomHavePortalFlag
                 pop     ebp
                 pop     edi
                 pop     esi
@@ -673,7 +671,7 @@ OpenningPortalToLevel endp
 ;   DWORD   unk8;            // +1C 
 ;};
 
-; ptUnit+0x64=ä¸‹ä¸€æ¬¡Spawnæ—¶é—´
+; ptUnit+0x64=ÏÂÒ»´ÎSpawnÊ±¼ä
 ; ptUnit+0x68=Spawn Counter
 ;
 ;ecx=ptGame
@@ -684,12 +682,12 @@ UberDiablo_AI0 proc
 	push		ecx
 ;	mov     eax, [esp+arg_0+4] ; pPar
 ;	mov     eax, [eax]      ; pPar->hControl
-	mov     ecx, [ecx+0A8h] ; æ¸¸æˆå½“å‰æ—¶é—´
-	mov     [edx+64h], ecx  ; ä¸‹ä¸€æ¬¡Spawnæ—¶é—´
+	mov     ecx, [ecx+0A8h] ; ÓÎÏ·µ±Ç°Ê±¼ä
+	mov     [edx+64h], ecx  ; ÏÂÒ»´ÎSpawnÊ±¼ä
 ;	mov     dword ptr [edx+68h], 0 ; Spawn Counter
 	pop			ecx	; ptGame
 	
-	; åˆå§‹åŒ–éšæœºæ•°ç§å­ï¼Œç”¨äºéšæœºSpawnæ€ªç‰©
+	; ³õÊ¼»¯Ëæ»úÊıÖÖ×Ó£¬ÓÃÓÚËæ»úSpawn¹ÖÎï
 	push		esi
 	push		edx
 	push		ecx
@@ -704,20 +702,20 @@ UberDiablo_AI0 proc
 	retn    4
 UberDiablo_AI0 endp
 
-; +14 = æ€»è®¡æ•°ï¼Ÿ
-; +18 = å½“å‰æ¬¡æ•°ï¼Ÿ
+; +14 = ×Ü¼ÆÊı£¿
+; +18 = µ±Ç°´ÎÊı£¿
 ; +1C = next State
 UberMephisto_AI0 proc
 	arg_0           = dword ptr  4
 	push		ecx
 ;	mov     eax, [esp+arg_0+4] ; pPar
 ;	mov     eax, [eax]      ; pPar->hControl
-	mov     ecx, [ecx+0A8h] ; æ¸¸æˆå½“å‰æ—¶é—´
-	mov     [edx+64h], ecx  ; ä¸‹ä¸€æ¬¡Spawnæ—¶é—´
+	mov     ecx, [ecx+0A8h] ; ÓÎÏ·µ±Ç°Ê±¼ä
+	mov     [edx+64h], ecx  ; ÏÂÒ»´ÎSpawnÊ±¼ä
 ;	mov     dword ptr [edx+68h], 0 ; Spawn Counter
 	pop			ecx	; ptGame
 	
-	; åˆå§‹åŒ–éšæœºæ•°ç§å­ï¼Œç”¨äºéšæœºSpawnæ€ªç‰©
+	; ³õÊ¼»¯Ëæ»úÊıÖÖ×Ó£¬ÓÃÓÚËæ»úSpawn¹ÖÎï
 	push		esi
 	push		edx
 	push		ecx
@@ -736,7 +734,7 @@ UberMephisto_AI0 endp
 ;edx=pMonster
 ;arg_0=pPar
 UberMephisto_AI proc
-; é¦–å…ˆåˆ›å»ºä¸€ä¸ªéšæœºæ•°ï¼Œç„¶åå†³å®šæ˜¯Spawnä¸€ä¸ªéšæœºæ€ªç‰©ï¼Œè¿˜æ˜¯ç»§ç»­åŸæ¥çš„Mephisto_AI
+; Ê×ÏÈ´´½¨Ò»¸öËæ»úÊı£¬È»ºó¾ö¶¨ÊÇSpawnÒ»¸öËæ»ú¹ÖÎï£¬»¹ÊÇ¼ÌĞøÔ­À´µÄMephisto_AI
 	push	ecx	; save ecx
 	push	edx	; save edx
 	
@@ -773,7 +771,7 @@ call_orig_Mephisto_AI:
 UberMephisto_AI endp
 
 UberDiablo_AI proc
-; é¦–å…ˆåˆ›å»ºä¸€ä¸ªéšæœºæ•°ï¼Œç„¶åå†³å®šæ˜¯Spawnä¸€ä¸ªéšæœºæ€ªç‰©ï¼Œè¿˜æ˜¯ç»§ç»­åŸæ¥çš„Diablo_AI
+; Ê×ÏÈ´´½¨Ò»¸öËæ»úÊı£¬È»ºó¾ö¶¨ÊÇSpawnÒ»¸öËæ»ú¹ÖÎï£¬»¹ÊÇ¼ÌĞøÔ­À´µÄDiablo_AI
 	push	ecx	; save ecx
 	push	edx ; save edx
 	
@@ -814,16 +812,16 @@ MaxSpawnNum_D dd 40
 SpawnInterv_D	dd 5
 ActivArea_D		dd 30
 StallTime_D		dd 2
-TypeOfSpawns_D	dd 3 ; æœ€å¤š10ç§
-SpawnMonsters_D	dd 712,731,732,0,0,0,0,0,0,0 ; 10ç§æ€ªç‰©çš„HCIDX
+TypeOfSpawns_D	dd 3 ; ×î¶à10ÖÖ
+SpawnMonsters_D	dd 712,731,732,0,0,0,0,0,0,0 ; 10ÖÖ¹ÖÎïµÄHCIDX
 
 SpawnProbability_M dd 30
 MaxSpawnNum_M dd 30
 SpawnInterv_M	dd 5
 ActivArea_M		dd 30
 StallTime_M		dd 2
-TypeOfSpawns_M	dd 6 ; æœ€å¤š10ç§
-SpawnMonsters_M	dd 725,726,727,728,729,730,0,0,0,0 ; 10ç§æ€ªç‰©çš„HCIDX
+TypeOfSpawns_M	dd 6 ; ×î¶à10ÖÖ
+SpawnMonsters_M	dd 725,726,727,728,729,730,0,0,0,0 ; 10ÖÖ¹ÖÎïµÄHCIDX
 
 ; ecx = ptGame
 ; edx = pMonster
@@ -843,11 +841,11 @@ arg_0           = dword ptr  4
                 push    esi
                 push    edi
                 mov     esi, edx        ; pMonster
-                mov     edx, ActivArea_M ; æ¿€æ´»åŒºåŸŸ
+                mov     edx, ActivArea_M ; ¼¤»îÇøÓò
                 cmp     [eax+14h], edx  ; pPar->DistanceToTarget
                 jg      short Meph_6FC886C2
-                mov     edx, [ebx+0A8h] ; æ¸¸æˆå½“å‰æ—¶é—´
-                cmp     edx, [esi+64h]  ; ä¸‹ä¸€ä¸ªSpawnçš„æ—¶é—´
+                mov     edx, [ebx+0A8h] ; ÓÎÏ·µ±Ç°Ê±¼ä
+                cmp     edx, [esi+64h]  ; ÏÂÒ»¸öSpawnµÄÊ±¼ä
                 jge     short Meph_6FC886D9
 
 Meph_6FC886C2:
@@ -862,12 +860,12 @@ Meph_6FC886D9:
                 push    offset D2GAME_GetAreaSpawnUnitNumUberMeph_CheckFunc
                 push    esi             ; pMonster
                 lea     ecx, [esp+40h+var_28]
-                mov     eax, 1          ; æœ¬æ¬¡æ£€æŸ¥ç±»å‹ï¼Œ1=monster
+                mov     eax, 1          ; ±¾´Î¼ì²éÀàĞÍ£¬1=monster
                 mov     edx, ebx        ; ptGame
                 mov     [esp+40h+var_28], 0
                 call    D2GAME_GetAreaSpawnUnitNum
-                mov     ecx, MaxSpawnNum_M ; ç›¸åº”éš¾åº¦ä¸‹çš„AI Par2ï¼Œè¯¥Areaçš„Spawnæœ€å¤§æ•°ç›®
-                cmp     [esp+38h+var_28], ecx ; Spawnæœ€å¤§æ•°ç›®
+                mov     ecx, MaxSpawnNum_M ; ÏàÓ¦ÄÑ¶ÈÏÂµÄAI Par2£¬¸ÃAreaµÄSpawn×î´óÊıÄ¿
+                cmp     [esp+38h+var_28], ecx ; Spawn×î´óÊıÄ¿
                 jge     Meph_6FC8874F
 
 								push		ebx
@@ -887,11 +885,11 @@ Meph_6FC886D9:
                 mov			edx,esi
                 call		MySpawnAMonster
                 
-                mov     edx, SpawnInterv_M ; ç›¸åº”éš¾åº¦ä¸‹çš„AI Par3ï¼ŒSpawnå»¶è¿Ÿ
-                mov     ecx, [ebx+0A8h] ; æ¸¸æˆå½“å‰æ—¶é—´
+                mov     edx, SpawnInterv_M ; ÏàÓ¦ÄÑ¶ÈÏÂµÄAI Par3£¬SpawnÑÓ³Ù
+                mov     ecx, [ebx+0A8h] ; ÓÎÏ·µ±Ç°Ê±¼ä
                 add     edx, ecx
-                mov     [esi+64h], edx  ; æ›´æ–°ä¸‹ä¸€ä¸ªSpawnçš„æ—¶é—´
-                mov     eax, StallTime_M ; ç›¸åº”éš¾åº¦ä¸‹çš„AI Par2ï¼Œåœé¡¿æ—¶é—´
+                mov     [esi+64h], edx  ; ¸üĞÂÏÂÒ»¸öSpawnµÄÊ±¼ä
+                mov     eax, StallTime_M ; ÏàÓ¦ÄÑ¶ÈÏÂµÄAI Par2£¬Í£¶ÙÊ±¼ä
                 push    eax
                 mov     eax, ebx
                 call    D2GAME_StallSomeTime
@@ -927,11 +925,11 @@ arg_0           = dword ptr  4
                 push    esi
                 push    edi
                 mov     esi, edx        ; pMonster
-                mov     edx, ActivArea_D ; æ¿€æ´»åŒºåŸŸ
+                mov     edx, ActivArea_D ; ¼¤»îÇøÓò
                 cmp     [eax+14h], edx  ; pPar->DistanceToTarget
                 jg      short Diablo_6FC886C2
-                mov     edx, [ebx+0A8h] ; æ¸¸æˆå½“å‰æ—¶é—´
-                cmp     edx, [esi+64h]  ; ä¸‹ä¸€ä¸ªSpawnçš„æ—¶é—´
+                mov     edx, [ebx+0A8h] ; ÓÎÏ·µ±Ç°Ê±¼ä
+                cmp     edx, [esi+64h]  ; ÏÂÒ»¸öSpawnµÄÊ±¼ä
                 jge     short Diablo_6FC886D9
 
 Diablo_6FC886C2:
@@ -946,12 +944,12 @@ Diablo_6FC886D9:
                 push    offset D2GAME_GetAreaSpawnUnitNumUberDiablo_CheckFunc
                 push    esi             ; pMonster
                 lea     ecx, [esp+40h+var_28]
-                mov     eax, 1          ; æœ¬æ¬¡æ£€æŸ¥ç±»å‹ï¼Œ1=monster
+                mov     eax, 1          ; ±¾´Î¼ì²éÀàĞÍ£¬1=monster
                 mov     edx, ebx        ; ptGame
                 mov     [esp+40h+var_28], 0
                 call    D2GAME_GetAreaSpawnUnitNum
-                mov     ecx, MaxSpawnNum_D ; ç›¸åº”éš¾åº¦ä¸‹çš„AI Par2ï¼Œè¯¥Areaçš„Spawnæœ€å¤§æ•°ç›®
-                cmp     [esp+38h+var_28], ecx ; Spawnæœ€å¤§æ•°ç›®
+                mov     ecx, MaxSpawnNum_D ; ÏàÓ¦ÄÑ¶ÈÏÂµÄAI Par2£¬¸ÃAreaµÄSpawn×î´óÊıÄ¿
+                cmp     [esp+38h+var_28], ecx ; Spawn×î´óÊıÄ¿
                 jge     Diablo_6FC8874F
 
 								push		ebx
@@ -971,11 +969,11 @@ Diablo_6FC886D9:
                 mov			edx,esi
                 call		MySpawnAMonster
                 
-                mov     edx, SpawnInterv_D ; ç›¸åº”éš¾åº¦ä¸‹çš„AI Par3ï¼ŒSpawnå»¶è¿Ÿ
-                mov     ecx, [ebx+0A8h] ; æ¸¸æˆå½“å‰æ—¶é—´
+                mov     edx, SpawnInterv_D ; ÏàÓ¦ÄÑ¶ÈÏÂµÄAI Par3£¬SpawnÑÓ³Ù
+                mov     ecx, [ebx+0A8h] ; ÓÎÏ·µ±Ç°Ê±¼ä
                 add     edx, ecx
-                mov     [esi+64h], edx  ; æ›´æ–°ä¸‹ä¸€ä¸ªSpawnçš„æ—¶é—´
-                mov     eax, StallTime_D ; ç›¸åº”éš¾åº¦ä¸‹çš„AI Par2ï¼Œåœé¡¿æ—¶é—´
+                mov     [esi+64h], edx  ; ¸üĞÂÏÂÒ»¸öSpawnµÄÊ±¼ä
+                mov     eax, StallTime_D ; ÏàÓ¦ÄÑ¶ÈÏÂµÄAI Par2£¬Í£¶ÙÊ±¼ä
                 push    eax
                 mov     eax, ebx
                 call    D2GAME_StallSomeTime
@@ -1006,7 +1004,7 @@ arg_0           = dword ptr  8
                 cmp     dword ptr [esi], 1
                 jnz     short loc_6FC859E6
 
-	; eax=HCIDX       ; æ£€æŸ¥æ˜¯å¦æ˜¯minion1ï¼ˆ453=1C5ï¼‰åˆ°minion8ï¼ˆ460=1CCï¼‰
+	; eax=HCIDX       ; ¼ì²éÊÇ·ñÊÇminion1£¨453=1C5£©µ½minion8£¨460=1CC£©
 	push ebx
 	push ecx
 	
@@ -1065,7 +1063,7 @@ arg_0           = dword ptr  8
                 cmp     dword ptr [esi], 1
                 jnz     short loc_6FC859E6
 
-	; eax=HCIDX       ; æ£€æŸ¥æ˜¯å¦æ˜¯minion1ï¼ˆ453=1C5ï¼‰åˆ°minion8ï¼ˆ460=1CCï¼‰
+	; eax=HCIDX       ; ¼ì²éÊÇ·ñÊÇminion1£¨453=1C5£©µ½minion8£¨460=1CC£©
 	push ebx
 	push ecx
 	
@@ -1129,7 +1127,7 @@ MySpawnAMonster proc
  	push 0
 	
 	push edi
-	call D2Common_10846_GethRoomFUnit ; GetUnit_hRoom
+	call D2Common_10331_GethRoomFUnit ; GetUnit_hRoom
 	push eax ; hRoom
 
 	push esi
@@ -1137,7 +1135,7 @@ MySpawnAMonster proc
 	mov     eax,0
 	mov     ecx,[esp+28h]
 	mov     edx,0
-	call    D2GAME_0XCDE20_SpawnSuperUnique
+	call    D2GAME_0X24950_SpawnSuperUnique
 	
 	test eax,eax
 	jz over
@@ -1145,7 +1143,7 @@ MySpawnAMonster proc
 	test ecx,ecx
 	jz over
 	mov ecx,[eax+0C4h]
-	or ecx,4020020h				; æ€æ­»æ€ªç‰©ä¸è·å¾—ç»éªŒå€¼ï¼Œä¸æ‰è½ï¼Œå°¸ä½“æ¶ˆå¤±
+	or ecx,4020020h				; É±ËÀ¹ÖÎï²»»ñµÃ¾­ÑéÖµ£¬²»µôÂä£¬Ê¬ÌåÏûÊ§
 	mov [eax+0C4h],ecx
 over:
 	pop edx
@@ -1155,13 +1153,13 @@ over:
 	retn 4
 MySpawnAMonster endp
 
-;ç»™sgptDataTablesæ‰“è¡¥ä¸ï¼Œå¯¹å¤šäººæ¸¸æˆçš„TC NoDropè¿›è¡Œé¢„è®¡ç®—
+;¸øsgptDataTables´ò²¹¶¡£¬¶Ô¶àÈËÓÎÏ·µÄTC NoDrop½øĞĞÔ¤¼ÆËã
 Patch_sgptDataTables proc
 	push eax
 	push ecx
 
 	push 134 ; get the level 134 record
-	call D2Common_10142_GetLevelTxt
+	call D2Common_10014_GetLevelTxt
 	test eax,eax
 	jz over
 	mov cx,0FFh
@@ -1220,133 +1218,126 @@ UberQuestPatchInit proc
 	mov eax,D2COMMON
 	mov esi,[eax]
 	
-	push 11166
+	push 10141
 	push esi
 	call ebx; GetProcAddr
-	mov D2Common_11166_GetMyPosition,eax
+	mov D2Common_10141_GetMyPosition,eax
 	
-	push 10691
+	push 10826
 	push esi
 	call ebx; GetProcAddr
-	mov D2Common_10691_GetLevelIdFromRoom,eax
+	mov D2Common_10826_GetLevelIdFromRoom,eax
 	
-	push 10716
+	push 10654
 	push esi
 	call ebx; GetProcAddr
-	mov D2Common_10716_GetFreeTile,eax
+	mov D2Common_10654_GetFreeTile,eax
 	
-	push 10193
+	push 10258
 	push esi
 	call ebx; GetProcAddr
-	mov D2Common_10193_ChangeCurrentMode,eax
+	mov D2Common_10258_GetPortalFlag,eax
 	
-	push 10040
+	push 10111
 	push esi
 	call ebx; GetProcAddr
-	mov D2Common_10040_GetPortalFlag,eax
+	mov D2Common_10111_UpdatePortalFlag,eax
 	
-	push 10033
+	push 10346
 	push esi
 	call ebx; GetProcAddr
-	mov D2Common_10033_UpdatePortalFlag,eax
+	mov D2Common_10346_UpdateRoomHavePortalFlag,eax
 	
-	push 10907
+	push 10331
 	push esi
 	call ebx; GetProcAddr
-	mov D2Common_10907_UpdateRoomHavePortalFlag,eax
+	mov D2Common_10331_GethRoomFUnit,eax
 	
-	push 10846
+	push 10174
 	push esi
 	call ebx; GetProcAddr
-	mov D2Common_10846_GethRoomFUnit,eax
+	mov D2Common_10174_GetQuestFlag,eax
 	
-	push 10156
+	push 10003
 	push esi
 	call ebx; GetProcAddr
-	mov D2Common_10156_GetQuestFlag,eax
+	mov D2Common_10003_SetQuestFlag,eax
 	
-	push 10595
+	push 10014
 	push esi
 	call ebx; GetProcAddr
-	mov D2Common_10595_SetQuestFlag,eax
-	
-	push 10142
-	push esi
-	call ebx; GetProcAddr
-	mov D2Common_10142_GetLevelTxt,eax
+	mov D2Common_10014_GetLevelTxt,eax
 	
 	mov eax,D2GAME
 	mov edx,[eax]
 	
 	mov eax,edx
-	add eax,1340h
-	mov D2GAME_0X1340,eax
+	add eax,1280h
+	mov D2GAME_0X1280_GetFreeTitle,eax
 	
 	mov eax,edx
-	add eax,6FE10h
-	mov D2GAME_0X6FE10,eax
+	add eax,0E1D90h
+	mov D2GAME_0XE1D90_InitTheUnit,eax
 	
 	mov eax,edx
-	add eax,15F40h
-	mov D2GAME_0X15F40,eax
+	add eax,0A22E0h
+	mov D2GAME_0XA22E0_CreatePortalInTown,eax
 	
 	mov eax,edx
-	add eax,59980h
-	mov D2GAME_0X59980,eax
+	add eax,200E0h
+	mov D2GAME_0X200E0,eax
 	
 	mov eax,edx
-	add eax,0CDE20h
-	mov D2GAME_0XCDE20_SpawnSuperUnique,eax
+	add eax,24950h
+	mov D2GAME_0X24950_SpawnSuperUnique,eax
 	
 	mov eax,edx
-	add eax,5A000h
-	mov D2GAME_RemoveMonsterCorpse,eax ;6FC7A000
+	add eax,20760h
+	mov D2GAME_RemoveMonsterCorpse,eax ;6FC43C40
 	
 	mov eax,edx
-	add eax,0C8850h
-	mov D2GAME_Baal_AI,eax ; 6FCE8850
+	add eax,0B8610h
+	mov D2GAME_Baal_AI,eax ; 6FC4BC80
 
 	mov eax,edx
-	add eax,4EAD0h
-	mov D2GAME_Mephisto_AI,eax ; 6FC6EAD0
+	add eax,85B60h
+	mov D2GAME_Mephisto_AI,eax ; 6FCF7BD0
 
 	mov eax,edx
-	add eax,31920h
-	mov D2GAME_Diablo_AI,eax ; 6FC51920
+	add eax,0A9610h
+	mov D2GAME_Diablo_AI,eax ; 6FCA5AA0
 
 	mov eax,edx
-	add eax,0F1380h
-	mov D2GAME_StallSomeTime,eax ; 6FD11380
+	add eax,0F22C0h
+	mov D2GAME_StallSomeTime,eax ; 6FD10CF0
 
 	mov eax,edx
-	add eax,0B1A00h
-	mov D2GAME_GetAreaSpawnUnitNum,eax ; 6FCD1A00
+	add eax,0B17B0h
+	mov D2GAME_GetAreaSpawnUnitNum,eax ; 6FCE2650
 
 	mov eax,edx
-	add eax,0F1430h
-	mov D2GAME_UseASkill,eax ; 6FD11430
+	add eax,0F2380h
+	mov D2GAME_UseASkill,eax ; 6FD10DB0
 
 	mov eax,edx
-	add eax,0C8D70h
-	mov D2GAME_SpawnAMonster,eax ; 6FCE8D70
+	add eax,0EF650h
+	mov D2GAME_SpawnAMonster,eax ; 6FD0F870
 
 	mov eax,edx
-	add eax,0F8260h
-	mov D2GAME_sgptDataTables,eax ; 6FD18260
+	add eax,0F829Ch
+	mov D2GAME_sgptDataTables,eax ; 6FD18288
 	
 	mov eax,edx
-	add eax,14C0h
-	mov D2GAME_GetMonstatsTxtRec,eax ; 6FC214C0
+	add eax,1220h
+	mov D2GAME_GetMonstatsTxtRec,eax ; 6FC21180
 	
 	mov eax,edx
-	add eax,70C50h
+	add eax,8E6F0h
 	mov D2GAME_DestoryAEvent,eax ; 6FC90C50
 	
 	mov eax,edx
-	add eax,10B1Bh
-	mov D2GAME_0X1606D,eax ; 6FC3606D
-	
-	
+	add eax,0A240Bh
+	mov D2GAME_0XA240B,eax ; 6FC30B1B
 	
 	mov eax,6800B03Ch
 	mov ebx,[eax] ; GetProcAddr
@@ -1360,7 +1351,7 @@ UberQuestPatchInit proc
 	ret
 UberQuestPatchInit endp
 
-D2GAME_0X13401 proc
+D2GAME_0X1280_GetFreeTitle_1 proc
 	arg_0= dword ptr  0Ch
 	
 	push    edi
@@ -1369,11 +1360,11 @@ D2GAME_0X13401 proc
 	mov     edi, [esp+arg_0]
 	mov     eax, ecx
 	mov     ebx, edx
-	call    D2GAME_0X1340
+	call    D2GAME_0X1280_GetFreeTitle
 	pop     ebx
 	pop     edi
 	retn    4
-D2GAME_0X13401 endp
+D2GAME_0X1280_GetFreeTitle_1 endp
 
 
 ; arg_0 = ptGame

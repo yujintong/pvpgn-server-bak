@@ -18,7 +18,7 @@ InitWardenThread proc
 	
   mov eax,D2Warden_ThreadHandle
   test eax,eax
-  jnz over	;å·²ç»åˆ›å»ºäº†warden çº¿ç¨‹
+  jnz over	;ÒÑ¾­´´½¨ÁËwarden Ïß³Ì
 	mov eax,EnableWarden
 	test eax,eax
 	jz over
@@ -96,18 +96,18 @@ over:
 InitWardenThread endp
 
 
-;d2game.dll 6FC86AE0
+;d2game.dll 6FC4BE20
 ;ecx
 ;edx
 ;arg_0
 ;arg_4
 ;
-;ret eax=3 éžæ³•æŠ¥æ–‡
+;ret eax=3 ·Ç·¨±¨ÎÄ
 MyPacket0X66Handler proc 
 	mov			eax,EnableWarden
 	test		eax,eax
 	jnz			SendInfoToWarden
-	; å¥‡æ€ªï¼Wardenå¹¶æ²¡æœ‰Enableï¼Œä½†æ˜¯å®¢æˆ·ç«¯å´å›žé€äº†0x66æŠ¥æ–‡ï¼Ÿï¼
+	; Ææ¹Ö£¡Warden²¢Ã»ÓÐEnable£¬µ«ÊÇ¿Í»§¶ËÈ´»ØËÍÁË0x66±¨ÎÄ£¿£¡
 	retn 8
 SendInfoToWarden:
 	; ecx=ptGame
@@ -138,7 +138,7 @@ check_asn_dru:
 	pop			eax
 
 check_dru:
-	; æ£€æŸ¥D2Cæ˜¯å¦æ˜¯DRUæˆ–è€…ASNè§’è‰²
+	; ¼ì²éD2CÊÇ·ñÊÇDRU»òÕßASN½ÇÉ«
 	pushad
 	push		eax
 	call		GetGameInfo
