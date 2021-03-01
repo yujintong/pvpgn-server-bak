@@ -44,13 +44,21 @@ int main()
 		return 0;
 	}
 
+// 512 == offset of '.text' PE section (start of executable code)
 	if (num>512 && num2 > 0xFA00)
 	{
 		fseek(d2server,0,SEEK_SET);
 		fwrite(targetbuf,1,0xFA00,d2server);
 		fwrite(&buf[512],1,num-512,d2server);
-		memset(targetbuf,0,1024*100);
-		fwrite(targetbuf,1,16384-num+512,d2server);
+
+		size_t remaining_section_space = 16384 - num + 512;
+		char* nullbuf = (char*)malloc(remaining_section_space);
+		memset(nullbuf,0, remaining_section_space);
+		fwrite(nullbuf,1, remaining_section_space,d2server);
+		
+		size_t pe_section_import_start_address = 0x013A00;
+		size_t pe_section_import_size = 0x013A00;
+		fwrite(&targetbuf[pe_section_import_start_address], 1, pe_section_import_size, d2server);
 	}
 	else
 	{
