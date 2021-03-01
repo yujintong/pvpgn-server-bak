@@ -1,5 +1,5 @@
 # Diablo II Game Server (D2GS)
-This repository contains changes to [pvpgn/d2gs109](https://github.com/pvpgn/d2gs109) to make it compatible the with current d2cs-d2gs protocol and with recent versions of `D2Server.dll`.
+This repository contains changes to [pvpgn/d2gs109](https://github.com/pvpgn/d2gs109) to make it compatible the with current d2cs-d2gs protocol and with a modified version of `D2Server.dll` 1.13c.
 
 Compile with Visual Studio 2019 in *Debug* mode and run the resulting binary using compatibility mode for *Windows 8*.
 
