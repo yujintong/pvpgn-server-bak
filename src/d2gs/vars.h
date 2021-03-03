@@ -7,7 +7,7 @@
 
 
 #include <windows.h>
-#include "d2gelib/d2server.h"
+#include <d2server.h>
 #include "d2gs.h"
 
 

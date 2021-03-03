@@ -2,7 +2,7 @@
 #include <windows.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "d2gelib/d2server.h"
+#include <d2server.h>
 #include "d2gs.h"
 #include "eventlog.h"
 #include "vars.h"

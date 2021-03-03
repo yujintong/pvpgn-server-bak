@@ -1,6 +1,6 @@
 #include <windows.h>
 #include <stdio.h>
-#include "d2gelib/d2server.h"
+#include <d2server.h>
 #include "callback.h"
 #include "debug.h"
 #include "vars.h"

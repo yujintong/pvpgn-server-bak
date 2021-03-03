@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <conio.h>
 #include <time.h>
-#include "d2gelib/d2server.h"
+#include <d2server.h>
 #include "d2gs.h"
 #include "d2ge.h"
 #include "eventlog.h"

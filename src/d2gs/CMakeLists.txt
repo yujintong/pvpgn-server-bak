@@ -44,11 +44,9 @@ add_executable(D2GS WIN32
 	d2server.rc
 	resource.h)
 
-target_include_directories(D2GS PRIVATE ${PROJECT_SOURCE_DIR}/include/ ${PROJECT_SOURCE_DIR}/resources/)
-
 target_compile_definitions(D2GS PRIVATE D2GS)
 
-target_link_libraries(D2GS PRIVATE ws2_32 ${PROJECT_SOURCE_DIR}/lib/d2gelib/d2server.lib)
+target_link_libraries(D2GS PRIVATE ws2_32 d2gelib)
 
 set_target_properties(D2GS
 	PROPERTIES

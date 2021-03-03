@@ -7,7 +7,7 @@
 #include <ctype.h>
 #include <string.h>
 #include <limits.h>
-#include "d2gelib/d2server.h"
+#include <d2server.h>
 #include "d2gs.h"
 #include "vars.h"
 #include "eventlog.h"

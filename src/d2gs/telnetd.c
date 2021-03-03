@@ -6,7 +6,7 @@
 #include <string.h>
 #include <time.h>
 #include "psapi.h"
-#include "d2gelib/d2server.h"
+#include <d2server.h>
 #include "d2gs.h"
 #include "eventlog.h"
 #include "config.h"

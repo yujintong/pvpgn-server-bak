@@ -1,5 +1,5 @@
 #include <windows.h>
-#include "d2gelib/d2server.h"
+#include <d2server.h>
 
 #define SPLIT_STRING_INIT_COUNT		32
 #define	SPLIT_STRING_INCREASEMENT	32
