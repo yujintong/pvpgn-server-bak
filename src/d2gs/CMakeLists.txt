@@ -48,7 +48,7 @@ target_include_directories(D2GS PRIVATE ${PROJECT_SOURCE_DIR}/include/ ${PROJECT
 
 target_compile_definitions(D2GS PRIVATE D2GS)
 
-target_link_libraries(D2GS PRIVATE ws2_32 ${PROJECT_SOURCE_DIR}/libs/d2server.lib)
+target_link_libraries(D2GS PRIVATE ws2_32 ${PROJECT_SOURCE_DIR}/lib/d2gelib/d2server.lib)
 
 set_target_properties(D2GS
 	PROPERTIES
