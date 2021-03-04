@@ -31,8 +31,8 @@ And some extra build args which is not related to CMAKE:
 
 | Build Argument | Description                       | Default Value |
 |----------------|-----------------------------------|---------------|
-| git_repo       | The repository you want to clone  | this repo     |
-| git_branch     | The branch you want to build from | master        |
+| git_repo       | The repository you want to clone  | this repo url |
+| git_branch     | The branch you want to build from | develop       |
 
 Adding above build arguments to enable/disable features (Image tagging will helps you distinguish image capabilities/features)
 

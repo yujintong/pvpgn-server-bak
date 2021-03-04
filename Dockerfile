@@ -17,7 +17,7 @@ ARG with_d2cs=false
 ARG with_d2dbs=false
 
 ARG git_repo=https://github.com/pvpgn/pvpgn-server.git
-ARG git_branch=master
+ARG git_branch=develop
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
