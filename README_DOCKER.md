@@ -80,8 +80,8 @@ docker build . --build-arg with_d2dbs=true --build-arg with_bnetd=false -t pvpgn
 # create configuration and asset locations
 mkdir -p /your/config/dir /your/assets/dir
 # copy configuration files and base assets from an image, all base configuration files in any image are the same
-docker run -v /your/config/dir:/tmp/conf --rm --entrypoint cp pvpgn-server:bnetd-mysql -r /usr/local/etc/pvpgn /tmp/conf
-docker run -v /your/assets/dir:/tmp/assets --rm --entrypoint cp pvpgn-server:bnetd-mysql -r /usr/local/etc/pvpgn /tmp/assets
+docker run -v /your/config/dir:/tmp/conf --rm --entrypoint cp pvpgn-server:bnetd-mysql -r /usr/local/etc/pvpgn/* /tmp/conf
+docker run -v /your/assets/dir:/tmp/assets --rm --entrypoint cp pvpgn-server:bnetd-mysql -r /usr/local/etc/pvpgn/* /tmp/assets
 ```
 Modifying the copied configuration files to fit your needs. check [this link](https://pvpgn.pro/pvpgn_installation.html) to get more information.
 
@@ -156,8 +156,8 @@ docker build . --build-arg with_d2dbs=true --build-arg with_bnetd=false -t pvpgn
 ```bash
 mkdir -p /your/config/dir /your/assets/dir
 # copy configuration files and base assets from an image, all base configuration files in any image are the same
-docker run -v /your/config/dir:/tmp/conf --rm --entrypoint cp pvpgn-server:bnetd-mysql -r /usr/local/etc/pvpgn /tmp/conf
-docker run -v /your/assets/dir:/tmp/assets --rm --entrypoint cp pvpgn-server:bnetd-mysql -r /usr/local/etc/pvpgn /tmp/assets
+docker run -v /your/config/dir:/tmp/conf --rm --entrypoint cp pvpgn-server:bnetd-mysql -r /usr/local/etc/pvpgn/* /tmp/conf
+docker run -v /your/assets/dir:/tmp/assets --rm --entrypoint cp pvpgn-server:bnetd-mysql -r /usr/local/etc/pvpgn/* /tmp/assets
 ```
 
 3. Copy the sample `docker-compose.yml` file from this repository and modify it to suit you (like changing volume mounting)
