@@ -1511,7 +1511,7 @@ namespace pvpgn
 					send_failed_motd = true;
 				}
 
-				if (true)
+				if (send_failed_motd)
 				{
 					irc_send(conn, RPL_MOTDSTART, ":- Failed to load motd, sending default motd              ");
 					irc_send(conn, RPL_MOTD, ":- ====================================================== ");

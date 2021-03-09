@@ -23,4 +23,4 @@ set(COMMON_SOURCES
 
 add_library(common STATIC ${COMMON_SOURCES})
 
-target_link_libraries(common PUBLIC fmt::fmt)
+target_link_libraries(common PUBLIC compat fmt::fmt)

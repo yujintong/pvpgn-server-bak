@@ -229,13 +229,10 @@ namespace pvpgn
 				now - attrgroup->lastaccess < prefs_get_user_flush_timer())
 				return 0;
 
-			assert(attrgroup->storage);
-			unsigned int uid = *((unsigned int *)attrgroup->storage);
 			t_storage_info *defacct = storage->get_defacct();
-			unsigned int defuid = *((unsigned int *)defacct);
 
 			// do not flush default account
-			if (uid == defuid)
+			if (attrgroup->storage == defacct)
 			{
 				storage->free_info(defacct);
 				return 2;

@@ -36,6 +36,8 @@
 #include <iostream>
 #include <string>
 
+#include "compat/gmtime_s.h"
+#include "compat/localtime_s.h"
 #include "compat/strcasecmp.h"
 #include "common/tag.h"
 #include "common/util.h"
@@ -232,8 +234,6 @@ namespace pvpgn
 			{
 				t_account * dest_a;
 				t_bnettime btlogin;
-				std::time_t ulogin;
-				struct std::tm * tmlogin;
 
 				if (!(dest_a = accountlist_find_account(dest))) {
 					message_send_text(c, message_type_error, c, localize(c, "Unknown user."));
@@ -243,11 +243,12 @@ namespace pvpgn
 				if (conn_get_class(c) == conn_class_bnet) {
 					btlogin = time_to_bnettime((std::time_t)account_get_ll_time(dest_a), 0);
 					btlogin = bnettime_add_tzbias(btlogin, conn_get_tzbias(c));
-					ulogin = bnettime_to_time(btlogin);
-					if (!(tmlogin = std::gmtime(&ulogin)))
+					std::time_t ulogin = bnettime_to_time(btlogin);
+					struct std::tm tmlogin = {};
+					if (pvpgn::gmtime_s(&ulogin, &tmlogin) == nullptr)
 						std::strcpy(msgtemp0, "?");
 					else
-						std::strftime(msgtemp0, sizeof(msgtemp0), "%a %b %d %H:%M:%S", tmlogin);
+						std::strftime(msgtemp0, sizeof(msgtemp0), "%a %b %d %H:%M:%S", &tmlogin);
 					msgtemp = localize(c, "User was last seen on: {}", msgtemp0);
 				}
 				else
@@ -2255,28 +2256,27 @@ namespace pvpgn
 		{
 			t_bnettime  btsystem;
 			t_bnettime  btlocal;
-			std::time_t      now;
-			struct std::tm * tmnow;
 
 			btsystem = bnettime();
 
 			/* Battle.net time: Wed Jun 23 15:15:29 */
 			btlocal = bnettime_add_tzbias(btsystem, local_tzbias());
-			now = bnettime_to_time(btlocal);
-			if (!(tmnow = std::gmtime(&now)))
+			std::time_t now = bnettime_to_time(btlocal);
+			struct std::tm tmnow = {};
+			if (pvpgn::gmtime_s(&now, &tmnow) == nullptr)
 				std::strcpy(msgtemp0, "?");
 			else
-				std::strftime(msgtemp0, sizeof(msgtemp0), "%a %b %d %H:%M:%S", tmnow);
+				std::strftime(msgtemp0, sizeof(msgtemp0), "%a %b %d %H:%M:%S", &tmnow);
 			msgtemp = localize(c, "Server Time: {}", msgtemp0);
 			message_send_text(c, message_type_info, c, msgtemp);
 			if (conn_get_class(c) == conn_class_bnet)
 			{
 				btlocal = bnettime_add_tzbias(btsystem, conn_get_tzbias(c));
 				now = bnettime_to_time(btlocal);
-				if (!(tmnow = std::gmtime(&now)))
+				if (pvpgn::gmtime_s(&now, &tmnow) == nullptr)
 					std::strcpy(msgtemp0, "?");
 				else
-					std::strftime(msgtemp0, sizeof(msgtemp0), "%a %b %d %H:%M:%S", tmnow);
+					std::strftime(msgtemp0, sizeof(msgtemp0), "%a %b %d %H:%M:%S", &tmnow);
 				msgtemp = localize(c, "Your local time: {}", msgtemp0);
 				message_send_text(c, message_type_info, c, msgtemp);
 			}
@@ -2901,18 +2901,22 @@ namespace pvpgn
 
 		static int _news_cb(std::time_t date, t_lstr *lstr, void *data)
 		{
-			char	strdate[64];
-			struct std::tm 	*tm;
 			char	save, *p, *q;
 			t_connection *c = (t_connection*)data;
 
-			tm = std::localtime(&date);
-			if (tm)
-				std::strftime(strdate, 64, "%B %d, %Y", tm);
-			else
-				std::snprintf(strdate, sizeof strdate, "%s", localize(c, "(invalid date)").c_str());
-
-			message_send_text(c, message_type_info, c, strdate);
+			{
+				char strdate[64] = {};
+				struct std::tm tm = {};
+				if (pvpgn::localtime_s(&date, &tm) != nullptr)
+				{
+					std::strftime(strdate, sizeof(strdate), "%B %d, %Y", &tm);
+					message_send_text(c, message_type_info, c, strdate);
+				}
+				else
+				{
+					message_send_text(c, message_type_info, c, localize(c, "(invalid date)"));
+				}
+			}
 
 			for (p = lstr_get_str(lstr); *p;) {
 				for (q = p; *q && *q != '\r' && *q != '\n'; q++);
@@ -3398,8 +3402,6 @@ namespace pvpgn
 			t_connection * conn;
 			char *         tok;
 			t_clanmember * clanmemb;
-			std::time_t      then;
-			struct std::tm * tmthen;
 
 			std::vector<std::string> args = split_command(text, 1);
 
@@ -3416,9 +3418,6 @@ namespace pvpgn
 				return -1;
 			}
 
-			then = account_get_ll_ctime(account);
-			tmthen = std::localtime(&then); /* FIXME: determine user's timezone */
-
 			// do not display sex if empty
 			std::string sex = account_get_sex(account);
 			std::string pattern = "Login: {} {} Sex: {}";
@@ -3432,9 +3431,21 @@ namespace pvpgn
 				account_get_sex(account));
 			message_send_text(c, message_type_info, c, msgtemp);
 
-			std::strftime(msgtemp0, sizeof(msgtemp0), "%a %b %d %H:%M %Y", tmthen);
-			msgtemp = localize(c, "Created: {}", msgtemp0);
-			message_send_text(c, message_type_info, c, msgtemp);
+			{
+				std::time_t then = account_get_ll_ctime(account);
+				struct std::tm tmthen = {};
+				if (pvpgn::localtime_s(&then, &tmthen) == nullptr)
+				{
+					msgtemp = localize(c, "Created: {}", "?");
+				}
+				else
+				{
+					std::strftime(msgtemp0, sizeof(msgtemp0), "%a %b %d %H:%M %Y", &tmthen);
+					msgtemp = localize(c, "Created: {}", msgtemp0);
+				}
+
+				message_send_text(c, message_type_info, c, msgtemp);
+			}
 
 			if ((clanmemb = account_get_clanmember(account)))
 			{
@@ -3496,19 +3507,21 @@ namespace pvpgn
 				ip = localize(c, "unknown");
 
 			{
+				std::time_t then = account_get_ll_time(account);
+				struct std::tm tmthen = {};
 
-				then = account_get_ll_time(account);
-				tmthen = std::localtime(&then); /* FIXME: determine user's timezone */
-				if (tmthen)
-					std::strftime(msgtemp0, sizeof(msgtemp0), "%a %b %d %H:%M %Y", tmthen);
+				/* FIXME: determine user's timezone */
+				if (pvpgn::localtime_s(&then, &tmthen) != nullptr)
+					std::strftime(msgtemp0, sizeof(msgtemp0), "%a %b %d %H:%M %Y", &tmthen);
 				else
 					std::strcpy(msgtemp0, "?");
-
-				if (!(conn))
-					msgtemp = localize(c, "Last login {} from ", msgtemp0);
-				else
-					msgtemp = localize(c, "On since {} from ", msgtemp0);
 			}
+
+			if (!(conn))
+				msgtemp = localize(c, "Last login {} from ", msgtemp0);
+			else
+				msgtemp = localize(c, "On since {} from ", msgtemp0);
+
 			msgtemp += ip;
 			message_send_text(c, message_type_info, c, msgtemp);
 
@@ -3760,24 +3773,22 @@ namespace pvpgn
 			message_send_text(c, message_type_info, c, msgtemp);
 
 			{
-				std::time_t      gametime;
-				struct std::tm * gmgametime;
-
-				gametime = game_get_create_time(game);
-				if (!(gmgametime = std::localtime(&gametime)))
+				struct std::tm gmgametime = {};
+				std::time_t gametime = game_get_create_time(game);
+				if (pvpgn::localtime_s(&gametime, &gmgametime) == nullptr)
 					std::strcpy(msgtemp0, "?");
 				else
-					std::strftime(msgtemp0, sizeof(msgtemp0), GAME_TIME_FORMAT, gmgametime);
+					std::strftime(msgtemp0, sizeof(msgtemp0), GAME_TIME_FORMAT, &gmgametime);
 				msgtemp = localize(c, "Created: {}", msgtemp0);
 				message_send_text(c, message_type_info, c, msgtemp);
 
 				gametime = game_get_start_time(game);
 				if (gametime != (std::time_t)0)
 				{
-					if (!(gmgametime = std::localtime(&gametime)))
+					if (pvpgn::localtime_s(&gametime, &gmgametime) == nullptr)
 						std::strcpy(msgtemp0, "?");
 					else
-						std::strftime(msgtemp0, sizeof(msgtemp0), GAME_TIME_FORMAT, gmgametime);
+						std::strftime(msgtemp0, sizeof(msgtemp0), GAME_TIME_FORMAT, &gmgametime);
 				}
 				else
 					std::strcpy(msgtemp0, "");

@@ -31,6 +31,8 @@
 #include <fmt/core.h>
 #include <fmt/chrono.h>
 
+#include "compat/localtime_s.h"
+
 #include "common/eventlog.h"
 #include "common/xalloc.h"
 
@@ -351,7 +353,18 @@ namespace pvpgn
 			curl_easy_setopt(curl, CURLOPT_READFUNCTION, read_callback);
 
 			// prepend email headers to the message
-			message.insert(0, fmt::format("MIME-Version: 1.0\r\nContent-Type: text/plain; charset=\"UTF-8\"\r\nDate: {:%a, %d %b %Y %T %z}\r\nFrom: {} <{}>\r\nTo: <{}>\r\nSubject: {}\r\n\r\n", *std::localtime(&now), from_name, from_address, to_address, subject));
+			std::string current_time_str;
+			{
+				std::time_t now = (std::time_t)(-1);
+				std::time(&now);
+				struct std::tm tmnow = {};
+
+				if (now != (std::time_t)(-1) && pvpgn::localtime_s(&now, &tmnow) != nullptr)
+				{
+					current_time_str = fmt::format("Date: {:%a, %d %b %Y %T %z}\r\n", tmnow);
+				}
+			}
+			message.insert(0, fmt::format("MIME-Version: 1.0\r\nContent-Type: text/plain; charset=\"UTF-8\"\r\n{}From: {} <{}>\r\nTo: <{}>\r\nSubject: {}\r\n\r\n", current_time_str, from_name, from_address, to_address, subject));
 
 			// this is the pointer that will be passed in to read_callback().
 			// passing in a pointer to the message alone is not sufficient because read_callback() is called by curl at least twice.
