@@ -22,6 +22,7 @@
 #define VERNUM						"1.13c"
 #define BUILDDATE					__DATE__ " " __TIME__
 #define D2GS_VERSION_STRING			D2COLOR_GOLDEN "D2GS Version " VERNUM ", build on " BUILDDATE
+#define D2GS_VERSION_STRING_ONLY	"D2GS Version " VERNUM ", build on " BUILDDATE
 
 #define D2GSERVER_MUTEX_NAME			"DIABLO_II_CLOSE_GAME_SERVER"
 #define D2GS_STOP_EVENT_NAME			"D2GSERVER_WHO_STOP_ME"
@@ -54,6 +55,7 @@
 #define MAX_ACCTNAME_LEN			16
 #define MAX_CHARNAME_LEN			16
 #define MAX_REALMNAME_LEN			32
+#define MAX_REALMIPNAME_LEN			16
 
 #define MAX_CHAR_IN_GAME			8
 #define TIMER_TICK_IN_MS			100
@@ -84,6 +86,8 @@ typedef struct RAW_CLEANUP_RT_ITEM {
 
 
 typedef struct RAW_D2GSCONFIGS {
+	char		d2csipstr[16];
+	char		d2dbsipstr[16];
 	DWORD		d2csip;		/* in network order */
 	DWORD		d2dbsip;	/* in network order */
 	u_short		d2csport;	/* in network order */
@@ -93,11 +97,13 @@ typedef struct RAW_D2GSCONFIGS {
 	BOOL		enablegepatch;
 	BOOL		enablegelog;
 	BOOL		enablegemsg;
+	BOOL		enablegslog;
 	BOOL		debugnetpacket;
 	BOOL		debugeventcallback;
 	DWORD		checksum;
 	DWORD		gemaxgames;
 	DWORD		gsmaxgames;
+	DWORD		curgsmaxgames;
 	DWORD		idlesleep;
 	DWORD		busysleep;
 	DWORD		charpendingtimeout;
@@ -106,10 +112,14 @@ typedef struct RAW_D2GSCONFIGS {
 	DWORD		maxgamelife;
 	DWORD		gsshutdowninterval;
 	DWORD		multicpumask;
+	DWORD		maxpreferusers;
+	DWORD		maxpacketpersecond;
 	u_char		adminpwd[64];
 	u_short		adminport;
+	u_short		padding;
 	u_char		d2cssecrect[32];
 	u_char		motd[256];
+	u_char		serverconffile[260];
 } D2GSCONFIGS, *PD2GSCONFIGS;
 
 
@@ -122,6 +132,15 @@ typedef struct RAW_D2GSPACKET {
 	u_short		datalen;	/* valid date length */
 	u_char		data[16384];
 } D2GSPACKET, *PD2GSPACKET;
+
+
+typedef struct AutoUpdateSetting
+{
+	BOOL		AutoUpdate;
+	DWORD		AutoUpdateTimeout;
+	DWORD		AutoUpdateVer;
+	char		AutoUpdateUrl[260];
+}AutoUpdateSetting;
 
 
 /* function */

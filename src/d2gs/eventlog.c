@@ -46,7 +46,7 @@ void D2GSEventLogCleanup(void)
 	if (hexstrm) fclose(hexstrm);
 #endif
 
-	eventstrm = gestrm = NULL;
+	hexstrm = eventstrm = gestrm = NULL;
 
 	return;
 

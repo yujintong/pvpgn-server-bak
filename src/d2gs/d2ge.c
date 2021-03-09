@@ -21,12 +21,17 @@ D2GSSendClientChatMessageFunc	D2GSSendClientChatMessage;
 D2GSSetTickCountFunc			D2GSSetTickCount;
 D2GSSetACDataFunc				D2GSSetACData;
 D2GSLoadConfigFunc				D2GSLoadConfig;
+D2GSAfterEndFunc				D2GSAfterEnd;
 D2GSInitConfigFunc				D2GSInitConfig;
+D2GSCheckTickCountFunc			D2GSCheckTickCount;
 
 
 /* variables */
-static D2GSINFO					gD2GSInfo;
+D2GSINFO						gD2GSInfo;
 static HANDLE					ghServerThread;
+static HMODULE					gD2ServerDll;
+static char						gD2GS_VERSION_STRING[256] = { 0 };
+DWORD							D2GEVersion;
 
 
 /*********************************************************************
@@ -57,36 +62,29 @@ int D2GEStartup(void)
 		return FALSE;
 	}
 	dwWait = WaitForSingleObject(hEvent, D2GE_INIT_TIMEOUT);
+	CloseHandle(hEvent);
+
 	if (dwWait!=WAIT_OBJECT_0) {
-		CloseHandle(hEvent);
+		CloseHandle(ghServerThread);
 		return FALSE;
 	}
 
-	CloseHandle(hEvent);
+	if (bGERunning == 0)
+	{
+		CloseHandle(ghServerThread);
+		return FALSE;
+	}
 
-	
-	Sleep(2500);// give time for the server to start up
-	/* reset game list */
-	D2GSResetGameList();
-
-	D2GSSetTickCount(time(NULL));
-
-	char acdata[] = "bogus_ac_string";
-	D2GSSetACData(acdata);
-
-	char configfile[] = "d2server.ini";
-	D2GSLoadConfig(configfile);
-
-	D2GSInitConfig();
-
-	if (CleanupRoutineInsert(D2GECleanup, "Diablo II Game Engine")) {
+	if (CleanupRoutineInsert(D2GECleanup, "Diablo II Game Engine"))
+	{
 		return TRUE;
-	} else {
+	}
+	else
+	{
 		/* do some cleanup before quiting */
 		D2GECleanup();
 		return FALSE;
 	}
-
 } /* End of D2GEStartup() */
 
 
@@ -97,11 +95,31 @@ int D2GEStartup(void)
 int D2GECleanup(void)
 {
 	D2GSEndAllGames();
+
+	Sleep(1000);
+	D2GSAfterEnd();
+
 	gD2GSInfo.bStop = TRUE;
-	if (ghServerThread) {
+	if (ghServerThread)
+	{
 		WaitForSingleObject(ghServerThread, D2GE_SHUT_TIMEOUT);
 		CloseHandle(ghServerThread);
 		ghServerThread = NULL;
+
+		D2GSStart = NULL;
+		D2GSSendDatabaseCharacter = NULL;
+		D2GSRemoveClientFromGame = NULL;
+		D2GSNewEmptyGame = NULL;
+		D2GSEndAllGames = NULL;
+		D2GSSendClientChatMessage = NULL;
+		D2GSSetTickCount = NULL;
+		D2GSSetACData = NULL;
+		// D2GSUnknown1
+		D2GSLoadConfig = NULL;
+		D2GSAfterEnd = NULL;
+		D2GSInitConfig = NULL;
+		// unknow 2 here
+		//
 	}
 
 	return TRUE;
@@ -119,6 +137,8 @@ int D2GEThreadInit(void)
 		return FALSE;
 	}
 
+	ZeroMemory(&gD2GSInfo, sizeof(gD2GSInfo));
+	strcpy(gD2GS_VERSION_STRING, D2GS_VERSION_STRING);
 	gD2GSInfo.szVersion				= D2GS_VERSION_STRING;
 	gD2GSInfo.dwLibVersion			= D2GS_LIBRARY_VERSION;
 	gD2GSInfo.bIsNT					= d2gsconf.enablentmode;
@@ -130,8 +150,8 @@ int D2GEThreadInit(void)
 	gD2GSInfo.dwIdleSleep			= d2gsconf.idlesleep;
 	gD2GSInfo.dwBusySleep			= d2gsconf.busysleep;
 	gD2GSInfo.dwMaxGame				= d2gsconf.gemaxgames;
-	gD2GSInfo.dwProcessAffinityMask = d2gsconf.multicpumask;
-	memset(gD2GSInfo.dwReserved, 0, sizeof(gD2GSInfo.dwReserved));
+	gD2GSInfo.dwMaxPacketPerSecond = d2gsconf.maxpacketpersecond; //d2gs use maxpacketpersecond, ithink it is bug
+
 	return TRUE;
 
 } /* D2GEThreadInit() */
@@ -157,8 +177,9 @@ static BOOL D2GSGetInterface(void)
 	D2GSSetTickCount			= lpD2GSInterface->D2GSSetTickCount;
 	D2GSSetACData				= lpD2GSInterface->D2GSSetACData;
 	D2GSLoadConfig				= lpD2GSInterface->D2GSLoadConfig;
-	D2GSLoadConfig				= lpD2GSInterface->D2GSLoadConfig;
+	D2GSAfterEnd				= lpD2GSInterface->D2GSAfterEnd;
 	D2GSInitConfig				= lpD2GSInterface->D2GSInitConfig;
+	D2GSCheckTickCount			= lpD2GSInterface->D2GSCheckTickCount;
 
 	return TRUE;
 
@@ -178,8 +199,12 @@ static DWORD __stdcall D2GSErrorHandle(void)
 	_getch();
 #endif
 
+	d2gsconf.enablegslog = 1;
+	D2GSEventLog("D2GSErrorHandle", "Error occur, exiting...\n\n");
+	d2gsconf.enablegslog = 0;
+
 	CloseServerMutex();
-	ExitProcess(0);
+	D2GSShutdown(0);
 	return 0;
 
 } /* End of D2GSErrorHandle() */
@@ -235,6 +260,8 @@ DWORD WINAPI D2GEThread(LPVOID lpParameter)
 		D2GSEventLog("D2GEThread", "Game Server Thread Start Successfully");
 		SetEvent(hEvent);
 		bGERunning = TRUE;
+		hGEThread = hObjects[1];
+		SetThreadAffinityMask(hObjects[1], d2gsconf.multicpumask);
 	} else {
 		D2GSEventLog("D2GEThread", "Wait Server Thread Returned %d", dwRetval);
 		SetEvent(hEvent);
@@ -243,8 +270,27 @@ DWORD WINAPI D2GEThread(LPVOID lpParameter)
 	CloseHandle(hObjects[0]);
 	CloseHandle(hObjects[1]);
 	bGERunning = FALSE;
+	hGEThread = NULL;
+	D2GSEventLog("D2GEThread", "Game Engine Thread terminated");
 	return TRUE;
 
 } /* End of D2GEThread */
 
 
+/*********************************************************************
+ * Purpose: Init from conf faile
+ * Return: TRUE(success) or FALSE(failed)
+ *********************************************************************/
+void D2GEReloadConfig(void)
+{
+	char buffer[260] = { 0 };
+	const WORLDEVENT* ret = 0;
+	snprintf(buffer, 259, "%s\\%s", PathName, d2gsconf.serverconffile);
+	buffer[259] = 0;
+	D2GSLoadConfig(buffer);
+	ret = D2GSInitConfig();
+	if (ret->bHasMsg)
+	{
+		snprintf(gWorldEventMessage, 255, "\xFF" "c9The World Event enables on this server. The key item is \"%s\"." "\xFF" "c1", (UCHAR*)(ret + 1));
+	}
+} /* End of D2GEInitConfig() */

@@ -11,6 +11,7 @@
 #include "debug.h"
 #include "d2gamelist.h"
 #include "d2cs_d2gs_protocol.h"
+#include "d2ge.h"
 
 
 /* vars */
@@ -32,6 +33,19 @@ static CRITICAL_SECTION	csNet;
 
 /* for statistic */
 static D2GSNETSTATISTIC	d2netstat;
+
+
+void D2GSSetDifficultyCount(int difficulty, int R0/*=0*/, int R1/*=0xFFFFFFFF*/)
+{
+	int diffIdx = difficulty % 3; // 0, 1, 2
+	gD2GSInfo.dwGameDifficultyCount[diffIdx][0] += R0;
+	gD2GSInfo.dwGameDifficultyCount[diffIdx][1] += R1;
+}
+
+void D2GSInitCountDifficulty()
+{
+	ZeroMemory(gD2GSInfo.dwGameDifficultyCount, sizeof(gD2GSInfo.dwGameDifficultyCount));
+}
 
 
 /*********************************************************************
@@ -874,8 +888,12 @@ int D2GSGetSockName(int server, DWORD *ipaddr, DWORD *port)
 	*ipaddr = *port = 0;
 
 	namelen = sizeof(name);
-	if (getsockname(sock, (struct sockaddr *)&name, &namelen))
+	if (getsockname(sock, (struct sockaddr*)&name, &namelen))
+	{
+		*ipaddr = 0;
+		*port = 0;
 		return -1;
+	}
 	else {
 		*ipaddr = ntohl(name.sin_addr.s_addr);
 		*port   = (DWORD)(ntohs(name.sin_port));

@@ -27,6 +27,12 @@
 int  DoCleanup(void);
 BOOL D2GSCheckRunning(void);
 int  CleanupRoutineForServerMutex(void);
+void D2GSShutdown(unsigned int exitCode);
+void D2GSWatchDogInit(void);
+void D2GSResetWatchDogCounter(void);
+extern BOOL D2GSCheckGameInfo(void);
+extern BOOL D2GSSaveAllGames(DWORD dwMilliseconds);
+
 /* CTRL+C or CTRL+Break signal handler */
 BOOL WINAPI ControlHandler(DWORD dwCtrlType);
 
@@ -34,7 +40,13 @@ BOOL WINAPI ControlHandler(DWORD dwCtrlType);
 /* some variables used just in this file */
 static HANDLE			hD2GSMutex  = NULL;
 static HANDLE			hStopEvent  = NULL;
+static HANDLE			hWatchDog	= NULL;
 static CLEANUP_RT_ITEM	*pCleanupRT = NULL;
+static CRITICAL_SECTION	csWatchDog;
+static DWORD			dwShutdownStatus = 0;
+static DWORD			dwShutdownTickCount = 0;
+static DWORD			dwWatchDogCounter = 0;
+
 
 
 /********************************************************************************
@@ -47,8 +59,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine, in
 	/* reset cleanup routine list */
 	pCleanupRT = NULL;
 
+	InitializeCriticalSection(&gsShutDown);
+
 	/* init log system first */
 	if (!D2GSEventLogInitialize()) return -1;
+
+	d2gsconf.enablegslog = TRUE;
+	D2GSEventLog("main", "Starting GS Server...");
 
 	/* setup signal capture */
 	SetConsoleCtrlHandler(ControlHandler, TRUE);
@@ -92,6 +109,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine, in
 	/* start up game engine */
 	if (!D2GEStartup()) {
 		D2GSEventLog("main", "Failed Startup Game Engine");
+		D2GSEventLog("main", "Please enable GELog, and see the message");
 		DoCleanup();
 		return -1;
 	}
@@ -110,6 +128,15 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine, in
 		return -1;
 	}
 
+	/* create timer */
+	D2GSWatchDogInit();
+	if (!D2GSTimerInitialize())
+	{
+		D2GSEventLog("main", "Failed Startup Timer");
+		DoCleanup();
+		return -1;
+	}
+
 	/* main server loop */
 	D2GSEventLog("main", "Entering Main Server Loop");
 	while(TRUE) {
@@ -118,9 +145,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine, in
 		/* service controler tell me to stop now. "Yes, sir!" */
 		D2GSSetD2CSMaxGameNumber(0);
 		D2GSActive(FALSE);
+		d2gsconf.enablegslog = TRUE;
 		D2GSEventLog("main", "I am going to stop");
-		D2GSEndAllGames();
+		d2gsconf.enablegslog = TRUE;
+		D2GSSaveAllGames(5000);
+		d2gsconf.enablegslog = FALSE;
 		Sleep(3000);
+		D2GSShutdown(0);
 		break;
 	}
 
@@ -270,3 +301,211 @@ void CloseServerMutex(void)
 
 } /* End of CloseServerMutex() */
 
+
+void D2GSBeforeShutdown(DWORD status, DWORD dwSecondsRemaining)
+{
+	// GetTickCount milliseconds
+	DWORD temp = 0;
+	D2GSSetD2CSMaxGameNumber(0);
+	D2GSActive(FALSE);
+	EnterCriticalSection(&gsShutDown);
+	dwShutdownStatus = status;
+	dwShutdownTickCount = GetTickCount() + dwSecondsRemaining * 1000;
+	switch (status)
+	{
+	case 1:
+	case 3:
+		D2GSEventLog("D2GSShutdown", "Restart GS in %lu seconds", dwSecondsRemaining);
+		break;
+	case 2:
+	case 4:
+		D2GSEventLog("D2GSShutdown", "Shutdown GS in %lu seconds", dwSecondsRemaining);
+		break;
+	}
+	LeaveCriticalSection(&gsShutDown);
+}
+
+DWORD D2GSGetShutdownStatus(void)
+{
+	DWORD status = 0;
+	EnterCriticalSection(&gsShutDown);
+	status = dwShutdownStatus;
+	LeaveCriticalSection(&gsShutDown);
+	return status;
+}
+
+void D2GSShutdown(unsigned int exitCode)
+{
+	if (D2GSCheckGameInfo())
+	{
+		D2GSSaveAllGames(5000);
+		Sleep(3000);
+	}
+
+	if (bGERunning != 0)
+	{
+		if (D2GSAfterEnd() != 0)
+		{
+			D2GSAfterEnd();
+		}
+	}
+
+	ExitProcess(exitCode);
+}
+
+
+void D2GSShutdownTimer(void)
+{
+	static DWORD ShutdownCount = 0;
+	char buffer[256] = { 0 };
+	DWORD curTickCount = 0;
+	DWORD overSeconds = 0;
+	ShutdownCount++;
+	if (ShutdownCount >= 0xA)
+	{
+		ShutdownCount = 0;
+		EnterCriticalSection(&gsShutDown);
+
+		if (dwShutdownStatus >= 1 && dwShutdownStatus <= 4)
+		{
+			curTickCount = GetTickCount();
+			if (curTickCount > dwShutdownTickCount)
+			{
+				d2gsconf.enablegslog = 1;
+				D2GSSaveAllGames(5000);
+				Sleep(0xBB8);
+				switch (dwShutdownStatus - 1)
+				{
+				case 0:
+					d2gsconf.enablegslog = 1;
+					D2GSEventLog("D2GSShutdownTimer", "Restart GS now");
+					D2GSEventLogCleanup();
+					d2gsconf.enablegslog = 0;
+					CloseServerMutex();
+					D2GSShutdown(0);
+					break;
+				case 1:
+					d2gsconf.enablegslog = 1;
+					D2GSEventLog("D2GSShutdownTimer", "Shutdown GS now");
+					D2GSEventLogCleanup();
+					d2gsconf.enablegslog = 0;
+					CloseServerMutex();
+					D2GSShutdown(1);
+					break;
+				case 2:
+					d2gsconf.enablegslog = 1;
+					D2GSEventLog("D2GSShutdownTimer", "D2CS Restart GS now");
+					D2GSEventLogCleanup();
+					d2gsconf.enablegslog = 0;
+					CloseServerMutex();
+					D2GSShutdown(0);
+					break;
+				case 3:
+					d2gsconf.enablegslog = 1;
+					D2GSEventLog("D2GSShutdownTimer", "D2CS Shutdown GS now");
+					D2GSEventLogCleanup();
+					d2gsconf.enablegslog = 0;
+					CloseServerMutex();
+					D2GSShutdown(1);
+					break;
+				default:
+					break;
+				}
+			}
+			else
+			{
+				overSeconds = (dwShutdownTickCount - curTickCount) / 1000;
+				if ((overSeconds / 15) == 0)
+				{
+					switch (dwShutdownStatus - 1)
+					{
+					case 0:
+						sprintf(buffer, "The game server will restart in %lu seconds", overSeconds);
+						chat_message_announce_all(CHAT_MESSAGE_TYPE_SYS_MESSAGE, buffer);
+						break;
+					case 1:
+						sprintf(buffer, "The game server will shutdown in %lu seconds", overSeconds);
+						chat_message_announce_all(CHAT_MESSAGE_TYPE_SYS_MESSAGE, buffer);
+						break;
+					case 2:
+						sprintf(buffer, "The realm will restart in %lu seconds", overSeconds);
+						chat_message_announce_all(CHAT_MESSAGE_TYPE_SYS_MESSAGE, buffer);
+						break;
+					case 3:
+						sprintf(buffer, "The realm will shutdown in %lu seconds", overSeconds);
+						chat_message_announce_all(CHAT_MESSAGE_TYPE_SYS_MESSAGE, buffer);
+						break;
+					default:
+						buffer[0] = 0;
+						break;
+					}
+				}
+			}
+		}
+		LeaveCriticalSection(&gsShutDown);
+	}
+	return;
+}
+
+
+DWORD CheckWatchDogCounter(void)
+{
+	EnterCriticalSection(&csWatchDog);
+	dwWatchDogCounter++;
+	if (dwWatchDogCounter < 0xF)
+	{
+		LeaveCriticalSection(&csWatchDog);
+		return 0;
+	}
+	LeaveCriticalSection(&csWatchDog);
+	return 1;
+}
+
+
+void D2GSResetWatchDogCounter(void)
+{
+	EnterCriticalSection(&csWatchDog);
+	dwWatchDogCounter = 0;
+	LeaveCriticalSection(&csWatchDog);
+}
+
+
+DWORD WINAPI D2GSWatchDogThread(LPVOID p)
+{
+	while (TRUE)
+	{
+		Sleep(6000);
+		if (CheckWatchDogCounter() != 0)
+		{
+			break;
+		}
+		if (D2GSCheckTickCount && D2GSCheckTickCount(0) != 0)
+		{
+			break;
+		}
+	}
+	d2gsconf.enablegslog = TRUE;
+	D2GSEventLog("watchdog_thread", "D2GS maybe in deadlock, restart it");
+	d2gsconf.enablegslog = FALSE;
+	CloseServerMutex();
+	D2GSShutdown(0);
+	return 0;
+}
+
+
+void D2GSWatchDogInit(void)
+{
+	DWORD dwThreadId = 0;
+	hWatchDog = 0;
+	InitializeCriticalSection(&csWatchDog);
+	hWatchDog = CreateThread(0, 0, D2GSWatchDogThread, NULL, 0, &dwThreadId);
+	if (!hWatchDog)
+	{
+		DWORD error = GetLastError();
+		D2GSEventLog("watchdog_init", "CreateThread watchdog_thread. Code: %lu", error);
+		return;
+	}
+	CloseHandle(hWatchDog);
+	D2GSEventLog("watchdog_init", "CreateThread watchdog_thread, %lu", dwThreadId);
+	return;
+}

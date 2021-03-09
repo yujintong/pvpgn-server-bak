@@ -15,6 +15,7 @@
 typedef struct RAW_D2CHARINFO {
 	bn_char		AcctName[MAX_ACCTNAME_LEN];	/* account name */
 	bn_char		CharName[MAX_CHARNAME_LEN];	/* char name */
+	bn_char		RealmIPName[MAX_REALMIPNAME_LEN]; /* realm name */
 	bn_int		token;
 	bn_int		CharLevel;
 	bn_short	CharClass;
@@ -35,6 +36,10 @@ typedef struct RAW_D2GAMEINFO {
 	bn_char		GameName[MAX_GAMENAME_LEN];
 	bn_char		game_pass[MAX_GAMEPASS_LEN];
 	bn_char		game_desc[MAX_GAMEDESC_LEN];
+	bn_char		creator_acct_name[MAX_ACCTNAME_LEN];
+	bn_char		creator_char_name[MAX_CHARNAME_LEN];
+	bn_char		creator_ip[MAX_REALMIPNAME_LEN];
+	bn_byte		ladder;
 	bn_byte		expansion;
 	bn_byte		difficulty;
 	bn_byte		hardcore;
@@ -73,14 +78,15 @@ void D2GSResetGameList(void);
 int  D2GSGetCurrentGameNumber(void);
 int  D2GSGetCurrentGameStatistic(DWORD *gamenum, DWORD *usernum);
 void D2GSDeleteAllCharInGame(D2GAMEINFO *lpGameInfo);
-int  D2GSGameListInsert(const char* game_name, const char* game_pass, const char* game_desc, UCHAR expansion,
-						UCHAR difficulty, UCHAR hardcore, WORD wGameId);
+int  D2GSGameListInsert(const char* game_name, const char* game_pass, const char* game_desc,
+						const char* creator_acct_name, const char* creator_char_name, const char* creator_ip,
+						UCHAR expansion, UCHAR difficulty, UCHAR hardcore, UCHAR ladder, WORD wGameId);
 int  D2GSGameListDelete(D2GAMEINFO *lpGameInfo);
 int  D2GSInsertCharIntoGameInfo(D2GAMEINFO *lpGameInfo, DWORD token, UCHAR *AcctName,
-					UCHAR *CharName, DWORD CharLevel, WORD CharClass, WORD EnterGame);
+					UCHAR *CharName, UCHAR* RealmIPName, DWORD CharLevel, WORD CharClass, WORD EnterGame);
 int  D2GSDeleteCharFromGameInfo(D2GAMEINFO *lpGameInfo, D2CHARINFO *lpCharInfo);
 int  D2GSInsertCharIntoPendingList(DWORD token, UCHAR *AcctName,
-					UCHAR *CharName, DWORD CharLevel, WORD CharClass, D2GAMEINFO *lpGame);
+					UCHAR *CharName, UCHAR* RealmIPName, DWORD CharLevel, WORD CharClass, D2GAMEINFO *lpGame);
 int  D2GSDeletePendingChar(D2CHARINFO *lpCharInfo);
 int  D2GSInsertGetDataRequest(UCHAR *AcctName, UCHAR *CharName, DWORD dwClientId, DWORD dwSeqno);
 int  D2GSDeleteGetDataRequest(D2GETDATAREQUEST *lpGetDataReq);
@@ -92,7 +98,7 @@ D2CHARINFO *D2GSFindPendingCharByCharName(UCHAR *CharName);
 D2GETDATAREQUEST *D2GSFindGetDataRequestBySeqno(DWORD dwSeqno);
 void D2GSPendingCharTimerRoutine(void);
 void D2GSGetDataRequestTimerRoutine(void);
-void FormatTimeString(long t, u_char *buf, int len);
+void FormatTimeString(long t, u_char *buf, int len, int format);
 void D2GSShowGameList(unsigned int ns);
 void D2GSShowCharInGame(unsigned int ns, WORD GameId);
 void D2GSDisableGameByGameId(unsigned int ns, WORD GameId);
@@ -106,6 +112,8 @@ int chat_message_announce_char2(DWORD dwMsgType, DWORD dwClientId, const char *m
 
 int D2GSMOTDAdd(DWORD dwClientId);
 int D2GSSendMOTD(void);
+void D2GSCheckGameLife();
+BOOL D2GSSaveAllGames(DWORD dwMilliseconds);
 
 
 #endif /* INCLUDED_D2GAMELIST_H */

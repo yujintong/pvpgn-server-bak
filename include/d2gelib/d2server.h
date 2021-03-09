@@ -55,8 +55,13 @@ typedef struct
 	DWORD					dwIdleSleep;
 	DWORD					dwBusySleep;
 	DWORD					dwMaxGame;
-	DWORD					dwProcessAffinityMask;
-	DWORD					dwReserved[26];
+	DWORD					dwMaxPacketPerSecond;
+	DWORD					dwGSId;
+	DWORD					dwACVersion;
+	DWORD					dwCheckSum0;
+	DWORD					dwRealCheckSumCount;
+	DWORD					dwCheckSumArray[16];
+	DWORD					dwGameDifficultyCount[3][2];
 } D2GSINFO, * PD2GSINFO, * LPD2GSINFO;
 #define D2GS_LIBRARY_VERSION	0x010A0304
 #define	DEFAULT_IDLE_SLEEP		10
@@ -74,6 +79,19 @@ typedef struct
 	UCHAR		CharName[16];
 	UCHAR		AcctName[16];
 } PLAYERINFO, * PPLAYERINFO, * LPPLAYERINFO;
+
+typedef struct
+{
+	DWORD bHasMsg;
+	DWORD WorldEventBaseCount;
+	DWORD WorldEventCurrentSpawnCount;
+	DWORD WorldEventLastSpawnCount;
+	DWORD WorldEventNextSpawnCount;
+	__time32_t WorldEventLastSellTime; // DWORD LastSellTickCount;
+	__time32_t WorldEventLastSpawnTime; // DWORD LastSpawnTickCount;
+	DWORD WorldEventTotalSpawn;
+	LPCSTR WorldEventKeyItem; // 128 bytes
+} WORLDEVENT, * PWORLDEVENT, * LPWORLDEVENT;
 
 typedef BOOL  (__stdcall * D2GSStartFunc ) (LPD2GSINFO lpD2GSInfo);
 typedef BOOL  (__stdcall * D2GSNewEmptyGameFunc) (LPCSTR lpGameName, LPCSTR lpGamePass,
@@ -95,7 +113,12 @@ typedef BOOL(__stdcall* D2GSSetACDataFunc)(LPCSTR data);
 
 typedef BOOL(__stdcall* D2GSLoadConfigFunc)(LPCSTR filename);
 
-typedef DWORD(__stdcall* D2GSInitConfigFunc)(void);
+typedef DWORD(__stdcall* D2GSAfterEndFunc)(void);
+
+typedef LPWORLDEVENT(__stdcall* D2GSInitConfigFunc)(void);
+
+typedef DWORD(__stdcall* D2GSCheckTickCountFunc)(DWORD);
+
 
 typedef struct 
 {
@@ -121,9 +144,9 @@ typedef struct
 	D2GSSetACDataFunc				D2GSSetACData;
 
 	/*
-	* BOOL Reserved3(DWORD param_1)
+	* BOOL D2GSUnknown1(DWORD param_1)
 	*/
-	DWORD							Reserved3;
+	DWORD							D2GSUnknown1;
 
 	/*
 	* d2server.ini filename max length = 260 bytes
@@ -145,21 +168,12 @@ typedef struct
 	*		return WriteToD2GEVar_dat(0x33445566);
 	* }
 	*/
-	DWORD							Reserved4;
+	D2GSAfterEndFunc				D2GSAfterEnd;
 
 	/*
 	*	This function doesn't initialize config, it should be renamed to D2GSGetConfig() in my opinion.
 	*	If config file is not loaded through D2GSLoadConfig(), returns a null pointer.
-	*	Otherwise, returns a pointer to the following struct:
-	*	void*      fp1
-	*	DWORD      WorldEventBaseCount
-	*	DWORD      WorldEventCurrentSpawnCount
-	*	DWORD      WorldEventLastSpawnCount
-	*	DWORD      WorldEventNextSpawnCount
-	*	__time32_t WorldEventLastSellTime
-	*	__time32_t WorldEventLastSpawnTime
-	*	DWORD      WorldEventTotalSpawn
-	*	LPCSTR     WorldEventKeyItem (128 bytes long)
+	*	Otherwise, returns a pointer to a WORLDEVENT struct.
 	*/
 	D2GSInitConfigFunc				D2GSInitConfig;
 
@@ -167,10 +181,10 @@ typedef struct
 	*	DebugGetGameInfo(WORD wGameId);
 	*	Returns a pointer to a struct?
 	*/
-	DWORD							Reserved5;
+	DWORD							D2GSDebugGetGameInfo;
 
 	/*
-	BOOL Reserved6(DWORD param_1)
+	BOOL D2GSCheckTickCount(DWORD param_1)
 	{
 		if (DAT_68010ef4 == 0)
 		{
@@ -187,7 +201,7 @@ typedef struct
 		return param_1 < tickCount - DAT_68010ef4;
 	}
 	*/
-	DWORD							Reserved6;
+	D2GSCheckTickCountFunc			D2GSCheckTickCount;
 } D2GSINTERFACE, * PD2GSINTERFACE, * LPD2GSINTERFACE;
 
 

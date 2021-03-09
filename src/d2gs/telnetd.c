@@ -25,25 +25,32 @@ extern void D2GSSetD2CSMaxGameNumber(DWORD maxgamenum);
 
 /* command table */
 static ADMINCOMMAND	admincmdtbl[] = {
-	{"help", 	admin_help,				"",			"Show this message."},
-	{"status",	admin_getstatus,		"",			"Get status of this GS."},
-	{"gl",		admin_show_game_list,	"",			"Show active game list."},
-	{"cl",		admin_show_char_in_game,"GameId",	"Show char list in a game."},
-	{"char",	admin_getcharinfo,		"CharName", "Get char information on this GS."},
-	{"kick",	admin_kick_user,		"CharName",	"Kick an user out of the game."},
-	{"msg",		admin_msg,				"MsgType Target Message", "Send message"},
-	{"disable",	admin_disablegame,		"GameId",	"Deny joining the specified game."},
-	{"enable",	admin_enablegame,		"GameId",	"Allow joining the specified game."},
-	{"maxgame",	admin_setmaxgame,		"MAXNUM",	"Change maximum game number."},
-	{"maxlife",	admin_setmaxgamelife,	"MaxLife",	"To set the maximum game life in seconds."},
-	{"uptime",	admin_uptime,			"",			"When the system startup."},
-	{"version", admin_getversion,		"",			"To show version informations."},
-	{"passwd",	admin_chgpasswd,		"",			"To change the login password."},
-	{"restart",	admin_restart,			"[seconds]","To restart this GS."},
-	{"shutdown",admin_shutdown,			"[seconds]","To shutdown this GS."},
-	{"setmotd",	admin_setmotd,			"MOTD",		"To set the Message of The Day"},
-	{"exit",	NULL,					"",			"Exit this administration console."},
-	{NULL, NULL, NULL, NULL}
+	{"help", 	FALSE,	admin_help,				"",			"Show this message."},
+	{"status",	FALSE,	admin_getstatus,		"",			"Get status of this GS."},
+	{"gl",		FALSE,	admin_show_game_list,	"",			"Show active game list."},
+	{"cl",		FALSE,	admin_show_char_in_game,"GameId",	"Show char list in a game."},
+	{"char",	FALSE,	admin_getcharinfo,		"CharName", "Get char information on this GS."},
+	{"kick",	FALSE,	admin_kick_user,		"CharName",	"Kick an user out of the game."},
+	{"msg",		FALSE,	admin_msg,				"MsgType Target Message", "Send message"},
+	{"disable",	FALSE,	admin_disablegame,		"GameId",	"Deny joining the specified game."},
+	{"enable",	FALSE,	admin_enablegame,		"GameId",	"Allow joining the specified game."},
+	{"maxgame",	FALSE,	admin_setmaxgame,		"MAXNUM",	"Change maximum game number."},
+	{"maxlife",	FALSE,	admin_setmaxgamelife,	"MaxLife",	"To set the maximum game life in seconds."},
+	{"maxuser", FALSE,	admin_setmaxpreferusers,"MaxPreferUsers", "To set the maximum prefer users in this gs."},
+	{"uptime",	FALSE,	admin_uptime,			"",			"When the system startup."},
+	{"version", FALSE,	admin_getversion,		"",			"To show version informations."},
+	{"ver",		FALSE,	admin_getversion,		"",			"To show version informations."},
+	{"passwd",	FALSE,	admin_chgpasswd,		"",			"To change the login password."},
+	{"gslog",	FALSE,	admin_enablegslog,		"",			"To enable or disable GS log to file."},
+	{"restart",	FALSE,	admin_restart,			"[seconds]","To restart this GS."},
+	{"shutdown",FALSE,	admin_shutdown,			"[seconds]","To shutdown this GS."},
+	{"setmotd",	FALSE,	admin_setmotd,			"MOTD",		"To set the Message of The Day"},
+	{"setcpumask",	FALSE,	admin_setcpumask,	"CPUMASK",	"To set process CPU mask, used in SMP machine"},
+	{"reload",	FALSE,	admin_reloadconf,		"",			"To reload d2gs config file"},
+	{"we",		FALSE,	admin_showwe,			""			"Show world event setting and status"},
+	//{"au",	FALSE,	admin_setautoupdate,	"[enable|disable|timeout|ver|url] [value].","To show/control autoupdate status."},
+	{"exit",	FALSE,	NULL,					"",			"Exit this administration console."},
+	{NULL, TRUE, NULL, NULL}
 };
 
 
@@ -536,9 +543,9 @@ void admin_logo(unsigned int ns)
 {
 	unsigned char	buf[512];
 
-	sprintf(buf, "%s%s%s%s%s%s",
+	sprintf(buf, "%s%s%s%s",
 			"\r\nDiablo II Close Game Server Administration Console\r\n",
-			"Win32 Version ", VERNUM, ", build on ", BUILDDATE, "\r\n\r\n");
+			"Win32 Version ", D2GS_VERSION_STRING_ONLY, "\r\n\r\n");
 	SENDSTR(ns, buf);
 
 } /* End of admin_logo() */
@@ -560,9 +567,12 @@ void admin_help(unsigned int ns, u_char *param)
 	i = 0;
 	while(admincmdtbl[i].keyword != NULL)
 	{
-		sprintf(buf, "%s %s\r\n  %s\r\n",
+		if (!admincmdtbl[i].disable)
+		{
+			sprintf(buf, "%s %s\r\n  %s\r\n",
 				admincmdtbl[i].keyword, admincmdtbl[i].param, admincmdtbl[i].annotation);
-		SENDSTR(ns, buf);
+			SENDSTR(ns, buf);
+		}
 		i++;
 	}
 	strcpy(buf, "\r\n");
@@ -678,6 +688,29 @@ void admin_show_char_in_game(unsigned int ns, u_char *param)
 } /* End of admin_show_char_in_game() */
 
 
+void admin_setcpumask(unsigned int ns, u_char* param)
+{
+	DWORD mask = 0;
+	unsigned char buf[256];
+	if (!param) return;
+	mask = atoi(param);
+	if (SetThreadAffinityMask(hGEThread, mask) == 0)
+	{
+		sprintf(buf, "Failed setting CPUMASK, code: %lx\r\n", GetLastError());
+		SENDSTR(ns, buf);
+		return;
+	}
+	if (D2GSSetMultiCpuMask(mask) == 0)
+	{
+		SENDSTR(ns, "Can't write CPUMASK to registry\r\n");
+		return;
+	}
+	sprintf(buf, "Set CPUMASK to 0x%lx.\r\n\r\n", mask);
+	SENDSTR(ns, buf);
+	return;
+} /* End of admin_setcpumask() */
+
+
 /**********************************************************
  * Function: admin_restart
  * Return: None
@@ -685,41 +718,32 @@ void admin_show_char_in_game(unsigned int ns, u_char *param)
 void admin_restart(unsigned int ns, u_char *param)
 {
 	unsigned int	delay;
-	unsigned char	buf[256];
 
-	D2GSSetD2CSMaxGameNumber(0);
-	D2GSActive(FALSE);
+	if (!param) return;
 
-	if (param) {
-		if (stricmp(param, "force")==0) {
-			SENDSTR(ns, "Force restarting Diablo II Close Game Server!\r\n");
-			D2GSEventLog("admin_restart", "force restart d2gs by admin %u", ns);
-			CloseServerMutex();
-			ExitProcess(0);
-			return;
-		} else {
-			delay = atoi(param);
-			if (delay==0)
-				delay = DEFAULT_GS_SHUTDOWN_DELAY;
-			delay = (delay+d2gsconf.gsshutdowninterval-1)/d2gsconf.gsshutdowninterval;
+	if (stricmp(param, "force") == 0)
+	{
+		SENDSTR(ns, "Force restarting Diablo II Close Game Server!\r\n");
+		d2gsconf.enablegslog = TRUE;
+		D2GSEventLog("admin_restart", "force restart d2gs by admin %u", ns);
+		d2gsconf.enablegslog = FALSE;
+		D2GSBeforeShutdown(1, 0);
+		return;
+	}
+	else
+	{
+		delay = atoi(param);
+		if (delay == 0)
+		{
+			delay = DEFAULT_GS_SHUTDOWN_DELAY;
 		}
 	}
 
-	D2GSEventLog("admin_restart", "restart d2gs by admin %u", ns);
-	while(delay)
-	{
-		sprintf(buf, "The game server will restart in %d seconds", delay*d2gsconf.gsshutdowninterval);
-		SENDSTR(ns, buf);
-		SENDSTR(ns, "\r\n");
-		chat_message_announce_all(CHAT_MESSAGE_TYPE_SYS_MESSAGE, buf);
-		delay--;
-		Sleep(d2gsconf.gsshutdowninterval*1000);
-	}
-	D2GSEndAllGames();
-	Sleep(2000);
-	CloseServerMutex();
-	ExitProcess(0);
-	return;
+	SENDSTR(ns, "Restart Diablo II Close Game Server in progress!");
+	d2gsconf.enablegslog = TRUE;
+	D2GSEventLog("admin_shutdown", "shutdown d2gs by admin %u in %lu second", ns, delay);
+	d2gsconf.enablegslog = FALSE;
+	D2GSBeforeShutdown(1, delay);
 
 } /* End of admin_restart() */
 
@@ -731,43 +755,44 @@ void admin_restart(unsigned int ns, u_char *param)
 void admin_shutdown(unsigned int ns, u_char *param)
 {
 	unsigned int	delay;
-	unsigned char	buf[256];
 
-	D2GSSetD2CSMaxGameNumber(0);
-	D2GSActive(FALSE);
+	if (!param) return;
 
-	if (param) {
-		if (param && stricmp(param, "force")==0) {
-			SENDSTR(ns, "Force shutdown Diablo II Close Game Server!\r\n");
-			D2GSEventLog("admin_shutdown", "force shutdown d2gs by admin %u", ns);
-			CloseServerMutex();
-			ExitProcess(1);
-			return;
-		} else {
-			delay = atoi(param);
-			if (delay==0)
-				delay = DEFAULT_GS_SHUTDOWN_DELAY;
-			delay = (delay+d2gsconf.gsshutdowninterval-1)/d2gsconf.gsshutdowninterval;
-		}
-	}
-
-	D2GSEventLog("admin_shutdown", "shutdown d2gs by admin %u", ns);
-	while(delay)
+	if (stricmp(param, "force") == 0)
 	{
-		sprintf(buf, "The game server will shutdown in %d seconds", delay*d2gsconf.gsshutdowninterval);
-		SENDSTR(ns, buf);
-		SENDSTR(ns, "\r\n");
-		chat_message_announce_all(CHAT_MESSAGE_TYPE_SYS_MESSAGE, buf);
-		delay--;
-		Sleep(d2gsconf.gsshutdowninterval*1000);
+		SENDSTR(ns, "Force shutdown Diablo II Close Game Server!\r\n");
+		d2gsconf.enablegslog = TRUE;
+		D2GSEventLog("admin_shutdown", "force shutdown d2gs by admin %u", ns);
+		d2gsconf.enablegslog = FALSE;
+		D2GSBeforeShutdown(2, 0);
+		return;
 	}
-	D2GSEndAllGames();
-	Sleep(2000);
-	CloseServerMutex();
-	ExitProcess(1);
+
+	delay = atoi(param);
+	if (delay == 0)
+	{
+		delay = DEFAULT_GS_SHUTDOWN_DELAY;
+	}
+
+	SENDSTR(ns, "Shutdown Diablo II Close Game Server in progress!\r\n");
+	d2gsconf.enablegslog = TRUE;
+	D2GSEventLog("admin_shutdown", "shutdown d2gs by admin %u in %lu seconds", ns, delay);
+	d2gsconf.enablegslog = FALSE;
+	D2GSBeforeShutdown(2, delay);
+} /* End of admin_shutdown() */
+
+
+/**********************************************************
+ * Function: admin_reloadconf
+ * Return: None
+ ************************************************************/
+void admin_reloadconf(unsigned int ns, u_char* param)
+{
+	D2GEReloadConfig();
+	SENDSTR(ns, "D2GE config file reloaded.\r\n");
 	return;
 
-} /* End of admin_shutdown() */
+} /* End of admin_reloadconf() */
 
 
 /**********************************************************
@@ -807,9 +832,32 @@ void admin_setmaxgame(unsigned int ns, u_char *param)
 {
 	unsigned char	buf[256];
 	DWORD			maxgamenum;
+	DWORD shutdownStatus = 0;
 
 	if (!param) return;
 	maxgamenum = (DWORD)atoi(param);
+	shutdownStatus = D2GSGetShutdownStatus();
+	if (shutdownStatus != 0 && maxgamenum != 0)
+	{
+		switch (shutdownStatus - 1)
+		{
+		case 0:
+			SENDSTR(ns, "The GS is in restarting progress!\r\n");
+			break;
+		case 1:
+			SENDSTR(ns, "The GS is in shutting down progress!\r\n");
+			break;
+		case 2:
+			SENDSTR(ns, "The GS is in D2CS restarting progress!\r\n");
+			break;
+		case 3:
+			SENDSTR(ns, "The GS is in D2CS shutting down progres!\r\n");
+			break;
+		default:
+			break;
+		}
+		return;
+	}
 	if (maxgamenum>d2gsconf.gemaxgames) {
 		sprintf(buf, "Maximum game number must be in range 0-%lu\r\n", d2gsconf.gemaxgames);
 		SENDSTR(ns, buf);
@@ -818,7 +866,13 @@ void admin_setmaxgame(unsigned int ns, u_char *param)
 		sprintf(buf, "Set maximum game number to %lu\r\n", maxgamenum);
 		SENDSTR(ns, buf);
 		if (D2GSSetMaxGames(maxgamenum))
+		{
 			sprintf(buf, "MaxGame set to registry\r\n");
+			D2GSEventLog("admin_setmaxgame",
+				"Change max game number to %lu by admin %u", maxgamenum, ns);
+			SENDSTR(ns, buf);
+			D2GSSetD2CSMaxGameNumber(maxgamenum);
+		}
 		else
 			sprintf(buf, "Set registry failed\r\n");
 		D2GSEventLog("admin_setmaxgame",
@@ -872,6 +926,29 @@ void admin_enablegame(unsigned int ns, u_char *param)
 
 
 /**********************************************************
+ * Function: admin_enablegslog
+ * Return: None
+ ************************************************************/
+void admin_enablegslog(unsigned int ns, u_char* param)
+{
+	BOOL Enable;
+
+	if (!param) return;
+
+	Enable = (WORD)atoi(param);
+
+	if (D2GSSetEnableGSLog(Enable))
+	{
+		SENDSTR(ns, "Done.\r\n\r\n");
+		return;
+	}
+	SENDSTR(ns, "Can't write ENABLEGSLOG to registry\r\n");
+	return;
+
+} /* End of admin_enablegslog() */
+
+
+/**********************************************************
  * Function: admin_setmaxgamelife
  * Return: None
  ************************************************************/
@@ -895,24 +972,50 @@ void admin_setmaxgamelife(unsigned int ns, u_char *param)
 
 
 /**********************************************************
+ * Function: admin_setmaxpreferuses
+ * Return: None
+ ************************************************************/
+void admin_setmaxpreferusers(unsigned int ns, u_char* param)
+{
+	DWORD	maxusers;
+
+	if (!param) return;
+	maxusers = (DWORD)atoi(param);
+	if (maxusers == 0)
+	{
+		SENDSTR(ns, "Invalid value\r\n\r\n");
+		return;
+	}
+	if (D2GSSetMaxPreferUsers(maxusers))
+		SENDSTR(ns, "Done.\r\n\r\n");
+	else
+		SENDSTR(ns, "Can't write MAXPREFERUSER to registry\r\n");
+	return;
+
+} /* End of admin_setmaxpreferusers() */
+
+
+/**********************************************************
  * Function: admin_version
  * Return: None
  ************************************************************/
 void admin_getversion(unsigned int ns, u_char *param)
 {
-	unsigned char	buf[64];
+	unsigned char	buf[1024];
 
 	sprintf(buf, "Checksum: 0x%08X\r\n", d2gsconf.checksum);
 	SENDSTR(ns, buf);
-	sprintf(buf, "D2GS Version:  0x%08X\r\n", D2GS_VERSION);
+	sprintf(buf, "D2GS Version:  %s\r\n", D2GS_VERSION_STRING_ONLY);
 	SENDSTR(ns, buf);
-	sprintf(buf, "d2server.dll Version:  0x%08X\r\n", D2GS_LIBRARY_VERSION);
+	sprintf(buf, "D2GE Version: %s\r\n", gD2GEVersionString);
 	SENDSTR(ns, buf);
 	sprintf(buf, "Busy sleep time:  %lu\r\n", d2gsconf.busysleep);
 	SENDSTR(ns, buf);
 	sprintf(buf, "Idle sleep time:  %lu\r\n", d2gsconf.idlesleep);
 	SENDSTR(ns, buf);
 	sprintf(buf, "NT mode:  %s\r\n", d2gsconf.enablentmode ? "Enable" : "Disable");
+	SENDSTR(ns, buf);
+	sprintf(buf, "GS:  %s\r\n", d2gsconf.enablegslog ? "Enable" : "Disable");
 	SENDSTR(ns, buf);
 	return;
 
@@ -996,22 +1099,26 @@ void admin_getstatus(unsigned int ns, u_char *param)
 		return;
 	}
 
-	sprintf(buf, "Maximum game number: %lu\r\n", d2gsconf.gsmaxgames);
+	sprintf(buf, "Setting maximum game: %lu\r\n", d2gsconf.gsmaxgames);
+	SENDSTR(ns, buf);
+	sprintf(buf, "Current maximum game: %lu\r\n", d2gsconf.curgsmaxgames);
 	SENDSTR(ns, buf);
 	D2GSGetCurrentGameStatistic(&gamenum, &usernum);
-	sprintf(buf, "Current game number: %lu\r\n", gamenum);
+	sprintf(buf, "Current running game: %lu\r\n", gamenum);
 	SENDSTR(ns, buf);
 	sprintf(buf, "Current users in game: %lu\r\n", usernum);
+	SENDSTR(ns, buf);
+	sprintf(buf, "Maximum prefer users: %lu\r\n", d2gsconf.maxpreferusers);
 	SENDSTR(ns, buf);
 	sprintf(buf, "Maximum game life: %lu seconds\r\n", d2gsconf.maxgamelife);
 	SENDSTR(ns, buf);
 
 	status = D2GSGetConnectionStatus();
 	sprintf(buf, "Connetion to D2CS:  %s\r\n",
-		status&D2CSERVER ? "connected" : "not connect");
+		status&D2CSERVER ? "connected" : "failed");
 	SENDSTR(ns, buf);
 	sprintf(buf, "Connetion to D2DBS: %s\r\n",
-		status&D2DBSERVER ? "connected" : "not connect");
+		status&D2DBSERVER ? "connected" : "failed");
 	SENDSTR(ns, buf);
 
 	hPsapi = LoadLibrary("Psapi.dll");
@@ -1077,6 +1184,23 @@ void admin_getstatus(unsigned int ns, u_char *param)
 	SENDSTR(ns, "\r\n\r\n");
 
 	CloseHandle(hProcess);
+	switch (D2GSGetShutdownStatus() - 1)
+	{
+	case 0:
+		SENDSTR(ns, "The GS is in restarting progress!\r\n");
+		break;
+	case 1:
+		SENDSTR(ns, "The GS is in shutting down progress!\r\n");
+		break;
+	case 2:
+		SENDSTR(ns, "The GS is in D2CS restarting progress!\r\n");
+		break;
+	case 3:
+		SENDSTR(ns, "The GS is in D2CS shutting down progres!\r\n");
+		break;
+	default:
+		break;
+	}
 	return;
 
 } /* End of admin_getstatus() */
@@ -1174,3 +1298,53 @@ void admin_setmotd(unsigned int ns, u_char *param)
 		SENDSTR(ns, "Failed change MOTD!\r\n");
 
 } /* End of admin_setmotd() */
+
+
+void admin_showwe(unsigned int ns, u_char* param)
+{
+	unsigned char		buf[256];
+	unsigned char		timestr[32] = { 0 };
+	const WORLDEVENT* ret = 0;
+	ret = D2GSInitConfig();
+	if (!ret->bHasMsg)
+	{
+		SENDSTR(ns, "World Event : Disable\r\n");
+		return;
+	}
+	SENDSTR(ns, "     World Event : Enable\r\n");
+	sprintf(buf, "        Key Item : %s\r\n", (UCHAR*)(ret + 1));//0x20
+	SENDSTR(ns, buf);
+	sprintf(buf, "     Total Spawn : %lu\r\n", ret->WorldEventTotalSpawn);//1C
+	SENDSTR(ns, buf);
+	sprintf(buf, "     Base Count : %lu\r\n", ret->WorldEventBaseCount);//0x04
+	SENDSTR(ns, buf);
+	sprintf(buf, "Last Spawn Count : %lu\r\n", ret->WorldEventLastSpawnCount);//0C
+	SENDSTR(ns, buf);
+	sprintf(buf, "     Current Count : %lu\r\n", ret->WorldEventCurrentSpawnCount);//0x08
+	SENDSTR(ns, buf);
+	sprintf(buf, "Next Spawn Count : %lu\r\n", ret->WorldEventNextSpawnCount);//0x10
+	SENDSTR(ns, buf);
+
+	if (ret->WorldEventCurrentSpawnCount != 0)
+	{
+		FormatTimeString(ret->WorldEventLastSellTime, timestr, 0x20, 1);
+	}
+	else
+	{
+		strcpy(timestr, "enon");
+	}
+	sprintf(buf, "  Last Sell Time : %s\r\n", timestr);
+	SENDSTR(ns, buf);
+
+	if (ret->WorldEventTotalSpawn != 0)
+	{
+		FormatTimeString(ret->WorldEventLastSpawnTime, timestr, 0x20, 1);
+	}
+	else
+	{
+		strcpy(timestr, "enon");
+	}
+	sprintf(buf, "  Last Spawn Time : %s\r\n", timestr);
+	SENDSTR(ns, buf);
+	SENDSTR(ns, "\r\n");
+}

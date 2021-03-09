@@ -11,11 +11,15 @@ int   D2GEStartup(void);
 int   D2GECleanup(void);
 int   D2GEThreadInit(void);
 DWORD WINAPI D2GEThread(LPVOID lpParameter);
+void  D2GEReloadConfig(void);
 
 
 /* local function */
 static BOOL D2GSGetInterface(void);
 static DWORD __stdcall D2GSErrorHandle(void);
+
+
+extern D2GSINFO gD2GSInfo;
 
 
 #endif /* INCLUDED_D2GE_H */

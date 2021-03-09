@@ -4,11 +4,16 @@
 #include "d2gamelist.h"
 #include "net.h"
 #include "timer.h"
+#include "vars.h"
 
 
 /* vars */
 static HANDLE	hStopEvent = NULL;
 static HANDLE	ghTimerThread = NULL;
+
+
+/* functions */
+extern void		D2GSResetWatchDogCounter();
 
 
 /*********************************************************************
@@ -70,6 +75,24 @@ int CleanupRoutineForTimer(void)
 
 
 /*********************************************************************
+ * Purpose: resets watchdog counter when called 20 times
+ * Return: none
+ *********************************************************************/
+static void D2GSCheckTimerCount(void)
+{
+	static DWORD count = 0;
+	count++;
+	if (count >= 20)
+	{
+		count = 0;
+		EnterCriticalSection(&csGameList);
+		D2GSResetWatchDogCounter();
+		LeaveCriticalSection(&csGameList);
+	}
+}
+
+
+/*********************************************************************
  * Purpose: timer processor
  * Return: return value of the thread
  *********************************************************************/
@@ -94,6 +117,9 @@ DWORD WINAPI D2GSTimerProcessor(LPVOID lpParameter)
 			D2GSGetDataRequestTimerRoutine();
 			D2GSCalculateNetStatistic();
 			D2GSSendMOTD();
+			D2GSCheckGameLife();
+			D2GSCheckTimerCount();
+			D2GSShutdownTimer();
 		} else {
 			continue;
 		}
