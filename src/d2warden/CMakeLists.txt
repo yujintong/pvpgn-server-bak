@@ -16,7 +16,7 @@ add_library(D2Warden SHARED
 	RC4.h
 	d2warden.def)
 
-target_compile_definitions(D2Warden PRIVATE D2_1_13_d)
+target_compile_definitions(D2Warden PRIVATE D2_1_13_c)
 
 target_link_options(D2Warden PRIVATE /SAFESEH:NO)
 

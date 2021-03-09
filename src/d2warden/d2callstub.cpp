@@ -36,6 +36,8 @@ DWORD __declspec(naked) __fastcall D2GAME_Send0XAEPacket_STUB(void *ptPlayer,DWO
 	}
 }
 
+#if defined(D2_1_11_b) || defined(D2_1_13_d)
+
 DWORD __declspec(naked) __fastcall D2GAME_GameFindUnitFunc_STUB(DWORD ptGame, DWORD dwUnitId, DWORD dwUnitType)
 {
 	__asm {
@@ -58,3 +60,4 @@ DWORD __declspec(naked) __fastcall D2GAME_SendPacket_STUB(char *ptConnection,uns
 	}
 }
 
+#endif

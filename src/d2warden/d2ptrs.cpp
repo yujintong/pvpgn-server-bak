@@ -53,6 +53,17 @@ D2FUNCPTR(D2GAME, KickCharFromGame, DWORD __stdcall, (DWORD ClientID), -10042)
 
 D2FUNCPTR(D2NET, GetClient, DWORD __stdcall, (DWORD ClientID), -10035)
 
+#elif defined(D2_1_13_c)
+// D2NET ptrs
+D2FUNCPTR(D2NET, SendPacket, void __stdcall, (DWORD unk1, DWORD ClientID, unsigned char* ThePacket, DWORD PacketLen), -10002)
+// by marsgod D2Game
+D2FUNCPTR(D2GAME, GetClient_I, DWORD __fastcall, (DWORD ClientID), 0x6FC4AB70)
+D2FUNCPTR(D2GAME, LeaveCriticalSection_I, void __stdcall, (DWORD ClientID), 0x6FC49BA0)
+D2FUNCPTR(D2GAME, Send0XAEPacket_I, DWORD __fastcall, (void* ptPlayer, DWORD Length, DWORD* Packet), 0x6FCAA4F0)
+D2FUNCPTR(D2GAME, KickCharFromGame, DWORD __stdcall, (DWORD ClientID), -10003)
+
+D2FUNCPTR(D2NET, GetClient, DWORD __stdcall, (DWORD ClientID), -10015)
+
 #elif defined(D2_1_13_d)
 // D2NET ptrs
 D2NET_SendPacket_t* D2NET_SendPacket = (D2NET_SendPacket_t*)DLLOFFSET(D2NET, -10012);
