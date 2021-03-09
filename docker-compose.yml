@@ -2,16 +2,20 @@ version: "3"
 
 services:
   bnetd:
+    depends_on: 
+      - mysql
     image: pvpgn-server:bnetd-mysql
     restart: unless-stopped
     ports:
       - 6112:6112/udp
       - 6112:6112
     volumes:
-      - /your/config/dir:/usr/local/etc/pvpgn
-      - /your/asset/dir:/usr/local/var/pvpgn
+      - /opt/pvpgn/etc:/usr/local/etc/pvpgn
+      - /opt/pvpgn/var:/usr/local/var/pvpgn
   
   d2cs:
+    depends_on: 
+      - mysql
     image: pvpgn-server:d2cs-mysql
     restart: unless-stopped
     ports:
@@ -20,10 +24,12 @@ services:
     environment: 
       SERVER_TYPE: d2cs 
     volumes:
-      - /your/config/dir:/usr/local/etc/pvpgn
-      - /your/asset/dir:/usr/local/var/pvpgn
+      - /opt/pvpgn/etc:/usr/local/etc/pvpgn
+      - /opt/pvpgn/var:/usr/local/var/pvpgn
 
   d2dbs:
+    depends_on: 
+      - mysql
     image: pvpgn-server:d2dbs-mysql
     restart: unless-stopped
     ports:
@@ -32,8 +38,8 @@ services:
     environment:
       SERVER_TYPE: d2dbs 
     volumes:
-      - /your/config/dir:/usr/local/etc/pvpgn
-      - /your/asset/dir:/usr/local/var/pvpgn
+      - /opt/pvpgn/etc:/usr/local/etc/pvpgn
+      - /opt/pvpgn/var:/usr/local/var/pvpgn
 
   mysql:
     image: mysql:8.0
@@ -47,4 +53,4 @@ services:
       MYSQL_USER: bnetd
       MYSQL_PASSWORD: example
     volumes:
-      - /your/db/storage:/var/lib/mysql
+      - /opt/var/lib/mysql:/var/lib/mysql
