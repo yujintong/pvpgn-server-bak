@@ -1,10 +1,10 @@
 Player vs Player Gaming Network - PRO on Docker
 =====
 
-To quickly deploy a PVPGN server on linux, using Docker is one of the best choices. You can gain some benefits using this:
-- Small image size: approx 234MB uncompressed, 57MB compressed image size
-- Quick deploy, easy to scale out, manage and update
-- Simple to use and config
+To quickly deploy a PVPGN server (especially on Linux), using Docker is one of the best choices. You can gain some benefits using this:
+- Small image size: approx. 234MB uncompressed, 57MB compressed image size (with single backend and data storage support, eg: `bnetd` and `mysql`)
+- Quick to deploy, easy to scale out and update
+- Simple to use and configurate
 
 ## Prequisite:
 
@@ -60,11 +60,11 @@ docker build . \
   -t pvpgn-server:d2cs-sqlite      # tag the image 
 ```
 
-## How to run and manage:
+## How to build, run and manage:
 
-### Using docker only:
+### Common preparation:
 
-To run the images, you will need to mount existed configuration files and assets which is located at `/usr/local/etc/pvpgn` and `/usr/local/var/pvpgn` inside the container. The example bellow shows how to obtain configuration files and turn up some pvpgn servers with `mysql` support:
+Before doing anything, you will need to prepare the images and configuration files. The example below will helps you to build PVPGN servers with `mysql` support.
 
 1. Prepare images:
 
@@ -78,32 +78,33 @@ docker build . --build-arg with_d2dbs=true --build-arg with_bnetd=false -t pvpgn
 
 ```bash
 # create configuration and asset locations
-mkdir -p /your/config/dir /your/assets/dir
+mkdir -p /opt/pvpgn/etc /opt/pvpgn/var
 # copy configuration files and base assets from an image, all base configuration files in any image are the same
-docker run -v /your/config/dir:/tmp/conf --rm --entrypoint cp pvpgn-server:bnetd-mysql -r /usr/local/etc/pvpgn/* /tmp/conf
-docker run -v /your/assets/dir:/tmp/assets --rm --entrypoint cp pvpgn-server:bnetd-mysql -r /usr/local/etc/pvpgn/* /tmp/assets
+docker run -v /opt/pvpgn/etc:/tmp/conf --rm --entrypoint cp pvpgn-server:bnetd-mysql -r /usr/local/etc/pvpgn/* /tmp/conf
+docker run -v /opt/pvpgn/var:/tmp/assets --rm --entrypoint cp pvpgn-server:bnetd-mysql -r /usr/local/etc/pvpgn/* /tmp/assets
 ```
-Modifying the copied configuration files to fit your needs. check [this link](https://pvpgn.pro/pvpgn_installation.html) to get more information.
+Modifying the copied configuration files to fit your needs. check [this link](https://pvpgn.pro/pvpgn_installation.html) to get more information of the configuration files.
+
+### Using docker only:
+
+To run the images, you will need to mount existed configuration files and assets which is located at `/usr/local/etc/pvpgn` and `/usr/local/var/pvpgn` inside the container. If you don't have those, you can obtain them by following the above instruction. The example bellow shows how to turn up some PVPGN containers by some images prepared above:
 
 ```bash
+mkdir -p /opt/var/lib/mysql # create mysql data directory
 # start mysql to store data
 docker run -d \              # run detached
   --name mysql \             # set a name for mysql
   --restart unless-stopped \ # auto restart the container if it crash or server restart, unless you manually stop it
-  -v /your/db/storage:/var/lib/mysql \ # mount database storage to the host
-  mysql:8.0 --default-authentication-plugin=mysql_native_password # use native password instead of default "caching_sha2_password" authentication plugin, which is not supported by php and some legacy software
-```
+  -v /opt/var/lib/mysql:/var/lib/mysql \ # mount database storage to the host
+  mysql:8.0 --default-authentication-plugin=mysql_native_password # use native password instead of default "caching_sha2_password" authentication plugin, which is not supported by php and a lot legacy softwares
 
-3. Start services:
-
-```bash
 # run pvpgn with bnetd and mysql support
 docker run -d \
   --name pvpgn-bnetd \
   --restart unless-stopped \
   -p 6112:6112 -p 6112:6112/udp \ # forwarding default bnetd port with both tcp and udp protocol
-  -v /your/config/dir:/usr/local/etc/pvpgn \ # configuration mounting
-  -v /your/assets/dir:/usr/local/var/pvpgn \ # assets mounting
+  -v /opt/pvpgn/etc:/usr/local/etc/pvpgn \ # configuration mounting
+  -v /opt/pvpgn/var:/usr/local/var/pvpgn \ # assets mounting
   pvpgn-server:bnetd-mysql                   # bnetd with mysql support image
 
 # run pvpgn with d2cs and mysql support
@@ -112,8 +113,8 @@ docker run -d \
   --restart unless-stopped \
   -e SERVER_TYPE=d2cs \ # override bnetd server type to d2cs
   -p 6113:6113 -p 6113:6113/udp \ # forwarding default d2cs port
-  -v /your/config/dir:/usr/local/etc/pvpgn \ 
-  -v /your/assets/dir:/usr/local/var/pvpgn \ 
+  -v /opt/pvpgn/etc:/usr/local/etc/pvpgn \ 
+  -v /opt/pvpgn/var:/usr/local/var/pvpgn \ 
   pvpgn-server:d2cs-mysql # d2cs with mysql support image
 
 # run pvpgn with d2dbs and mysql support
@@ -122,8 +123,8 @@ docker run -d \
   --restart unless-stopped \
   -e SERVER_TYPE=d2dbs \ # override bnetd server type to d2dbs
   -p 6114:6114 -p 6114:6114/udp \ # forwarding default d2cdb port
-  -v /your/config/dir:/usr/local/etc/pvpgn \ 
-  -v /your/assets/dir:/usr/local/var/pvpgn \ 
+  -v /opt/pvpgn/etc:/usr/local/etc/pvpgn \ 
+  -v /opt/pvpgn/var:/usr/local/var/pvpgn \ 
   pvpgn-server:d2dbs-mysql # d2dbs with mysql support image
 ```
 
@@ -143,26 +144,9 @@ Change `pvpgn-bnetd` to `pvpgn-d2cs` or `pvpgn-d2dbs` to get corresponding conta
 
 To simplify the managing process, we should use `docker-compose`. The step-by-step example below will help you to create a system of 3 different containers running `bnetd`, `d2cs` and `d2dbs` with `mysql` storage:
 
-1. Prepare images:
+1. Copy the sample `docker-compose.yml` file from this repository and modify it to suit you (like changing volume mounting):
 
-```bash
-docker build . -t pvpgn-server:bnetd-mysql
-docker build . --build-arg with_d2cs=true --build-arg with_bnetd=false -t pvpgn-server:d2cs-mysql
-docker build . --build-arg with_d2dbs=true --build-arg with_bnetd=false -t pvpgn-server:d2dbs-mysql
-```
-
-2. Prepare configuration files and assets (skip this step if you've already had them):
-
-```bash
-mkdir -p /your/config/dir /your/assets/dir
-# copy configuration files and base assets from an image, all base configuration files in any image are the same
-docker run -v /your/config/dir:/tmp/conf --rm --entrypoint cp pvpgn-server:bnetd-mysql -r /usr/local/etc/pvpgn/* /tmp/conf
-docker run -v /your/assets/dir:/tmp/assets --rm --entrypoint cp pvpgn-server:bnetd-mysql -r /usr/local/etc/pvpgn/* /tmp/assets
-```
-
-3. Copy the sample `docker-compose.yml` file from this repository and modify it to suit you (like changing volume mounting)
-
-4. Finally, hit `docker-compose up -d` to turn up all containers
+2. Finally, hit `docker-compose up -d` to turn up all containers
 
 #### Obtain logs
 
@@ -177,7 +161,7 @@ docker-compose logs --tail 1000 bnetd # get last 1000 log lines of bnetd only
 
 ## Some notes:
 
-Here are some notes from my experience:
+Here are some notes from my administration experience:
 
 ### Spin up a simple server:
 
@@ -190,7 +174,7 @@ docker build . --build-arg with_sqlite3=true --build-arg with_mysql=false -t pvp
 docker run -d \
   --name pvpgn-bnetd \
   -p 6112:6112 -p 6112:6112/udp \
-  -v /your/config/dir/bnetd.conf:/usr/local/etc/pvpgn/bnetd.conf \ # just mount the bnetd configuration files
+  -v /opt/pvpgn/etc/bnetd.conf:/usr/local/etc/pvpgn/bnetd.conf \ # just mount the bnetd configuration files
   pvpgn-server:bnetd-sqlite
 ```
 
@@ -206,7 +190,7 @@ To achieve this, add `"userland-proxy": false` to `/etc/docker/daemon.json`:
 ```json
 {
     "userland-proxy": false
-    // some more options
+    // your existing options
 }
 ```
 
@@ -215,7 +199,7 @@ then restart docker daemon:
 sudo systemctl restart docker
 ```
 
-If this file does not exist, just create it and add this to the file and restart docker daemon with the command above:
+If `/etc/docker/daemon.json` file does not exist, just create a new one and add this to it then restart docker daemon with the command above:
 ```json
 {
     "userland-proxy": false
