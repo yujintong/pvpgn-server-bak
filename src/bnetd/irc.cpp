@@ -61,6 +61,7 @@
 #include "clan.h"
 #include "command.h"
 #include "anongame_wol.h"
+#include "i18n.h"
 #include "common/setup_after.h"
 
 namespace pvpgn
@@ -1467,47 +1468,41 @@ namespace pvpgn
 			{
 				bool send_failed_motd = false;
 
-				const char* filename;
-				if ((filename = prefs_get_motdfile()))
+				std::string filename = i18n_filename(prefs_get_motdfile(), conn_get_gamelang_localized(conn));
+				std::FILE* fp = std::fopen(filename.c_str(), "r");
+				if (fp)
 				{
-					fp = std::fopen(filename, "r");
-					if (fp)
+					bool first = true;
+					const char* line;
+					while ((line = file_get_line(fp)))
 					{
-						bool first = true;
-						const char* line;
-						while ((line = file_get_line(fp)))
+						if ((formatted_line = message_format_line(conn, line)))
 						{
-							if ((formatted_line = message_format_line(conn, line)))
+							formatted_line[0] = ' ';
+							std::string send_line = fmt::format(":-{}", formatted_line);
+
+							if (first)
 							{
-								formatted_line[0] = ' ';
-								std::string send_line = fmt::format(":-{}", formatted_line);
-
-								if (first)
-								{
-									irc_send(conn, RPL_MOTDSTART, send_line.c_str());
-									first = false;
-								}
-								else
-								{
-									irc_send(conn, RPL_MOTD, send_line.c_str());
-								}
-
-								xfree(formatted_line);
-								formatted_line = nullptr;
+								irc_send(conn, RPL_MOTDSTART, send_line.c_str());
+								first = false;
 							}
-						}
+							else
+							{
+								irc_send(conn, RPL_MOTD, send_line.c_str());
+							}
 
-						file_get_line(nullptr); // clear file_get_line buffer
-						std::fclose(fp);
-						fp = nullptr;
+							xfree(formatted_line);
+							formatted_line = nullptr;
+						}
 					}
-					else
-					{
-						send_failed_motd = true;
-					}
+
+					file_get_line(nullptr); // clear file_get_line buffer
+					std::fclose(fp);
+					fp = nullptr;
 				}
 				else
 				{
+					eventlog(eventlog_level_error, __FUNCTION__, "could not open motd file \"{}\" for reading (std::fopen: {})", filename, std::strerror(errno));
 					send_failed_motd = true;
 				}
 
