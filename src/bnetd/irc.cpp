@@ -344,7 +344,13 @@ namespace pvpgn
 			outpos = 1;
 
 			if ((conn_get_wol(c) == 1) && (channel_get_clienttag(channel) != 0 && (conn_get_clienttag(c) == channel_get_clienttag(channel))))
+			{
 				bname = channel_get_shortname(channel); /* We converting unreadable "lob 18 0" names to human redable ones */
+				if (!bname)
+				{
+					bname = channel_get_name(channel);
+				}
+			}
 			else
 				bname = channel_get_name(channel);
 
