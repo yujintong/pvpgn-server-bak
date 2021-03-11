@@ -57,6 +57,18 @@ if(WITH_BNETD)
 	find_package(ZLIB REQUIRED)
 endif(WITH_BNETD)
 
+if(WITH_D2GS)
+	add_library(d2gelib INTERFACE)
+	target_link_libraries(d2gelib INTERFACE ${CMAKE_SOURCE_DIR}/lib/d2gelib/d2server.lib)
+	target_include_directories(d2gelib INTERFACE ${CMAKE_SOURCE_DIR}/include/d2gelib/)
+	install(
+		FILES
+			"${PROJECT_SOURCE_DIR}/lib/d2gelib/d2gelib.dll"
+		DESTINATION
+			${SBINDIR}
+	)
+endif(WITH_D2GS)
+
 if(WITH_LUA)
 	if (WIN32 AND (NOT DEFINED LUA_LIBRARIES OR NOT DEFINED LUA_INCLUDE_DIR))
 		set(LUA_LIBRARIES ${CMAKE_SOURCE_DIR}/lib/lua/lua5.1.lib)

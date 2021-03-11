@@ -15,6 +15,9 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 option(WITH_BNETD "compile the bnetd target" ON)
 option(WITH_D2CS "compile the d2cs target" ON)
 option(WITH_D2DBS "compile the d2dbs target" ON)
+if(WIN32)
+	option(WITH_D2GS "compile the d2gs target" ON)
+endif(WIN32)
 option(WITH_LUA "enable Lua support" OFF)
 if(WIN32)
 	option(WITH_WIN32_GUI "enable GUI building (default on)" ON)
@@ -46,8 +49,6 @@ elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
 	add_definitions(
 		-D_CRT_SECURE_NO_DEPRECATE
 		-D_CRT_NONSTDC_NO_DEPRECATE
-		-DUNICODE
-		-D_UNICODE
 		-DNOMINMAX
 	)
 	
@@ -87,7 +88,7 @@ configure_file(
 
 add_custom_target(uninstall
     COMMAND ${CMAKE_COMMAND} -P ${CMAKE_MODULE_PATH}/cmake_uninstall.cmake)
-	
+
 # purge target
 configure_file(
     "${CMAKE_MODULE_PATH}/cmake_purge.cmake.in"
