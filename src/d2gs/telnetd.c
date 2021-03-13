@@ -223,7 +223,7 @@ DWORD WINAPI admin_service(LPVOID lpParam)
  * Purpose: administration service thread
  * Return: None
  ************************************************************/
-DWORD WINAPI admin_thread(LPVOID *lpParam)
+DWORD WINAPI admin_thread(LPVOID lpParam)
 {
 	unsigned int		ns;
 	unsigned char		buf[1024], recvbuf[2048];
