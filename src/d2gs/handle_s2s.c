@@ -272,7 +272,7 @@ void D2GSAuthreq(int peer, LPVOID lpdata)
 
 	/* get realm name */
 	char realm_name[MAX_REALMNAME_LEN] = { 0 };
-	snprintf(realm_name, sizeof(realm_name), "%s", (char*)&((void*)preq) + sizeof(t_d2cs_d2gs_authreq));
+	snprintf(realm_name, sizeof(realm_name), "%s", (char*)(preq + 1));
 	strcpy(d2gsparam.realmname, realm_name);
 
 	/* get session number */
