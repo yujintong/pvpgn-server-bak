@@ -1,11 +1,11 @@
 #include <winsock2.h>
 #include <windows.h>
 #include <tlhelp32.h>
+#include <Psapi.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include "psapi.h"
 #include <d2server.h>
 #include "d2gs.h"
 #include "eventlog.h"
@@ -1083,11 +1083,8 @@ void admin_kick_user(unsigned int ns, char* param)
  * Function: admin_getstatus
  * Return: None
  ************************************************************/
-typedef BOOL (WINAPI * GetProcessMemoryInfoFunc)(HANDLE, PPROCESS_MEMORY_COUNTERS, DWORD);
 void admin_getstatus(unsigned int ns, char* param)
 {
-	GetProcessMemoryInfoFunc	GetProcMem;
-	HMODULE						hPsapi;
 	HANDLE						hProcess;
 	PROCESS_MEMORY_COUNTERS		psmem;
 	char				buf[256];
@@ -1126,22 +1123,13 @@ void admin_getstatus(unsigned int ns, char* param)
 		status&D2DBSERVER ? "connected" : "failed");
 	SENDSTR(ns, buf);
 
-	hPsapi = LoadLibrary("Psapi.dll");
-	if (hPsapi) {
-		GetProcMem = (GetProcessMemoryInfoFunc)GetProcAddress(hPsapi, "GetProcessMemoryInfo");
-		if (GetProcMem) {
-			GetProcMem(hProcess, &psmem, sizeof(psmem));
-			sprintf(buf, "Physical memory usage: %7.3fMB/%7.3fMB\r\n",
-				psmem.WorkingSetSize/1048576.0, psmem.PeakWorkingSetSize/1048576.0);
-			SENDSTR(ns, buf);
-			sprintf(buf, "Virtual memory usage:  %7.3fMB/%7.3fMB\r\n",
-				psmem.PagefileUsage/1048576.0, psmem.PeakPagefileUsage/1048576.0);
-			SENDSTR(ns, buf);
-		}
-		FreeLibrary(hPsapi);
-	} else {
-		SENDSTR(ns, "No meomory info while Psapi.dll unavailable\r\n");
-	}
+	GetProcessMemoryInfo(hProcess, &psmem, sizeof(psmem));
+	sprintf(buf, "Physical memory usage: %7.3fMB/%7.3fMB\r\n",
+		psmem.WorkingSetSize/1048576.0, psmem.PeakWorkingSetSize/1048576.0);
+	SENDSTR(ns, buf);
+	sprintf(buf, "Virtual memory usage:  %7.3fMB/%7.3fMB\r\n",
+		psmem.PagefileUsage/1048576.0, psmem.PeakPagefileUsage/1048576.0);
+	SENDSTR(ns, buf);
 
 	QueryPerformanceFrequency(&freq);
 	if (freq.QuadPart==0) return;

@@ -29,7 +29,6 @@ add_executable(d2gs WIN32
 	main.cpp
 	net.cpp
 	net.h
-	psapi.h
 	telnetd.cpp
 	telnetd.h
 	timer.cpp
