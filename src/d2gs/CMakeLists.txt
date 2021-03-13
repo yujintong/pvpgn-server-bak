@@ -49,7 +49,7 @@ target_link_libraries(d2gs PRIVATE ws2_32 d2gelib)
 
 set_target_properties(d2gs
 	PROPERTIES
-		CXX_STANDARD 98
+		CXX_STANDARD 11
 		CXX_STANDARD_REQUIRED YES
 		CXX_EXTENSIONS NO)
 
