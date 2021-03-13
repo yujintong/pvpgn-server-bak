@@ -91,7 +91,7 @@ void D2GSGetNetStatistic(D2GSNETSTATISTIC *pnetstat);
 
 /* NETRECVBUFFER operator */
 void NRBInitialize(NETRECVBUFFER *lpnrb, u_short peer);
-void NRBAddNewData(NETRECVBUFFER *lpnrb, u_char *lpdata, u_int datalen);
+void NRBAddNewData(NETRECVBUFFER *lpnrb, void* lpdata, u_int datalen);
 int  NRBRemovePacketOut(NETRECVBUFFER *lpnrb, D2GSPACKET *lpPkt);
 void NSBInitialize(NETSENDBUFFER *lpnsr, u_short peer);
 int  NSBAppendData(NETSENDBUFFER *lpnsr, D2GSPACKET *lpPkt);

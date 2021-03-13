@@ -15,11 +15,11 @@ extern char * * strtoarray(char const * str, char const * delim, int * count)
 
 	if (!str || !delim || !count) return NULL;
 
-	temp=malloc(strlen(str)+1);
+	temp=static_cast<char*>(malloc(strlen(str)+1));
 	if (!temp) return NULL;
 
 	n = SPLIT_STRING_INIT_COUNT;
-	pindex=malloc(sizeof(char *) * n);
+	pindex=static_cast<int*>(malloc(sizeof(char *) * n));
 	if (!pindex) {
 		free(temp);
 		return NULL;
@@ -48,7 +48,7 @@ extern char * * strtoarray(char const * str, char const * delim, int * count)
 			if (in_delim) {
 				if (*count>=n) {
 					n += SPLIT_STRING_INCREASEMENT;
-					if (!(realloc_tmp=realloc(pindex,n * sizeof(char *)))) {
+					if (!(realloc_tmp=static_cast<char*>(realloc(pindex,n * sizeof(char *))))) {
 						free(pindex);
 						free(temp);
 						return NULL;
@@ -74,7 +74,7 @@ extern char * * strtoarray(char const * str, char const * delim, int * count)
 		free(pindex);
 		return NULL;
 	}
-	result=malloc(pd-temp+index_size);
+	result=static_cast<char*>(malloc(pd-temp+index_size));
 	if (!result) {
 		free(temp);
 		free(pindex);
@@ -101,10 +101,10 @@ extern char * * strtoargv(char const * str, int * count)
 	char		* realloc_tmp;
 
 	if (!str || !count) return NULL;
-	temp=malloc(strlen(str)+1);
+	temp=static_cast<char*>(malloc(strlen(str)+1));
 	if (!temp) return NULL;
 	n = SPLIT_STRING_INIT_COUNT;
-	pindex=malloc(n * sizeof (char *));
+	pindex=static_cast<int*>(malloc(n * sizeof (char *)));
 	if (!pindex) return NULL;
 
 	i=j=0;
@@ -114,7 +114,7 @@ extern char * * strtoargv(char const * str, int * count)
 		if (!str[i]) break;
 		if ((unsigned int)(*count) >=n ) {
 			n += SPLIT_STRING_INCREASEMENT;
-			if (!(realloc_tmp=realloc(pindex,n * sizeof(char *)))) {
+			if (!(realloc_tmp=static_cast<char*>(realloc(pindex,n * sizeof(char *))))) {
 				free(pindex);
 				free(temp);
 				return NULL;
@@ -148,7 +148,7 @@ extern char * * strtoargv(char const * str, int * count)
 		free(pindex);
 		return NULL;
 	}
-	result=malloc(j+index_size);
+	result=static_cast<char*>(malloc(j+index_size));
 	if (!result) {
 		free(temp);
 		free(pindex);

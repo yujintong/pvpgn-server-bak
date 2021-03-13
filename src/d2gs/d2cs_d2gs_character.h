@@ -7,6 +7,7 @@
 
 #ifdef D2GS
 # include "bn_types.h"
+# include "d2gs.h"
 #pragma pack(push, pack01, 1)
 #endif 
 
@@ -23,9 +24,9 @@ typedef struct
 	bn_int		checksum;
 	bn_int		total_play_time;/* total in game play time */
 	bn_int		reserved[6];
-	unsigned char	charname[MAX_CHARNAME_LEN];
-	unsigned char	account[MAX_ACCTNAME_LEN];
-	unsigned char	realmname[MAX_REALMNAME_LEN];
+	char		charname[MAX_CHARNAME_LEN];
+	char		account[MAX_ACCTNAME_LEN];
+	char		realmname[MAX_REALMNAME_LEN];
 } t_d2charinfo_header;
 
 typedef struct
@@ -40,7 +41,7 @@ typedef struct
 {
         bn_short        header;	/* 0x84 0x80 */
         bn_byte         gfx[11];
-        bn_byte         class;
+        bn_byte         chclass;
         bn_byte         color[11];
         bn_byte         level;
         bn_byte         status;

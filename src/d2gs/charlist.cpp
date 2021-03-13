@@ -77,7 +77,7 @@ void charlist_flush(void)
 }
 
 
-void *charlist_getdata(unsigned char const *charname, int type)
+void *charlist_getdata(const char* charname, int type)
 {
 	D2CHARLIST		*pcl;
 	unsigned int	hashval;
@@ -112,7 +112,7 @@ void *charlist_getdata(unsigned char const *charname, int type)
 }
 
 
-int charlist_insert(unsigned char *charname, void *pCharInfo, void *pGameInfo)
+int charlist_insert(const char* charname, void *pCharInfo, void *pGameInfo)
 {
 	D2CHARLIST		*pcl, *ptmp;
 	unsigned int	hashval;
@@ -148,7 +148,7 @@ int charlist_insert(unsigned char *charname, void *pCharInfo, void *pGameInfo)
 }
 
 
-int charlist_delete(unsigned char *charname)
+int charlist_delete(const char* charname)
 {
 	D2CHARLIST		*pcl, *ptmp;
 	unsigned int	hashval;

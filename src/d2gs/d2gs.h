@@ -114,12 +114,12 @@ typedef struct RAW_D2GSCONFIGS {
 	DWORD		multicpumask;
 	DWORD		maxpreferusers;
 	DWORD		maxpacketpersecond;
-	u_char		adminpwd[64];
+	char		adminpwd[64];
 	u_short		adminport;
 	u_short		padding;
-	u_char		d2cssecrect[32];
-	u_char		motd[256];
-	u_char		serverconffile[260];
+	char		d2cssecrect[32];
+	char		motd[256];
+	char		serverconffile[260];
 } D2GSCONFIGS, *PD2GSCONFIGS;
 
 
@@ -146,6 +146,9 @@ typedef struct AutoUpdateSetting
 /* function */
 int CleanupRoutineInsert(CLEANUP_ROUTINE pRoutine, char *comment);
 void CloseServerMutex(void);
+void D2GSShutdown(unsigned int exitcode);
+void D2GSShutdownTimer(void);
+void D2GSBeforeShutdown(DWORD status, DWORD seconds);
 
 
 #endif /* INCLUDED_D2GS_H */

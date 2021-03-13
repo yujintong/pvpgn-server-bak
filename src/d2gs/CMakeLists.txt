@@ -1,60 +1,58 @@
-enable_language(C)
-
 add_executable(d2gs WIN32
 	bn_types.h
-	bnethash.c
+	bnethash.cpp
 	bnethash.h
-	callback.c
+	callback.cpp
 	callback.h
-	charlist.c
+	charlist.cpp
 	charlist.h
-	config.c
+	config.cpp
 	config.h
 	connection.h
 	d2cs_d2gs_character.h
 	d2cs_d2gs_protocol.h
 	d2dbs_d2gs_protocol.h
-	d2gamelist.c
+	d2gamelist.cpp
 	d2gamelist.h
-	d2ge.c
+	d2ge.cpp
 	d2ge.h
 	d2gs.h
-	debug.c
+	debug.cpp
 	debug.h
-	eventlog.c
+	eventlog.cpp
 	eventlog.h
-	handle_s2s.c
+	handle_s2s.cpp
 	handle_s2s.h
-	hexdump.c
+	hexdump.cpp
 	hexdump.h
 	list.h
-	main.c
-	net.c
+	main.cpp
+	net.cpp
 	net.h
 	psapi.h
-	telnetd.c
+	telnetd.cpp
 	telnetd.h
-	timer.c
+	timer.cpp
 	timer.h
-	utils.c
+	utils.cpp
 	utils.h
-	vars.c
+	vars.cpp
 	vars.h
-	versioncheck.c
+	versioncheck.cpp
 	versioncheck.h
 	D2Server.ico
 	d2server.rc
 	resource.h)
 
-target_compile_definitions(d2gs PRIVATE D2GS)
+target_compile_definitions(d2gs PRIVATE D2GS _USE_32BIT_TIME_T)
 
 target_link_libraries(d2gs PRIVATE ws2_32 d2gelib)
 
 set_target_properties(d2gs
 	PROPERTIES
-		C_STANDARD 99
-		C_STANDARD_REQUIRED YES
-		C_EXTENSIONS NO)
+		CXX_STANDARD 98
+		CXX_STANDARD_REQUIRED YES
+		CXX_EXTENSIONS NO)
 
 install(TARGETS d2gs DESTINATION ${SBINDIR})
 

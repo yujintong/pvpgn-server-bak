@@ -190,7 +190,7 @@ static BOOL D2GSGetInterface(void)
  * Purpose: called by Game Engine when error occur
  * Return: TRUE(success) or FALSE(failed)
  *********************************************************************/
-static DWORD __stdcall D2GSErrorHandle(void)
+static int WINAPI D2GSErrorHandle(void)
 {
 	D2GSEventLog("D2GSErrorHandle", "Error occur, exiting...\n\n");
 

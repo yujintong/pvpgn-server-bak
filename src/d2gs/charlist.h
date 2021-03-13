@@ -24,7 +24,7 @@
 
 /* charlist info */
 typedef struct RAW_D2CHARLIST {
-	unsigned char	charname[MAX_CHARNAME_LEN];
+	char			charname[MAX_CHARNAME_LEN];
 	void			*pCharInfo;
 	void			*pGameInfo;
 	struct RAW_D2CHARLIST	*next;
@@ -36,9 +36,9 @@ unsigned int string_hash(char const *string);
 int charlist_init(unsigned int tbllen);
 int charlist_destroy(void);
 void charlist_flush(void);
-void *charlist_getdata(unsigned char const *charname, int type);
-int charlist_insert(unsigned char *charname, void *pCharInfo, void *pGameInfo);
-int charlist_delete(unsigned char *charname);
+void *charlist_getdata(const char* charname, int type);
+int charlist_insert(const char* charname, void *pCharInfo, void *pGameInfo);
+int charlist_delete(const char* charname);
 
 
 #endif /* INCLUDED_CHARLIST_H */

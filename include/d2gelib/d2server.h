@@ -76,8 +76,8 @@ typedef struct
 {
 	PLAYERMARK	PlayerMark;
 	DWORD		dwReserved;
-	UCHAR		CharName[16];
-	UCHAR		AcctName[16];
+	char		CharName[16];
+	char		AcctName[16];
 } PLAYERINFO, * PPLAYERINFO, * LPPLAYERINFO;
 
 typedef struct
@@ -87,13 +87,13 @@ typedef struct
 	DWORD WorldEventCurrentSpawnCount;
 	DWORD WorldEventLastSpawnCount;
 	DWORD WorldEventNextSpawnCount;
-	__time32_t WorldEventLastSellTime; // DWORD LastSellTickCount;
-	__time32_t WorldEventLastSpawnTime; // DWORD LastSpawnTickCount;
+	time_t WorldEventLastSellTime; // DWORD LastSellTickCount;
+	time_t WorldEventLastSpawnTime; // DWORD LastSpawnTickCount;
 	DWORD WorldEventTotalSpawn;
 	LPCSTR WorldEventKeyItem; // 128 bytes
 } WORLDEVENT, * PWORLDEVENT, * LPWORLDEVENT;
 
-typedef BOOL  (__stdcall * D2GSStartFunc ) (LPD2GSINFO lpD2GSInfo);
+typedef /*BOOL*/DWORD  (__stdcall * D2GSStartFunc ) (/*LPD2GSINFO*/ LPVOID lpD2GSInfo);
 typedef BOOL  (__stdcall * D2GSNewEmptyGameFunc) (LPCSTR lpGameName, LPCSTR lpGamePass,
 					LPCSTR lpGameDesc, DWORD dwGameFlag,
 					BYTE  bTemplate, BYTE bReserved1,

@@ -211,7 +211,7 @@ int RegkeyReadString(HKEY hKey, LPCTSTR name, char* buf, DWORD buflen)
 		return FALSE;
 	dwLen = buflen;
 	ZeroMemory(buf, buflen);
-	lReturn = RegQueryValueEx(hKey, name, NULL, &dwType, buf, &dwLen);
+	lReturn = RegQueryValueEx(hKey, name, NULL, &dwType, (LPBYTE)buf, &dwLen);
 	if (lReturn == ERROR_SUCCESS)
 	{
 		*(buf + buflen - 1) = 0;

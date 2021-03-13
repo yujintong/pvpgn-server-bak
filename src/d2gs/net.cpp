@@ -453,7 +453,7 @@ int D2GSNetRecvPacket(void)
 	WSAEVENT			hEvents[4];
 	DWORD				dwWait;
 	WSANETWORKEVENTS	NetEvents;
-	u_char				buffer[8192];
+	char				buffer[8192];
 	int					val;
 	int					retval;
 
@@ -572,7 +572,7 @@ int D2GSSendNetData(NETSENDBUFFER *lpnsr)
 	EnterCriticalSection(&csNet);
 	NSBGetData(lpnsr, &buf, &datalen);
 	if (datalen) {
-		bytes = send(sock, buf, datalen, 0);
+		bytes = send(sock, (char*)buf, datalen, 0);
 		if (bytes<=0) {
 			if (WSAGetLastError()==WSAEWOULDBLOCK) {
 				D2GSEventLog("D2GSSendNetData",
@@ -685,7 +685,7 @@ void NRBInitialize(NETRECVBUFFER *lpnbr, u_short peer)
  * Purpose: to add some new data to the NETRECVBUFFER
  * Return: None
  *********************************************************************/
-void NRBAddNewData(NETRECVBUFFER *lpnbr, u_char *lpdata, u_int datalen)
+void NRBAddNewData(NETRECVBUFFER *lpnbr, void* lpdata, u_int datalen)
 {
 	u_int		bmove;
 

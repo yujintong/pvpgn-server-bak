@@ -237,8 +237,8 @@ int D2GSGameListDelete(D2GAMEINFO *lpGameInfo)
  * Purpose: to insert a char into the game
  * Return: 0(success), other(failed)
  *********************************************************************/
-int D2GSInsertCharIntoGameInfo(D2GAMEINFO *lpGameInfo, DWORD token, UCHAR *AcctName,
-			UCHAR *CharName, UCHAR* RealmIPName, DWORD CharLevel, WORD CharClass, WORD EnterGame)
+int D2GSInsertCharIntoGameInfo(D2GAMEINFO *lpGameInfo, DWORD token, const char* AcctName,
+	const char* CharName, const char* RealmIPName, DWORD CharLevel, WORD CharClass, WORD EnterGame)
 {
 	D2CHARINFO		*lpCharInfo;
 	D2CHARINFO		*lpTemp;
@@ -327,8 +327,8 @@ int D2GSDeleteCharFromGameInfo(D2GAMEINFO *lpGameInfo, D2CHARINFO *lpCharInfo)
  *          (receive join game request, but not EnterGame event callback)
  * Return: 0(success), other(failed)
  *********************************************************************/
-int D2GSInsertCharIntoPendingList(DWORD token, UCHAR *AcctName,
-					UCHAR *CharName, UCHAR* RealmIPName, DWORD CharLevel, WORD CharClass, D2GAMEINFO *lpGame)
+int D2GSInsertCharIntoPendingList(DWORD token, const char* AcctName,
+	const char* CharName, const char* RealmIPName, DWORD CharLevel, WORD CharClass, D2GAMEINFO *lpGame)
 {
 	D2CHARINFO		*lpCharInfo;
 	D2CHARINFO		*lpTemp;
@@ -407,7 +407,7 @@ int D2GSDeletePendingChar(D2CHARINFO *lpCharInfo)
  * Purpose: to insert get data request to the list
  * Return: 0(success), other(failed)
  *********************************************************************/
-int D2GSInsertGetDataRequest(UCHAR *AcctName, UCHAR *CharName, DWORD dwClientId, DWORD dwSeqno)
+int D2GSInsertGetDataRequest(const char* AcctName, const char* CharName, DWORD dwClientId, DWORD dwSeqno)
 {
 	D2GETDATAREQUEST	*lpGetDataReq;
 	D2GETDATAREQUEST	*lpTemp;
@@ -492,7 +492,7 @@ D2GAMEINFO *D2GSFindGameInfoByGameId(WORD GameId)
  * Purpose: to find a game info by game name
  * Return: NULL(not found or failed), other(success)
  *********************************************************************/
-D2GAMEINFO *D2GSFindGameInfoByGameName(UCHAR *GameName)
+D2GAMEINFO *D2GSFindGameInfoByGameName(const char* GameName)
 {
 	D2GAMEINFO	*lpGame;
 
@@ -515,7 +515,7 @@ D2GAMEINFO *D2GSFindGameInfoByGameName(UCHAR *GameName)
  * Purpose: to find a char by char name in pending char list
  * Return: NULL(not found or failed), other(success)
  *********************************************************************/
-D2CHARINFO *D2GSFindCharInGameByCharName(D2GAMEINFO *lpGame, UCHAR *CharName)
+D2CHARINFO *D2GSFindCharInGameByCharName(D2GAMEINFO *lpGame, const char* CharName)
 {
 	D2CHARINFO		*lpChar;
 
@@ -559,7 +559,7 @@ D2CHARINFO *D2GSFindPendingCharByToken(DWORD token)
  * Purpose: to find a char by char name in pending char list
  * Return: NULL(not found or failed), other(success)
  *********************************************************************/
-D2CHARINFO *D2GSFindPendingCharByCharName(UCHAR *CharName)
+D2CHARINFO *D2GSFindPendingCharByCharName(const char *CharName)
 {
 	D2CHARINFO		*lpChar;
 
@@ -637,8 +637,8 @@ void D2GSGetDataRequestTimerRoutine(void)
 	MOTDCLIENT* lpBuffer = NULL;
 	D2GETDATAREQUEST	*lpGetDataReq, *lpTimeOutReq;
 	DWORD				dwClientId;
-	u_char				AcctName[MAX_ACCTNAME_LEN];
-	u_char				CharName[MAX_CHARNAME_LEN];
+	char				AcctName[MAX_ACCTNAME_LEN];
+	char				CharName[MAX_CHARNAME_LEN];
 	D2GAMEINFO			*lpGameInfo;
 	D2CHARINFO			*lpCharInfo;
 
@@ -654,7 +654,7 @@ void D2GSGetDataRequestTimerRoutine(void)
 		lpGetDataReq = lpGetDataReq->next;
 		if (lpTimeOutReq) {
 			dwClientId = lpTimeOutReq->ClientId;
-			lpBufferTemp = malloc(sizeof(MOTDCLIENT));
+			lpBufferTemp = static_cast<MOTDCLIENT*>(malloc(sizeof(MOTDCLIENT)));
 			if (!lpBufferTemp)
 			{
 				D2GSSendDatabaseCharacter(dwClientId, NULL, 0, 0, TRUE, 0, NULL, 1);
@@ -712,10 +712,10 @@ void D2GSGetDataRequestTimerRoutine(void)
 
 /*-------------------------------------------------------------------*/
 
-void FormatTimeString(long t, u_char *buf, int len, int format)
+void FormatTimeString(time_t t, char* buf, int len, int format)
 {
 	struct tm		*tm;
-	long			now;
+	time_t			now;
 
 	ZeroMemory(buf, len);
 	now = t;
@@ -746,7 +746,8 @@ void D2GSShowGameList(unsigned int ns)
 {
 	D2GAMEINFO		*lpGame;
 	int				gamecount, charcount;
-	unsigned char	buf[256], timestr[32];
+	char			buf[256];
+	char			timestr[32];
 
 	gamecount = charcount = 0;
 	sprintf(buf, "+-No.--GameName---------GamePass---------ID----GameVer--Type--Difficulty--Ladder-----Users-CreateTime-Dis-+\r\n");
@@ -794,7 +795,8 @@ void D2GSShowCharInGame(unsigned int ns, WORD GameId)
 {
 	D2GAMEINFO		*lpGame;
 	D2CHARINFO		*lpChar;
-	unsigned char	buf[256], timestr[32];
+	char			buf[256];
+	char			timestr[32];
 	int				count;
 
 	EnterCriticalSection(&csGameList);
@@ -1038,7 +1040,7 @@ int chat_message_announce_char(DWORD dwMsgType, const char *CharName, const char
 	D2CHARINFO		*lpChar;
 
 	EnterCriticalSection(&csGameList);
-	lpChar = charlist_getdata(CharName, CHARLIST_GET_CHARINFO);
+	lpChar = (D2CHARINFO*)charlist_getdata(CharName, CHARLIST_GET_CHARINFO);
 	if (!lpChar) {
 		LeaveCriticalSection(&csGameList);
 		return -1;
@@ -1196,7 +1198,7 @@ void D2GSCheckGameLife()
 			if ((curTime - lpGame->CreateTime) > d2gsconf.maxgamelife)
 			{
 				lpChar = lpGame->lpCharInfo;
-				overLastMinute = (((DWORD)curTime - lpGame->CreateTime) >= (d2gsconf.maxgamelife + 60));
+				overLastMinute = ((curTime - lpGame->CreateTime) >= (d2gsconf.maxgamelife + 60));
 				/*
 					cmp eax, edx; >= cf=0, < cf=1
 					sbb edi,edi -> edi - edi - cf -> 0, -1

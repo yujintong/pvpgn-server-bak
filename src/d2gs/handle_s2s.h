@@ -4,7 +4,7 @@
 
 /* structure */
 typedef struct {
-	UCHAR		realmname[MAX_REALMNAME_LEN];
+	char		realmname[MAX_REALMNAME_LEN];
 	DWORD		sessionnum;
 	DWORD		gsactive;
 } D2GSPARAM, *PD2GSPARAM, *LPD2GAPARAM;
@@ -63,7 +63,7 @@ void D2GSLoadComplete(WORD wGameId, LPCSTR lpCharName, BOOL bExpansion);
 /* by d2dbs */
 void D2DBSSaveDataReply(int peer, LPVOID lpdata);
 void D2DBSGetDataReply(int peer, LPVOID lpdata);
-void D2GSSetCharLockStatus(LPCSTR lpAccountName, LPCSTR lpCharName, UCHAR *RealmName, DWORD CharLockStatus);
+void D2GSSetCharLockStatus(const char* lpAccountName, const char* lpCharName, const char* RealmName, DWORD CharLockStatus);
 void D2GSUnlockChar(LPCSTR lpAccountName, LPCSTR lpCharName);
 
 
