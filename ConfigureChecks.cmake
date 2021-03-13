@@ -63,7 +63,7 @@ if(WITH_D2GS)
 	target_include_directories(d2gelib INTERFACE ${CMAKE_SOURCE_DIR}/include/d2gelib/)
 	install(
 		FILES
-			"${PROJECT_SOURCE_DIR}/lib/d2gelib/d2gelib.dll"
+			"${PROJECT_SOURCE_DIR}/lib/d2gelib/d2server.dll"
 		DESTINATION
 			${SBINDIR}
 	)
