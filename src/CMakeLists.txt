@@ -49,3 +49,7 @@ if(CMAKE_TESTING_ENABLED)
     add_subdirectory(test)
 endif(CMAKE_TESTING_ENABLED)
 
+if (NOT HAVE_MICROSOFT_GMTIME_S AND NOT HAVE_GMTIME_S AND NOT HAVE_GMTIME_R)
+    message(FATAL_ERROR "At least one of HAVE_MICROSOFT_GMTIME_S, HAVE_GMTIME_S or HAVE_GMTIME_R needs to be found.")
+endif()
+

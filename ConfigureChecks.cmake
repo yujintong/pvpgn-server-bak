@@ -172,7 +172,7 @@ check_function_exists(getrlimit HAVE_GETRLIMIT)
 check_cxx_source_compiles("
 #include <ctime>
 int main() {
-	std::time_t t = std::time(nullptr);
+	std::time_t t = std::time(NULL);
 	struct tm buf;
 	errno_t err = gmtime_s(&buf, &t);
 	return 0;
@@ -181,7 +181,7 @@ int main() {
 check_cxx_source_compiles("
 #include <ctime>
 int main() {
-	std::time_t t = std::time(nullptr);
+	std::time_t t = std::time(NULL);
 	struct tm buf;
 	struct tm* retbuf = gmtime_s(&t, &buf);
 	return 0;
@@ -190,7 +190,7 @@ int main() {
 check_cxx_source_compiles("
 #include <ctime>
 int main() {
-	std::time_t t = std::time(nullptr);
+	std::time_t t = std::time(NULL);
 	struct tm buf;
 	struct tm* retbuf = gmtime_r(&t, &buf);
 	return 0;
@@ -203,7 +203,7 @@ check_function_exists(kqueue HAVE_KQUEUE)
 check_cxx_source_compiles("
 #include <ctime>
 int main() {
-	std::time_t t = std::time(nullptr);
+	std::time_t t = std::time(NULL);
 	struct tm buf;
 	errno_t err = localtime_s(&buf, &t);
 	return 0;
@@ -212,7 +212,7 @@ int main() {
 check_cxx_source_compiles("
 #include <ctime>
 int main() {
-	std::time_t t = std::time(nullptr);
+	std::time_t t = std::time(NULL);
 	struct tm buf;
 	struct tm* retbuf = localtime_s(&t, &buf);
 	return 0;
@@ -221,7 +221,7 @@ int main() {
 check_cxx_source_compiles("
 #include <ctime>
 int main() {
-	std::time_t t = std::time(nullptr);
+	std::time_t t = std::time(NULL);
 	struct tm buf;
 	struct tm* retbuf = localtime_r(&t, &buf);
 	return 0;
