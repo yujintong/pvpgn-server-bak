@@ -5,6 +5,7 @@
 #include "net.h"
 #include "timer.h"
 #include "vars.h"
+#include "watchdog.h"
 
 
 /* vars */

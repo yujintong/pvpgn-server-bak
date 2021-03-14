@@ -39,6 +39,8 @@ add_executable(d2gs WIN32
 	vars.h
 	versioncheck.cpp
 	versioncheck.h
+	watchdog.cpp
+	watchdog.h
 	D2Server.ico
 	d2server.rc
 	resource.h)

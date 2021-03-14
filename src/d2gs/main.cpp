@@ -21,6 +21,7 @@
 #include "telnetd.h"
 #include "d2gamelist.h"
 #include "handle_s2s.h"
+#include "watchdog.h"
 
 
 /* function declarations */
@@ -28,8 +29,6 @@ int  DoCleanup(void);
 BOOL D2GSCheckRunning(void);
 int  CleanupRoutineForServerMutex(void);
 void D2GSShutdown(unsigned int exitCode);
-void D2GSWatchDogInit(void);
-void D2GSResetWatchDogCounter(void);
 extern BOOL D2GSCheckGameInfo(void);
 extern BOOL D2GSSaveAllGames(DWORD dwMilliseconds);
 
@@ -40,13 +39,9 @@ BOOL WINAPI ControlHandler(DWORD dwCtrlType);
 /* some variables used just in this file */
 static HANDLE			hD2GSMutex  = NULL;
 static HANDLE			hStopEvent  = NULL;
-static HANDLE			hWatchDog	= NULL;
 static CLEANUP_RT_ITEM	*pCleanupRT = NULL;
-static CRITICAL_SECTION	csWatchDog;
 static DWORD			dwShutdownStatus = 0;
 static DWORD			dwShutdownTickCount = 0;
-static DWORD			dwWatchDogCounter = 0;
-
 
 
 /********************************************************************************
@@ -444,68 +439,5 @@ void D2GSShutdownTimer(void)
 		}
 		LeaveCriticalSection(&gsShutDown);
 	}
-	return;
-}
-
-
-DWORD CheckWatchDogCounter(void)
-{
-	EnterCriticalSection(&csWatchDog);
-	dwWatchDogCounter++;
-	if (dwWatchDogCounter < 0xF)
-	{
-		LeaveCriticalSection(&csWatchDog);
-		return 0;
-	}
-	LeaveCriticalSection(&csWatchDog);
-	return 1;
-}
-
-
-void D2GSResetWatchDogCounter(void)
-{
-	EnterCriticalSection(&csWatchDog);
-	dwWatchDogCounter = 0;
-	LeaveCriticalSection(&csWatchDog);
-}
-
-
-DWORD WINAPI D2GSWatchDogThread(LPVOID p)
-{
-	while (TRUE)
-	{
-		Sleep(6000);
-		if (CheckWatchDogCounter() != 0)
-		{
-			break;
-		}
-		if (D2GSCheckTickCount && D2GSCheckTickCount(0) != 0)
-		{
-			break;
-		}
-	}
-	d2gsconf.enablegslog = TRUE;
-	D2GSEventLog("watchdog_thread", "D2GS maybe in deadlock, restart it");
-	d2gsconf.enablegslog = FALSE;
-	CloseServerMutex();
-	D2GSShutdown(0);
-	return 0;
-}
-
-
-void D2GSWatchDogInit(void)
-{
-	DWORD dwThreadId = 0;
-	hWatchDog = 0;
-	InitializeCriticalSection(&csWatchDog);
-	hWatchDog = CreateThread(0, 0, D2GSWatchDogThread, NULL, 0, &dwThreadId);
-	if (!hWatchDog)
-	{
-		DWORD error = GetLastError();
-		D2GSEventLog("watchdog_init", "CreateThread watchdog_thread. Code: %lu", error);
-		return;
-	}
-	CloseHandle(hWatchDog);
-	D2GSEventLog("watchdog_init", "CreateThread watchdog_thread, %lu", dwThreadId);
 	return;
 }
