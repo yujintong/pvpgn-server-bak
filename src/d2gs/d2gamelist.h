@@ -112,6 +112,7 @@ int chat_message_announce_char2(DWORD dwMsgType, DWORD dwClientId, const char *m
 
 int D2GSMOTDAdd(DWORD dwClientId);
 int D2GSSendMOTD(void);
+BOOL D2GSCheckGameInfo();
 void D2GSCheckGameLife();
 BOOL D2GSSaveAllGames(DWORD dwMilliseconds);
 

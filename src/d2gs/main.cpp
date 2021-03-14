@@ -29,7 +29,6 @@ int  DoCleanup(void);
 BOOL D2GSCheckRunning(void);
 int  CleanupRoutineForServerMutex(void);
 void D2GSShutdown(unsigned int exitCode);
-extern BOOL D2GSCheckGameInfo(void);
 extern BOOL D2GSSaveAllGames(DWORD dwMilliseconds);
 
 /* CTRL+C or CTRL+Break signal handler */
