@@ -7,6 +7,9 @@
 #include <ctype.h>
 #include <string.h>
 #include <limits.h>
+#include <functional>
+#include <stdexcept>
+#include <unordered_map>
 #include <d2server.h>
 #include "d2gs.h"
 #include "vars.h"
@@ -183,33 +186,21 @@ void D2GSSendClassToD2DBS(void)
 }
 
 
-typedef void (*PacketProc)(int, LPVOID);
-typedef struct PacketProcItem
-{
-	DWORD			Size;
-	PacketProc		Proc;
-	DWORD			DebugPacketType;
-	const char* DebugPacketTypeStr;
-	const char* DebugFuncNameStr;
-}PacketProcItem;
-
-//#define DECL_ITEM(Val, S, Proc) [Val] = {S, Proc, Val, #Val, #Proc}
-#define DECL_ITEM(Val, S, Proc) {S, Proc, Val, #Val, #Proc}
-
-static PacketProcItem ProcItems[0x36] = {
-	DECL_ITEM(D2CS_D2GS_AUTHREQ,				sizeof(t_d2cs_d2gs_authreq),				D2GSAuthreq),				//0x10
-	DECL_ITEM(D2CS_D2GS_AUTHREPLY,				sizeof(t_d2cs_d2gs_authreply),				D2GSAuthReply),				//0x11
-	DECL_ITEM(D2GS_D2CS_SETGSINFO,				sizeof(t_d2gs_d2cs_setgsinfo),				D2GSSetGameInfoByD2CS),		//0x12
-	DECL_ITEM(D2CS_D2GS_ECHOREQ,				sizeof(t_d2cs_d2gs_echoreq),				D2XSEchoReply),				//0x13
-	DECL_ITEM(D2CS_D2GS_CONTROL,				sizeof(t_d2cs_d2gs_control),				D2CSControlCmd),			//0x14
-	DECL_ITEM(D2CS_D2GS_SETINITINFO,			sizeof(t_d2cs_d2gs_setinitinfo),			D2GSSetInitInfo),			//0x15
-	DECL_ITEM(D2CS_D2GS_SETCONFFILE,			sizeof(t_d2cs_d2gs_setconffile) + 1,		D2GSSetConfFile),			//0x16
-	DECL_ITEM(D2CS_D2GS_CREATEGAMEREQ,			sizeof(t_d2cs_d2gs_creategamereq) + 1,		D2CSCreateEmptyGame),		//0x20
-	DECL_ITEM(D2CS_D2GS_JOINGAMEREQ,			sizeof(t_d2cs_d2gs_joingamereq) + 1,		D2CSClientJoinGameRequest),	//0x21
-	DECL_ITEM(D2DBS_D2GS_SAVE_DATA_REPLY,		sizeof(t_d2dbs_d2gs_save_data_reply) + 1,	D2DBSSaveDataReply),		//0x30
-	DECL_ITEM(D2DBS_D2GS_GET_DATA_REPLY,		sizeof(t_d2dbs_d2gs_get_data_reply) + 1,	D2DBSGetDataReply),			//0x31
-	DECL_ITEM(D2DBS_D2GS_ECHOREQUEST,			sizeof(t_d2dbs_d2gs_echoreq),				D2XSEchoReply)				//0x34
+std::unordered_map<decltype(t_d2cs_d2gs_header::type), std::function<void(int, LPVOID)>> s2s_packet_table = {
+	{ D2CS_D2GS_AUTHREQ,			D2GSAuthreq },
+	{ D2CS_D2GS_AUTHREPLY,			D2GSAuthReply },
+	{ D2GS_D2CS_SETGSINFO,			D2GSSetGameInfoByD2CS },
+	{ D2CS_D2GS_ECHOREQ,			D2XSEchoReply },
+	{ D2CS_D2GS_CONTROL,			D2CSControlCmd },
+	{ D2CS_D2GS_SETINITINFO,		D2GSSetInitInfo },
+	{ D2CS_D2GS_SETCONFFILE,		D2GSSetConfFile },
+	{ D2CS_D2GS_CREATEGAMEREQ,		D2CSCreateEmptyGame },
+	{ D2CS_D2GS_JOINGAMEREQ,		D2CSClientJoinGameRequest },
+	{ D2DBS_D2GS_SAVE_DATA_REPLY,	D2DBSSaveDataReply },
+	{ D2DBS_D2GS_GET_DATA_REPLY,	D2DBSGetDataReply },
+	{ D2DBS_D2GS_ECHOREQUEST,		D2XSEchoReply }
 };
+
 
 /*********************************************************************
  * Purpose: to deal with a packet received
@@ -232,29 +223,26 @@ void D2GSHandleS2SPacket(D2GSPACKET *lpPacket)
 		return;
 	}
 
-	if (bn_ntohs(lpcshead->type) >= 0x36 || ProcItems[bn_ntohs(lpcshead->type)].Proc == 0)
+	std::function<void(int, LPVOID)> packet_handler;
+	try
 	{
-		D2GSEventLog("D2GSHandleS2SPacket",
-			"No packet handler found for type 0x%02x",
-			lpcshead->type
-		);
+		packet_handler = s2s_packet_table.at(lpcshead->type);
+	}
+	catch (const std::out_of_range&)
+	{
+		D2GSEventLog("D2GSHandleS2SPacket", "No packet handler for packet type 0x%02x", lpcshead->type);
 		return;
 	}
 
-	if (bn_ntohs(lpcshead->size) < ProcItems[bn_ntohs(lpcshead->type)].Size)
+	try
 	{
-		D2GSEventLog("D2GSHandleS2SPacket",
-			"Packet data size incorrect!"
-		);
+		packet_handler(lpPacket->peer, static_cast<LPVOID>(lpPacket->data));
+	}
+	catch (const std::exception& e)
+	{
+		D2GSEventLog("D2GSHandleS2SPacket", "Caught exception: %s", e.what());
 		return;
 	}
-
-	D2GSEventLog("D2GSHandleS2SPacket", "Type %x Name %s Proc %s Peer %d",
-		ProcItems[lpcshead->type].DebugPacketType,
-		ProcItems[lpcshead->type].DebugPacketTypeStr,
-		ProcItems[lpcshead->type].DebugFuncNameStr,
-		lpPacket->peer);
-	ProcItems[bn_ntohs(lpcshead->type)].Proc(lpPacket->peer, (LPVOID)lpPacket->data);
 } /* End of D2GSHandleS2SPacket() */
 
 
