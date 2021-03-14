@@ -289,7 +289,7 @@ BOOL WINAPI ControlHandler(DWORD dwCtrlType)
  * Purpose: to close the server mutex
  * Return: none
  *********************************************************************/
-void CloseServerMutex(void)
+static void CloseServerMutex(void)
 {
 	if (hD2GSMutex) CloseHandle(hD2GSMutex);
 	hD2GSMutex = NULL;
@@ -331,6 +331,8 @@ DWORD D2GSGetShutdownStatus(void)
 
 void D2GSShutdown(unsigned int exitCode)
 {
+	CloseServerMutex();
+
 	if (D2GSCheckGameInfo())
 	{
 		D2GSSaveAllGames(5000);
@@ -376,7 +378,6 @@ void D2GSShutdownTimer(void)
 					D2GSEventLog("D2GSShutdownTimer", "Restart GS now");
 					D2GSEventLogCleanup();
 					d2gsconf.enablegslog = 0;
-					CloseServerMutex();
 					D2GSShutdown(0);
 					break;
 				case 1:
@@ -384,7 +385,6 @@ void D2GSShutdownTimer(void)
 					D2GSEventLog("D2GSShutdownTimer", "Shutdown GS now");
 					D2GSEventLogCleanup();
 					d2gsconf.enablegslog = 0;
-					CloseServerMutex();
 					D2GSShutdown(1);
 					break;
 				case 2:
@@ -392,7 +392,6 @@ void D2GSShutdownTimer(void)
 					D2GSEventLog("D2GSShutdownTimer", "D2CS Restart GS now");
 					D2GSEventLogCleanup();
 					d2gsconf.enablegslog = 0;
-					CloseServerMutex();
 					D2GSShutdown(0);
 					break;
 				case 3:
@@ -400,7 +399,6 @@ void D2GSShutdownTimer(void)
 					D2GSEventLog("D2GSShutdownTimer", "D2CS Shutdown GS now");
 					D2GSEventLogCleanup();
 					d2gsconf.enablegslog = 0;
-					CloseServerMutex();
 					D2GSShutdown(1);
 					break;
 				default:

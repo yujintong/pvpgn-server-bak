@@ -69,7 +69,6 @@ static DWORD WINAPI D2GSWatchDogThread(LPVOID p)
 	d2gsconf.enablegslog = TRUE;
 	D2GSEventLog("watchdog_thread", "D2GS maybe in deadlock, restart it");
 	d2gsconf.enablegslog = FALSE;
-	CloseServerMutex();
 	D2GSShutdown(0);
 	return 0;
 }

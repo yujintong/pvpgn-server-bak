@@ -203,7 +203,6 @@ static int WINAPI D2GSErrorHandle(void)
 	D2GSEventLog("D2GSErrorHandle", "Error occur, exiting...\n\n");
 	d2gsconf.enablegslog = 0;
 
-	CloseServerMutex();
 	D2GSShutdown(0);
 	return 0;
 

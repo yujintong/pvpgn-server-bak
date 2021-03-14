@@ -145,7 +145,6 @@ typedef struct AutoUpdateSetting
 
 /* function */
 int CleanupRoutineInsert(CLEANUP_ROUTINE pRoutine, char *comment);
-void CloseServerMutex(void);
 void D2GSShutdown(unsigned int exitcode);
 void D2GSShutdownTimer(void);
 void D2GSBeforeShutdown(DWORD status, DWORD seconds);
