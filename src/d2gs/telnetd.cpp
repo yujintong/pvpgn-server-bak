@@ -7,6 +7,7 @@
 #include <string.h>
 #include <time.h>
 #include <d2server.h>
+#include "common/bnethash.h"
 #include "d2gs.h"
 #include "eventlog.h"
 #include "config.h"
@@ -16,7 +17,6 @@
 #include "vars.h"
 #include "charlist.h"
 #include "telnetd.h"
-#include "bnethash.h"
 #include "utils.h"
 #include "d2ge.h"
 #include "server.h"

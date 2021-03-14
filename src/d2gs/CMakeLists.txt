@@ -1,7 +1,5 @@
 add_executable(d2gs WIN32
 	bn_types.h
-	bnethash.cpp
-	bnethash.h
 	callback.cpp
 	callback.h
 	charlist.cpp
@@ -49,7 +47,7 @@ add_executable(d2gs WIN32
 
 target_compile_definitions(d2gs PRIVATE D2GS _USE_32BIT_TIME_T)
 
-target_link_libraries(d2gs PRIVATE ws2_32 d2gelib)
+target_link_libraries(d2gs PRIVATE common ws2_32 d2gelib)
 
 set_target_properties(d2gs
 	PROPERTIES
