@@ -13,6 +13,12 @@
 #include "utils.h"
 
 
+namespace pvpgn
+{
+
+	namespace d2gs
+	{
+
 /* vars */
 static D2GAMEINFO		*lpGameInfoHead   = NULL;
 static D2CHARINFO		*lpPendingChar    = NULL;
@@ -1262,4 +1268,8 @@ void D2GSCheckGameLife()
 		pCheckCharHead = pCheckCharHead->Next;
 		free(pCheckCharLife);
 	}
+}
+
+}
+
 }

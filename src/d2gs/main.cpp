@@ -22,22 +22,20 @@
 #include "d2gamelist.h"
 #include "handle_s2s.h"
 #include "watchdog.h"
+#include "server.h"
 
+using namespace pvpgn::d2gs;
+using namespace pvpgn;
 
 /* function declarations */
-int  DoCleanup(void);
 BOOL D2GSCheckRunning(void);
-int  CleanupRoutineForServerMutex(void);
-void D2GSShutdown(unsigned int exitCode);
+void pvpgn::d2gs::D2GSShutdown(unsigned int exitCode);
 
 /* CTRL+C or CTRL+Break signal handler */
 BOOL WINAPI ControlHandler(DWORD dwCtrlType);
 
 
 /* some variables used just in this file */
-static HANDLE			hD2GSMutex  = NULL;
-static HANDLE			hStopEvent  = NULL;
-static CLEANUP_RT_ITEM	*pCleanupRT = NULL;
 static DWORD			dwShutdownStatus = 0;
 static DWORD			dwShutdownTickCount = 0;
 
@@ -48,9 +46,6 @@ static DWORD			dwShutdownTickCount = 0;
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nCmdShow)
 {
 	DWORD	dwWait;
-
-	/* reset cleanup routine list */
-	pCleanupRT = NULL;
 
 	InitializeCriticalSection(&gsShutDown);
 
@@ -155,73 +150,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine, in
 
 
 /*********************************************************************
- * Purpose: to add an cleanup routine item to the list
- * Return: TRUE(success) or FALSE(failed)
- *********************************************************************/
-int CleanupRoutineInsert(CLEANUP_ROUTINE pRoutine, char *comment)
-{
-	CLEANUP_RT_ITEM		*pitem;
-
-	if (pRoutine==NULL) return FALSE;
-	pitem = (CLEANUP_RT_ITEM *)malloc(sizeof(CLEANUP_RT_ITEM));
-	if (!pitem) {
-		D2GSEventLog("CleanupRoutineInsert", "Can't alloc memory");
-		return FALSE;
-	}
-	ZeroMemory(pitem, sizeof(CLEANUP_RT_ITEM));
-
-	/* fill the structure */
-	if (comment)
-		strncpy(pitem->comment, comment, sizeof(pitem->comment)-1);
-	else
-		strncpy(pitem->comment, "unknown", sizeof(pitem->comment)-1);
-	pitem->cleanup = pRoutine;
-	pitem->next = pCleanupRT;
-	pCleanupRT = pitem;
-
-	return TRUE;
-
-} /* End of CleanupRoutineInsert() */
-
-
-/*********************************************************************
- * Purpose: call the cleanup routine to do real cleanup work
- * Return: TRUE or FALSE
- *********************************************************************/
-int DoCleanup(void)
-{
-	CLEANUP_RT_ITEM		*pitem, *pprev;
-
-	pitem = pCleanupRT;
-	while(pitem)
-	{
-		D2GSEventLog("DoCleanup", "Calling cleanup routine '%s'", pitem->comment);
-		pitem->cleanup();
-		pprev = pitem;
-		pitem = pitem->next;
-		free(pprev);
-	}
-	pCleanupRT = NULL;
-
-	/* at last, cleanup event log system */
-	D2GSEventLog("DoCleanup", "Cleanup done.");
-	D2GSEventLogCleanup();
-
-	/* Close the mutex */
-	if (hD2GSMutex)	CloseHandle(hD2GSMutex);
-	if (hStopEvent) CloseHandle(hStopEvent);
-
-#ifdef DEBUG_ON_CONSOLE
-	printf("Press Any Key to Continue");
-	_getch();
-#endif
-
-	return TRUE;
-
-} /* End of DoCleanup() */
-
-
-/*********************************************************************
  * Purpose: check if other instance is running
  * Return: TRUE(server is running) or FALSE(not running)
  *********************************************************************/
@@ -248,18 +176,6 @@ BOOL D2GSCheckRunning(void)
 	}
 
 } /* End of D2GServerCheckRun() */
-
-
-/*********************************************************************
- * Purpose: cleanup routine for release the global server mutex
- * Return: TRUE or FALSE
- *********************************************************************/
-int CleanupRoutineForServerMutex(void)
-{
-	if (!hD2GSMutex) return FALSE;
-	return CloseHandle(hD2GSMutex);
-
-} /* End of CleanupRoutineServerMutex() */
 
 
 /*********************************************************************
@@ -295,145 +211,157 @@ static void CloseServerMutex(void)
 } /* End of CloseServerMutex() */
 
 
-void D2GSBeforeShutdown(DWORD status, DWORD dwSecondsRemaining)
+namespace pvpgn
 {
-	// GetTickCount milliseconds
-	DWORD temp = 0;
-	D2GSSetD2CSMaxGameNumber(0);
-	D2GSActive(FALSE);
-	EnterCriticalSection(&gsShutDown);
-	dwShutdownStatus = status;
-	dwShutdownTickCount = GetTickCount() + dwSecondsRemaining * 1000;
-	switch (status)
+
+	namespace d2gs
 	{
-	case 1:
-	case 3:
-		D2GSEventLog("D2GSShutdown", "Restart GS in %lu seconds", dwSecondsRemaining);
-		break;
-	case 2:
-	case 4:
-		D2GSEventLog("D2GSShutdown", "Shutdown GS in %lu seconds", dwSecondsRemaining);
-		break;
-	}
-	LeaveCriticalSection(&gsShutDown);
-}
 
-DWORD D2GSGetShutdownStatus(void)
-{
-	DWORD status = 0;
-	EnterCriticalSection(&gsShutDown);
-	status = dwShutdownStatus;
-	LeaveCriticalSection(&gsShutDown);
-	return status;
-}
-
-void D2GSShutdown(unsigned int exitCode)
-{
-	CloseServerMutex();
-
-	if (D2GSCheckGameInfo())
-	{
-		D2GSSaveAllGames(5000);
-		Sleep(3000);
-	}
-
-	if (bGERunning != 0)
-	{
-		if (D2GSAfterEnd() != 0)
+		void D2GSBeforeShutdown(DWORD status, DWORD dwSecondsRemaining)
 		{
-			D2GSAfterEnd();
-		}
-	}
-
-	ExitProcess(exitCode);
-}
-
-
-void D2GSShutdownTimer(void)
-{
-	static DWORD ShutdownCount = 0;
-	char buffer[256] = { 0 };
-	DWORD curTickCount = 0;
-	DWORD overSeconds = 0;
-	ShutdownCount++;
-	if (ShutdownCount >= 0xA)
-	{
-		ShutdownCount = 0;
-		EnterCriticalSection(&gsShutDown);
-
-		if (dwShutdownStatus >= 1 && dwShutdownStatus <= 4)
-		{
-			curTickCount = GetTickCount();
-			if (curTickCount > dwShutdownTickCount)
+			// GetTickCount milliseconds
+			DWORD temp = 0;
+			D2GSSetD2CSMaxGameNumber(0);
+			D2GSActive(FALSE);
+			EnterCriticalSection(&gsShutDown);
+			dwShutdownStatus = status;
+			dwShutdownTickCount = GetTickCount() + dwSecondsRemaining * 1000;
+			switch (status)
 			{
-				d2gsconf.enablegslog = 1;
+			case 1:
+			case 3:
+				D2GSEventLog("D2GSShutdown", "Restart GS in %lu seconds", dwSecondsRemaining);
+				break;
+			case 2:
+			case 4:
+				D2GSEventLog("D2GSShutdown", "Shutdown GS in %lu seconds", dwSecondsRemaining);
+				break;
+			}
+			LeaveCriticalSection(&gsShutDown);
+		}
+
+
+		DWORD D2GSGetShutdownStatus(void)
+		{
+			DWORD status = 0;
+			EnterCriticalSection(&gsShutDown);
+			status = dwShutdownStatus;
+			LeaveCriticalSection(&gsShutDown);
+			return status;
+		}
+
+
+		void D2GSShutdown(unsigned int exitCode)
+		{
+			CloseServerMutex();
+
+			if (D2GSCheckGameInfo())
+			{
 				D2GSSaveAllGames(5000);
-				Sleep(0xBB8);
-				switch (dwShutdownStatus - 1)
+				Sleep(3000);
+			}
+
+			if (bGERunning != 0)
+			{
+				if (D2GSAfterEnd() != 0)
 				{
-				case 0:
-					d2gsconf.enablegslog = 1;
-					D2GSEventLog("D2GSShutdownTimer", "Restart GS now");
-					D2GSEventLogCleanup();
-					d2gsconf.enablegslog = 0;
-					D2GSShutdown(0);
-					break;
-				case 1:
-					d2gsconf.enablegslog = 1;
-					D2GSEventLog("D2GSShutdownTimer", "Shutdown GS now");
-					D2GSEventLogCleanup();
-					d2gsconf.enablegslog = 0;
-					D2GSShutdown(1);
-					break;
-				case 2:
-					d2gsconf.enablegslog = 1;
-					D2GSEventLog("D2GSShutdownTimer", "D2CS Restart GS now");
-					D2GSEventLogCleanup();
-					d2gsconf.enablegslog = 0;
-					D2GSShutdown(0);
-					break;
-				case 3:
-					d2gsconf.enablegslog = 1;
-					D2GSEventLog("D2GSShutdownTimer", "D2CS Shutdown GS now");
-					D2GSEventLogCleanup();
-					d2gsconf.enablegslog = 0;
-					D2GSShutdown(1);
-					break;
-				default:
-					break;
+					D2GSAfterEnd();
 				}
 			}
-			else
+
+			ExitProcess(exitCode);
+		}
+
+
+		void D2GSShutdownTimer(void)
+		{
+			static DWORD ShutdownCount = 0;
+			char buffer[256] = { 0 };
+			DWORD curTickCount = 0;
+			DWORD overSeconds = 0;
+			ShutdownCount++;
+			if (ShutdownCount >= 0xA)
 			{
-				overSeconds = (dwShutdownTickCount - curTickCount) / 1000;
-				if ((overSeconds / 15) == 0)
+				ShutdownCount = 0;
+				EnterCriticalSection(&gsShutDown);
+
+				if (dwShutdownStatus >= 1 && dwShutdownStatus <= 4)
 				{
-					switch (dwShutdownStatus - 1)
+					curTickCount = GetTickCount();
+					if (curTickCount > dwShutdownTickCount)
 					{
-					case 0:
-						sprintf(buffer, "The game server will restart in %lu seconds", overSeconds);
-						chat_message_announce_all(CHAT_MESSAGE_TYPE_SYS_MESSAGE, buffer);
-						break;
-					case 1:
-						sprintf(buffer, "The game server will shutdown in %lu seconds", overSeconds);
-						chat_message_announce_all(CHAT_MESSAGE_TYPE_SYS_MESSAGE, buffer);
-						break;
-					case 2:
-						sprintf(buffer, "The realm will restart in %lu seconds", overSeconds);
-						chat_message_announce_all(CHAT_MESSAGE_TYPE_SYS_MESSAGE, buffer);
-						break;
-					case 3:
-						sprintf(buffer, "The realm will shutdown in %lu seconds", overSeconds);
-						chat_message_announce_all(CHAT_MESSAGE_TYPE_SYS_MESSAGE, buffer);
-						break;
-					default:
-						buffer[0] = 0;
-						break;
+						d2gsconf.enablegslog = 1;
+						D2GSSaveAllGames(5000);
+						Sleep(0xBB8);
+						switch (dwShutdownStatus - 1)
+						{
+						case 0:
+							d2gsconf.enablegslog = 1;
+							D2GSEventLog("D2GSShutdownTimer", "Restart GS now");
+							D2GSEventLogCleanup();
+							d2gsconf.enablegslog = 0;
+							D2GSShutdown(0);
+							break;
+						case 1:
+							d2gsconf.enablegslog = 1;
+							D2GSEventLog("D2GSShutdownTimer", "Shutdown GS now");
+							D2GSEventLogCleanup();
+							d2gsconf.enablegslog = 0;
+							D2GSShutdown(1);
+							break;
+						case 2:
+							d2gsconf.enablegslog = 1;
+							D2GSEventLog("D2GSShutdownTimer", "D2CS Restart GS now");
+							D2GSEventLogCleanup();
+							d2gsconf.enablegslog = 0;
+							D2GSShutdown(0);
+							break;
+						case 3:
+							d2gsconf.enablegslog = 1;
+							D2GSEventLog("D2GSShutdownTimer", "D2CS Shutdown GS now");
+							D2GSEventLogCleanup();
+							d2gsconf.enablegslog = 0;
+							D2GSShutdown(1);
+							break;
+						default:
+							break;
+						}
+					}
+					else
+					{
+						overSeconds = (dwShutdownTickCount - curTickCount) / 1000;
+						if ((overSeconds / 15) == 0)
+						{
+							switch (dwShutdownStatus - 1)
+							{
+							case 0:
+								sprintf(buffer, "The game server will restart in %lu seconds", overSeconds);
+								chat_message_announce_all(CHAT_MESSAGE_TYPE_SYS_MESSAGE, buffer);
+								break;
+							case 1:
+								sprintf(buffer, "The game server will shutdown in %lu seconds", overSeconds);
+								chat_message_announce_all(CHAT_MESSAGE_TYPE_SYS_MESSAGE, buffer);
+								break;
+							case 2:
+								sprintf(buffer, "The realm will restart in %lu seconds", overSeconds);
+								chat_message_announce_all(CHAT_MESSAGE_TYPE_SYS_MESSAGE, buffer);
+								break;
+							case 3:
+								sprintf(buffer, "The realm will shutdown in %lu seconds", overSeconds);
+								chat_message_announce_all(CHAT_MESSAGE_TYPE_SYS_MESSAGE, buffer);
+								break;
+							default:
+								buffer[0] = 0;
+								break;
+							}
+						}
 					}
 				}
+				LeaveCriticalSection(&gsShutDown);
 			}
+			return;
 		}
-		LeaveCriticalSection(&gsShutDown);
+
 	}
-	return;
+
 }

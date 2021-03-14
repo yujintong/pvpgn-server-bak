@@ -2,7 +2,13 @@
 #define INCLUDED_CONFIG_H
 
 
-/* registry key names */
+namespace pvpgn
+{
+
+	namespace d2gs
+	{
+
+		/* registry key names */
 #define REGKEY_ROOT						"Software\\D2Server\\D2GS"
 #define REGKEY_D2CSIP					"D2CSIP"
 #define REGKEY_D2CSPORT					"D2CSPort"
@@ -46,23 +52,27 @@
 
 
 /* functions */
-int  D2GSReadConfig(void);
-int  RegkeyOpen(HKEY hKeyRoot, LPCTSTR lpSubKey, PHKEY hKey, REGSAM sam);
-void RegkeyClose(HKEY hKey);
-int  RegkeyReadString(HKEY hKey, LPCTSTR name, char *buf, DWORD buflen);
-int  RegkeyReadDWORD(HKEY hKey, LPCTSTR name, DWORD *val);
-int  RegkeyWriteString(HKEY hKey, LPCTSTR name, LPCSTR buf);
-int  RegkeyWriteDWORD(HKEY hKey, LPCTSTR name, DWORD val);
-/* setting value in the registry */
-int  D2GSSetConfigDWORD(LPCSTR keyname, DWORD dwVal);
-int  D2GSSetConfigString(LPCSTR keyname, LPCSTR str);
-int  D2GSSetMaxGameLife(DWORD maxgamelife);
-int  D2GSSetAdminPassword(LPCSTR password);
-int D2GSSetMaxGames(DWORD maxgames);
-DWORD D2GSSetMultiCpuMask(int mask);
-DWORD D2GSSetEnableGSLog(int enable);
-int D2GSSetMaxPreferUsers(DWORD maxusers);
-DWORD D2GSGetShutdownStatus();
+		int  D2GSReadConfig(void);
+		int  RegkeyOpen(HKEY hKeyRoot, LPCTSTR lpSubKey, PHKEY hKey, REGSAM sam);
+		void RegkeyClose(HKEY hKey);
+		int  RegkeyReadString(HKEY hKey, LPCTSTR name, char* buf, DWORD buflen);
+		int  RegkeyReadDWORD(HKEY hKey, LPCTSTR name, DWORD* val);
+		int  RegkeyWriteString(HKEY hKey, LPCTSTR name, LPCSTR buf);
+		int  RegkeyWriteDWORD(HKEY hKey, LPCTSTR name, DWORD val);
+		/* setting value in the registry */
+		int  D2GSSetConfigDWORD(LPCSTR keyname, DWORD dwVal);
+		int  D2GSSetConfigString(LPCSTR keyname, LPCSTR str);
+		int  D2GSSetMaxGameLife(DWORD maxgamelife);
+		int  D2GSSetAdminPassword(LPCSTR password);
+		int D2GSSetMaxGames(DWORD maxgames);
+		DWORD D2GSSetMultiCpuMask(int mask);
+		DWORD D2GSSetEnableGSLog(int enable);
+		int D2GSSetMaxPreferUsers(DWORD maxusers);
+		DWORD D2GSGetShutdownStatus();
+
+	}
+
+}
 
 
 #endif /* INCLUDED_CONFIG_H */

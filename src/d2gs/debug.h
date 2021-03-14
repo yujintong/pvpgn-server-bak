@@ -3,13 +3,24 @@
 
 #include "d2gs.h"
 
+
+namespace pvpgn
+{
+
+	namespace d2gs
+	{
+
 #ifdef DEBUG
-extern void DebugEventCallback(char const *, int, ...);
-extern void DebugNetPacket(D2GSPACKET *lpPacket);
+		extern void DebugEventCallback(char const*, int, ...);
+		extern void DebugNetPacket(D2GSPACKET* lpPacket);
 #else
 #define	DebugEventCallback
 #define DebugNetPacket
 #endif
+
+	}
+
+}
 
 
 #endif

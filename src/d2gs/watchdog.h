@@ -1,7 +1,17 @@
 #ifndef INCLUDED_WATCHDOG_H
 #define INCLUDED_WATCHDOG_H
 
-void D2GSWatchDogInit(void);
-void D2GSResetWatchDogCounter(void);
+namespace pvpgn
+{
+
+	namespace d2gs
+	{
+
+		void D2GSWatchDogInit(void);
+		void D2GSResetWatchDogCounter(void);
+
+	}
+
+}
 
 #endif

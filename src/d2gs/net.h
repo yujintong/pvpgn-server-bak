@@ -2,53 +2,63 @@
 #define INCLUDED_NET_H
 
 
-/* structure */
+namespace pvpgn
+{
+
+	namespace d2gs
+	{
+
+		/* structure */
 #define DEFAULT_RECV_BUFFER_LENGTH			65536
-typedef struct {
-	u_short	peer;		/* descripion of the buffer, recv from whom? */
-	u_short	reserved;
-	u_char	*lpHead;	/* pointer to the first byte of the valid data */
-	u_char	*lpTail;	/* pointer to the next byte of the last legal data */
-	u_int	length;		/* legal data length in bytes */
-	u_int	rest;		/* the rest avalible bytes to the end of the buffer */
-	u_char	data[DEFAULT_RECV_BUFFER_LENGTH];
-} NETRECVBUFFER, *PNETRECVBUFFER, *LPNETRECVBUFFER;
+		typedef struct
+		{
+			u_short	peer;		/* descripion of the buffer, recv from whom? */
+			u_short	reserved;
+			u_char* lpHead;	/* pointer to the first byte of the valid data */
+			u_char* lpTail;	/* pointer to the next byte of the last legal data */
+			u_int	length;		/* legal data length in bytes */
+			u_int	rest;		/* the rest avalible bytes to the end of the buffer */
+			u_char	data[DEFAULT_RECV_BUFFER_LENGTH];
+		} NETRECVBUFFER, * PNETRECVBUFFER, * LPNETRECVBUFFER;
 
 #define DEFAULT_SEND_BUFFER_LENGTH			1024*1024
-typedef struct {
-	u_short	peer;		/* descripion of the buffer, recv from whom? */
-	u_short	reserved;
-	u_char	*lpHead;	/* pointer to the first byte of the valid data */
-	u_char	*lpTail;	/* pointer to the next byte of the last legal data */
-	u_int	length;		/* legal data length in bytes */
-	u_int	rest;		/* the rest avalible bytes to the end of the buffer */
-	u_int	writable;	/* if the socket is writable */
-	u_char	data[DEFAULT_SEND_BUFFER_LENGTH];
-} NETSENDBUFFER, *PNETSENDBUFFER, *LPNETSENDBUFFER;
+		typedef struct
+		{
+			u_short	peer;		/* descripion of the buffer, recv from whom? */
+			u_short	reserved;
+			u_char* lpHead;	/* pointer to the first byte of the valid data */
+			u_char* lpTail;	/* pointer to the next byte of the last legal data */
+			u_int	length;		/* legal data length in bytes */
+			u_int	rest;		/* the rest avalible bytes to the end of the buffer */
+			u_int	writable;	/* if the socket is writable */
+			u_char	data[DEFAULT_SEND_BUFFER_LENGTH];
+		} NETSENDBUFFER, * PNETSENDBUFFER, * LPNETSENDBUFFER;
 
 
-typedef struct {
-	u_int	tick;
-	u_int	recvpacket;
-	u_int	sendpacket;
-	u_int	recvbytes;
-	u_int	sendbytes;
-	u_int	orgrecvbytes;
-	u_int	orgsendbytes;
-	double	recvrate;
-	double	sendrate;
-	double	peakrecvrate;
-	double	peaksendrate;
-} NETSTATISTIC, *PNETSTATISTIC, *LPNETSTATISTIC;
+		typedef struct
+		{
+			u_int	tick;
+			u_int	recvpacket;
+			u_int	sendpacket;
+			u_int	recvbytes;
+			u_int	sendbytes;
+			u_int	orgrecvbytes;
+			u_int	orgsendbytes;
+			double	recvrate;
+			double	sendrate;
+			double	peakrecvrate;
+			double	peaksendrate;
+		} NETSTATISTIC, * PNETSTATISTIC, * LPNETSTATISTIC;
 
 
-typedef struct {
-	NETSTATISTIC	d2cs;
-	NETSTATISTIC	d2dbs;
-} D2GSNETSTATISTIC, *PD2NETSTATISTIC, *LPD2NETSTATISTIC;
+		typedef struct
+		{
+			NETSTATISTIC	d2cs;
+			NETSTATISTIC	d2dbs;
+		} D2GSNETSTATISTIC, * PD2NETSTATISTIC, * LPD2NETSTATISTIC;
 
 
-/* const */
+		/* const */
 #define DEFAULT_CONNECT_INTERVAL		1000
 #define DEFAULT_CONNECT_INTERVAL2		30000
 #define DEFAULT_CONNECT_TIMEOUT			400
@@ -75,28 +85,32 @@ typedef struct {
 #define D2GS_WAIT_TIMEOUT				0xff
 
 /* functions */
-int   D2GSNetInitialize(void);
-int   CleanupRoutineForNet(void);
-DWORD WINAPI D2GSConnectToD2xS(LPVOID lpParameter);
-void  CloseConnectionToD2CS(void);
-void  CloseConnectionToD2DBS(void);
-DWORD WINAPI D2GSNetProcessor(LPVOID lpParameter);
-int   D2GSNetRecvPacket(void);
-int   D2GSSendNetData(NETSENDBUFFER *lpnsr);
-int   D2GSNetSendPacket(D2GSPACKET *lpPacket);
-int   D2GSGetSockName(int server, DWORD *ipaddr, DWORD *port);
-int  D2GSGetConnectionStatus(void);
-void D2GSCalculateNetStatistic(void);
-void D2GSGetNetStatistic(D2GSNETSTATISTIC *pnetstat);
+		int   D2GSNetInitialize(void);
+		int   CleanupRoutineForNet(void);
+		DWORD WINAPI D2GSConnectToD2xS(LPVOID lpParameter);
+		void  CloseConnectionToD2CS(void);
+		void  CloseConnectionToD2DBS(void);
+		DWORD WINAPI D2GSNetProcessor(LPVOID lpParameter);
+		int   D2GSNetRecvPacket(void);
+		int   D2GSSendNetData(NETSENDBUFFER* lpnsr);
+		int   D2GSNetSendPacket(D2GSPACKET* lpPacket);
+		int   D2GSGetSockName(int server, DWORD* ipaddr, DWORD* port);
+		int  D2GSGetConnectionStatus(void);
+		void D2GSCalculateNetStatistic(void);
+		void D2GSGetNetStatistic(D2GSNETSTATISTIC* pnetstat);
 
-/* NETRECVBUFFER operator */
-void NRBInitialize(NETRECVBUFFER *lpnrb, u_short peer);
-void NRBAddNewData(NETRECVBUFFER *lpnrb, void* lpdata, u_int datalen);
-int  NRBRemovePacketOut(NETRECVBUFFER *lpnrb, D2GSPACKET *lpPkt);
-void NSBInitialize(NETSENDBUFFER *lpnsr, u_short peer);
-int  NSBAppendData(NETSENDBUFFER *lpnsr, D2GSPACKET *lpPkt);
-int  NSBGetData(NETSENDBUFFER *lpnsr, u_char **lppdata, u_int *datalen);
-int  NSBRemoveData(NETSENDBUFFER *lpnsr, u_int datalen);
+		/* NETRECVBUFFER operator */
+		void NRBInitialize(NETRECVBUFFER* lpnrb, u_short peer);
+		void NRBAddNewData(NETRECVBUFFER* lpnrb, void* lpdata, u_int datalen);
+		int  NRBRemovePacketOut(NETRECVBUFFER* lpnrb, D2GSPACKET* lpPkt);
+		void NSBInitialize(NETSENDBUFFER* lpnsr, u_short peer);
+		int  NSBAppendData(NETSENDBUFFER* lpnsr, D2GSPACKET* lpPkt);
+		int  NSBGetData(NETSENDBUFFER* lpnsr, u_char** lppdata, u_int* datalen);
+		int  NSBRemoveData(NETSENDBUFFER* lpnsr, u_int datalen);
+
+	}
+
+}
 
 
 #endif /* INCLUDED_NET_H */

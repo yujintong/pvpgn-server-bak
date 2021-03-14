@@ -29,6 +29,8 @@ add_executable(d2gs WIN32
 	main.cpp
 	net.cpp
 	net.h
+	server.cpp
+	server.h
 	telnetd.cpp
 	telnetd.h
 	timer.cpp

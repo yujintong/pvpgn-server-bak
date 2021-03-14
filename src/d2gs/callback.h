@@ -3,6 +3,16 @@
 
 #include <d2server.h>
 
-extern LPEVENTCALLBACKTABLE EventCallbackTableInit(void);
+namespace pvpgn
+{
+
+	namespace d2gs
+	{
+
+		extern LPEVENTCALLBACKTABLE EventCallbackTableInit(void);
+
+	}
+
+}
 
 #endif

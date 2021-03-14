@@ -12,7 +12,7 @@
 #include <windows.h>
 
 
-/* constants */
+		/* constants */
 #define D2CSERVER					0x01
 #define D2DBSERVER					0x02
 #define D2GSERVER					0x04
@@ -76,78 +76,80 @@
 #define NELEMS(array) (sizeof(array)/sizeof(array[0]))
 
 
-/* structures */
-typedef int (*CLEANUP_ROUTINE)(void);
-typedef struct RAW_CLEANUP_RT_ITEM {
-	char				comment[64];
-	CLEANUP_ROUTINE		cleanup;
-	struct RAW_CLEANUP_RT_ITEM	*next;
-} CLEANUP_RT_ITEM, *PCLEANUP_RT_ITEM;
+namespace pvpgn
+{
 
+	namespace d2gs
+	{
 
-typedef struct RAW_D2GSCONFIGS {
-	char		d2csipstr[16];
-	char		d2dbsipstr[16];
-	DWORD		d2csip;		/* in network order */
-	DWORD		d2dbsip;	/* in network order */
-	u_short		d2csport;	/* in network order */
-	u_short		d2dbsport;	/* in network order */
-	BOOL		enablentmode;
-	BOOL		enableprecachemode;
-	BOOL		enablegepatch;
-	BOOL		enablegelog;
-	BOOL		enablegemsg;
-	BOOL		enablegslog;
-	BOOL		debugnetpacket;
-	BOOL		debugeventcallback;
-	DWORD		checksum;
-	DWORD		gemaxgames;
-	DWORD		gsmaxgames;
-	DWORD		curgsmaxgames;
-	DWORD		idlesleep;
-	DWORD		busysleep;
-	DWORD		charpendingtimeout;
-	DWORD		intervalreconnectd2cs;
-	DWORD		admintimeout;
-	DWORD		maxgamelife;
-	DWORD		gsshutdowninterval;
-	DWORD		multicpumask;
-	DWORD		maxpreferusers;
-	DWORD		maxpacketpersecond;
-	char		adminpwd[64];
-	u_short		adminport;
-	u_short		padding;
-	char		d2cssecrect[32];
-	char		motd[256];
-	char		serverconffile[260];
-} D2GSCONFIGS, *PD2GSCONFIGS;
+		typedef struct RAW_D2GSCONFIGS
+		{
+			char		d2csipstr[16];
+			char		d2dbsipstr[16];
+			DWORD		d2csip;		/* in network order */
+			DWORD		d2dbsip;	/* in network order */
+			u_short		d2csport;	/* in network order */
+			u_short		d2dbsport;	/* in network order */
+			BOOL		enablentmode;
+			BOOL		enableprecachemode;
+			BOOL		enablegepatch;
+			BOOL		enablegelog;
+			BOOL		enablegemsg;
+			BOOL		enablegslog;
+			BOOL		debugnetpacket;
+			BOOL		debugeventcallback;
+			DWORD		checksum;
+			DWORD		gemaxgames;
+			DWORD		gsmaxgames;
+			DWORD		curgsmaxgames;
+			DWORD		idlesleep;
+			DWORD		busysleep;
+			DWORD		charpendingtimeout;
+			DWORD		intervalreconnectd2cs;
+			DWORD		admintimeout;
+			DWORD		maxgamelife;
+			DWORD		gsshutdowninterval;
+			DWORD		multicpumask;
+			DWORD		maxpreferusers;
+			DWORD		maxpacketpersecond;
+			char		adminpwd[64];
+			u_short		adminport;
+			u_short		padding;
+			char		d2cssecrect[32];
+			char		motd[256];
+			char		serverconffile[260];
+		} D2GSCONFIGS, * PD2GSCONFIGS;
 
 
 #define PACKET_PEER_RECV_FROM_D2CS		0x01
 #define PACKET_PEER_SEND_TO_D2CS		0x02
 #define PACKET_PEER_RECV_FROM_D2DBS		0x03
 #define PACKET_PEER_SEND_TO_D2DBS		0x04
-typedef struct RAW_D2GSPACKET {
-	u_short		peer;		/* where packet from or to? D2CS or D2DBS */
-	u_short		datalen;	/* valid date length */
-	u_char		data[16384];
-} D2GSPACKET, *PD2GSPACKET;
+		typedef struct RAW_D2GSPACKET
+		{
+			u_short		peer;		/* where packet from or to? D2CS or D2DBS */
+			u_short		datalen;	/* valid date length */
+			u_char		data[16384];
+		} D2GSPACKET, * PD2GSPACKET;
 
 
-typedef struct AutoUpdateSetting
-{
-	BOOL		AutoUpdate;
-	DWORD		AutoUpdateTimeout;
-	DWORD		AutoUpdateVer;
-	char		AutoUpdateUrl[260];
-}AutoUpdateSetting;
+		typedef struct AutoUpdateSetting
+		{
+			BOOL		AutoUpdate;
+			DWORD		AutoUpdateTimeout;
+			DWORD		AutoUpdateVer;
+			char		AutoUpdateUrl[260];
+		}AutoUpdateSetting;
 
 
-/* function */
-int CleanupRoutineInsert(CLEANUP_ROUTINE pRoutine, char *comment);
-void D2GSShutdown(unsigned int exitcode);
-void D2GSShutdownTimer(void);
-void D2GSBeforeShutdown(DWORD status, DWORD seconds);
+		/* function */
+		void D2GSShutdown(unsigned int exitcode);
+		void D2GSShutdownTimer(void);
+		void D2GSBeforeShutdown(DWORD status, DWORD seconds);
+
+	}
+
+}
 
 
 #endif /* INCLUDED_D2GS_H */
