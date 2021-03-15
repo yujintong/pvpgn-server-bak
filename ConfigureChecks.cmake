@@ -172,7 +172,7 @@ check_function_exists(getrlimit HAVE_GETRLIMIT)
 check_cxx_source_compiles("
 #include <ctime>
 int main() {
-	std::time_t t = std::time(nullptr);
+	std::time_t t = std::time(NULL);
 	struct tm buf;
 	errno_t err = gmtime_s(&buf, &t);
 	return 0;
@@ -181,7 +181,7 @@ int main() {
 check_cxx_source_compiles("
 #include <ctime>
 int main() {
-	std::time_t t = std::time(nullptr);
+	std::time_t t = std::time(NULL);
 	struct tm buf;
 	struct tm* retbuf = gmtime_s(&t, &buf);
 	return 0;
@@ -190,7 +190,7 @@ int main() {
 check_cxx_source_compiles("
 #include <ctime>
 int main() {
-	std::time_t t = std::time(nullptr);
+	std::time_t t = std::time(NULL);
 	struct tm buf;
 	struct tm* retbuf = gmtime_r(&t, &buf);
 	return 0;
@@ -203,7 +203,7 @@ check_function_exists(kqueue HAVE_KQUEUE)
 check_cxx_source_compiles("
 #include <ctime>
 int main() {
-	std::time_t t = std::time(nullptr);
+	std::time_t t = std::time(NULL);
 	struct tm buf;
 	errno_t err = localtime_s(&buf, &t);
 	return 0;
@@ -212,7 +212,7 @@ int main() {
 check_cxx_source_compiles("
 #include <ctime>
 int main() {
-	std::time_t t = std::time(nullptr);
+	std::time_t t = std::time(NULL);
 	struct tm buf;
 	struct tm* retbuf = localtime_s(&t, &buf);
 	return 0;
@@ -221,7 +221,7 @@ int main() {
 check_cxx_source_compiles("
 #include <ctime>
 int main() {
-	std::time_t t = std::time(nullptr);
+	std::time_t t = std::time(NULL);
 	struct tm buf;
 	struct tm* retbuf = localtime_r(&t, &buf);
 	return 0;
@@ -276,3 +276,11 @@ endif(HAVE_WINSOCK2_H)
 check_mkdir_args(MKDIR_TAKES_ONE_ARG)
 
 configure_file(config.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config.h)
+
+if (NOT HAVE_MICROSOFT_GMTIME_S AND NOT HAVE_GMTIME_S AND NOT HAVE_GMTIME_R)
+    message(FATAL_ERROR "At least one of HAVE_MICROSOFT_GMTIME_S, HAVE_GMTIME_S or HAVE_GMTIME_R needs to be found.")
+endif()
+
+if (NOT HAVE_MICROSOFT_LOCALTIME_S AND NOT HAVE_LOCALTIME_S AND NOT HAVE_LOCALTIME_R)
+    message(FATAL_ERROR "At least one of HAVE_MICROSOFT_LOCALTIME_S, HAVE_LOCALTIME_S or HAVE_LOCALTIME_R needs to be found.")
+endif()
