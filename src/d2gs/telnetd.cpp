@@ -424,7 +424,7 @@ namespace pvpgn
 					continue;
 				}
 				if (admin_to_stop()) return -1;
-				if ((bytes=recv(ns, mybuf, sizeof(mybuf), 0))<=0)
+				if ((bytes=recv(ns, mybuf, sizeof(mybuf) - 1, 0))<=0)
 					return -1;
 				timeoutcount = 0;
 				*(mybuf+bytes) = '\0';
