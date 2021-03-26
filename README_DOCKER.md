@@ -8,9 +8,8 @@ To quickly deploy a PVPGN server (especially on Linux), using Docker is one of t
 
 ## Prequisite:
 
-- `docker` (Check [this link](https://docs.docker.com/engine/install/) for installation manual) 
-  - you can use `podman` instead of `docker`, but in this manual we will use `docker` cli so you may need `podman` with `docker` cli support
-- (optionally) `docker-compose` for better configuration, deployment and logging managing
+- Docker (Check [this link](https://docs.docker.com/engine/install/) for installation manual). You can use Podman instead of Docker, but in this manual we will use Docker CLI command so you may need Podman with Docker CLI support
+- (optional) `docker-compose` for better configuration, deployment and logging managing
 
 ## How to build:
 
@@ -47,20 +46,22 @@ Choose the appropriate `SERVER_TYPE` base on your image build
 Below are some sample build commands:
 
 ```bash
-# This command will use all default build arguments and build PVPGN docker image with only bnetd and mysql support using master branch
+# This command will use all default build arguments and build PVPGN docker image with only bnetd and MySQL support using master branch
 docker build . -t pvpgn-server:bnetd-mysql
 
 # This command will build a PVPGN with only d2cs and sqlite3 support using develop branch
 docker build . \
   --build-arg with_d2cs=true \     # enable d2cs support (disable by default)
   --build-arg with_bnetd=false \   # enable bnetd support (enable by default)
-  --build-arg with_mysql=false \   # enable mysql support (enable by default)
+  --build-arg with_mysql=false \   # enable MySQL support (enable by default)
   --build-arg with_sqlite3=true \  # enable sqlite3 support (disable by default)
   --build-arg git_branch=develop \ # switch to develop branch (master branch by default)
   -t pvpgn-server:d2cs-sqlite      # tag the image 
 ```
 
 ## How to build, run and manage:
+
+Below are a sample build and run session.
 
 ### Common preparation:
 
@@ -80,53 +81,74 @@ docker build . --build-arg with_d2dbs=true --build-arg with_bnetd=false -t pvpgn
 # create configuration and asset locations
 mkdir -p /opt/pvpgn/etc /opt/pvpgn/var
 # copy configuration files and base assets from an image, all base configuration files in any image are the same
+# and btw yes, this command is not a mistake, please read ENTRYPOINT and CMD in Dockerfile specification for further explain
 docker run -v /opt/pvpgn/etc:/tmp/conf --rm --entrypoint cp pvpgn-server:bnetd-mysql -r /usr/local/etc/pvpgn/* /tmp/conf
 docker run -v /opt/pvpgn/var:/tmp/assets --rm --entrypoint cp pvpgn-server:bnetd-mysql -r /usr/local/etc/pvpgn/* /tmp/assets
 ```
-Modifying the copied configuration files to fit your needs. check [this link](https://pvpgn.pro/pvpgn_installation.html) to get more information of the configuration files.
+Modify the copied configuration files to fit your needs. There are examples to configurating the server to use database in container, please check below. To configurate more, check [this link](https://pvpgn.pro/pvpgn_installation.html) to get more information of each components of the configuration files.
+
 
 ### Using docker only:
 
 To run the images, you will need to mount existed configuration files and assets which is located at `/usr/local/etc/pvpgn` and `/usr/local/var/pvpgn` inside the container. If you don't have those, you can obtain them by following the above instruction. The example bellow shows how to turn up some PVPGN containers by some images prepared above:
 
 ```bash
-mkdir -p /opt/var/lib/mysql # create mysql data directory
-# start mysql to store data
+mkdir -p /opt/var/lib/mysql # create MySQL data directory
+# start MySQL to store data
 docker run -d \              # run detached
-  --name mysql \             # set a name for mysql
+  --name mysql \             # set a name for MySQL
   --restart unless-stopped \ # auto restart the container if it crash or server restart, unless you manually stop it
+  # set some required MySQL environment variables
+  -e MYSQL_ROOT_PASSWORD='example' \ # password of user root
+  -e MYSQL_USER='bnetd' \            # bnetd MySQL user
+  -e MYSQL_PASSWORD='example' \      # bnetd MySQL password
+  -e MYSQL_DATABASE='bnetd' \        # the only database which bnetd user can access
   -v /opt/var/lib/mysql:/var/lib/mysql \ # mount database storage to the host
   mysql:8.0 --default-authentication-plugin=mysql_native_password # use native password instead of default "caching_sha2_password" authentication plugin, which is not supported by php and a lot legacy softwares
 
-# run pvpgn with bnetd and mysql support
+# run pvpgn with bnetd and MySQL support
 docker run -d \
   --name pvpgn-bnetd \
   --restart unless-stopped \
-  -p 6112:6112 -p 6112:6112/udp \ # forwarding default bnetd port with both tcp and udp protocol
+  -p 6112:6112 -p 6112:6112/udp \          # forwarding default bnetd port with both tcp and udp protocol
   -v /opt/pvpgn/etc:/usr/local/etc/pvpgn \ # configuration mounting
   -v /opt/pvpgn/var:/usr/local/var/pvpgn \ # assets mounting
-  pvpgn-server:bnetd-mysql                   # bnetd with mysql support image
+  pvpgn-server:bnetd-mysql                 # bnetd with MySQL support image
 
-# run pvpgn with d2cs and mysql support
+# run pvpgn with d2cs and MySQL support
 docker run -d \                   
   --name pvpgn-d2cs \            
   --restart unless-stopped \
-  -e SERVER_TYPE=d2cs \ # override bnetd server type to d2cs
+  -e SERVER_TYPE=d2cs \           # override bnetd server type to d2cs
   -p 6113:6113 -p 6113:6113/udp \ # forwarding default d2cs port
   -v /opt/pvpgn/etc:/usr/local/etc/pvpgn \ 
   -v /opt/pvpgn/var:/usr/local/var/pvpgn \ 
-  pvpgn-server:d2cs-mysql # d2cs with mysql support image
+  pvpgn-server:d2cs-mysql         # d2cs with MySQL support image
 
-# run pvpgn with d2dbs and mysql support
+# run pvpgn with d2dbs and MySQL support
 docker run -d \
   --name pvpgn-d2dbs \
   --restart unless-stopped \
-  -e SERVER_TYPE=d2dbs \ # override bnetd server type to d2dbs
+  -e SERVER_TYPE=d2dbs \          # override bnetd server type to d2dbs
   -p 6114:6114 -p 6114:6114/udp \ # forwarding default d2cdb port
   -v /opt/pvpgn/etc:/usr/local/etc/pvpgn \ 
   -v /opt/pvpgn/var:/usr/local/var/pvpgn \ 
-  pvpgn-server:d2dbs-mysql # d2dbs with mysql support image
+  pvpgn-server:d2dbs-mysql        # d2dbs with MySQL support image
 ```
+
+#### To configurate MySQL connection:
+To connect to MySQL inside the container, find the `storage_path` in `bnetd.conf` (in `/opt/pvpgn/etc`) and replace it with this:
+```
+storage_path = "sql:mode=mysql;host=mysql;name=bnetd;user=bnetd;pass=example;default=0;prefix=pvpgn_"
+```
+
+Some explanations:
+* `host=mysql`: The host name we use which is also the name of the MySQL container
+* `name=bnetd`, `user=bnetd`, `pass=example`: MySQL login info which is specified above
+
+Change them to fit the MySQL server you created.
+
+You may need to create multiple MySQL servers or multiple MySQL users for each servers or just simply change the table prefix from `pvpgn_` to something else.
 
 #### Obtain logs
 
@@ -148,6 +170,20 @@ To simplify the managing process, we should use `docker-compose`. The step-by-st
 
 2. Finally, hit `docker-compose up -d` to turn up all containers
 
+#### To configurate MySQL connection:
+To connect to MySQL inside the container, find the `storage_path` in `bnetd.conf` (in `/opt/pvpgn/etc`) and replace it with this:
+```
+storage_path = "sql:mode=mysql;host=mysql;name=bnetd;user=bnetd;pass=example;default=0;prefix=pvpgn_"
+```
+
+Some explanations:
+* `host=mysql`: Name of the MySQL service which is configurated in `docker-compose.yml`.
+* `name=bnetd`, `user=bnetd`, `pass=example`: MySQL login info which is also specified in 
+
+Change them to fit the MySQL server you created.
+
+You may need to create multiple MySQL ervers or multiple MySQL users for each servers or just simply change the table prefix from `pvpgn_` to something else.
+
 #### Obtain logs
 
 To obtain logs from containers managed by `docker-compose`, use this command:
@@ -158,6 +194,7 @@ docker-compose logs --tail 1000 # get last 1000 log lines of all containers mana
 # or
 docker-compose logs --tail 1000 bnetd # get last 1000 log lines of bnetd only
 ```
+Check `docker-compose` specification for furter information.
 
 ## Some notes:
 
