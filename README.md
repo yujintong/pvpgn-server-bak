@@ -138,7 +138,9 @@ First open *Developer PowerShell for VS ...* or *Developer Command Prompt for VS
 ```
 msbuild pvpgn.sln -target:ALL_BUILD;INSTALL /p:Configuration="RelWithDebInfo"
 ```
+#### Docker
 
+[Check this link](README_DOCKER.md)
 
 ## Hosting on LAN or VPS with private IP address
 Some VPS providers do not assign your server a direct public IP. If that is the case or you host at home behind NAT you need to setup the route translation in `address_translation.conf`. The public address is pushed as the route server address to game clients when seeking games. Failure to push the correct address to game clients results in players not being able to match and join games (long game search and error).
