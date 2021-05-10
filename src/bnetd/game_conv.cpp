@@ -1145,9 +1145,20 @@ namespace pvpgn
 			 * multiplying each piece by 32.
 			 * for example, 34 = (32*3) x (32*4) = 96 x 128
 			 */
-			/* special handling for mapsize. empty is 256x256 */
+			/* special handling for mapsize. */
 			if ((mapsize[0] == '\0') || (str_to_uint(mapsize, &bngmapsize) < 0))
-				bngmapsize = 88; /* 256x256 */
+			{
+				if (clienttag == CLIENTTAG_WARCIIBNE_UINT)
+				{
+					// WarCraft II null mapsize = 128x128
+					bngmapsize = 44;
+				}
+				else
+				{
+					// StarCraft null mapsize = 256x256
+					bngmapsize = 88;
+				}
+			}
 			game_set_mapsize_x(game, (bngmapsize / 10) * 32);
 			game_set_mapsize_y(game, (bngmapsize % 10) * 32);
 
