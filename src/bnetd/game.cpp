@@ -341,6 +341,8 @@ namespace pvpgn
 			{
 			case game_speed_slowest:
 				return "slowest";
+			case game_speed_evenslower:
+				return "even slower";
 			case game_speed_slower:
 				return "slower";
 			case game_speed_slow:
@@ -351,6 +353,8 @@ namespace pvpgn
 				return "fast";
 			case game_speed_faster:
 				return "faster";
+			case game_speed_evenfaster:
+				return "even faster";
 			case game_speed_fastest:
 				return "fastest";
 			default:
