@@ -649,11 +649,11 @@ namespace pvpgn
 				return 0;
 			}
 
-			eventlog(eventlog_level_debug, __FUNCTION__, "[{}] CLIENT_PROGIDENT archtag=0x{:08x} clienttag=0x{:08x} versionid=0x{:08x} unknown1=0x{:08x}", conn_get_socket(c), bn_int_get(packet->u.client_progident.archtag), bn_int_get(packet->u.client_progident.clienttag), bn_int_get(packet->u.client_progident.versionid), bn_int_get(packet->u.client_progident.unknown1));
-
 			conn_set_archtag(c, bn_int_get(packet->u.client_progident.archtag));
 			conn_set_clienttag(c, bn_int_get(packet->u.client_progident.clienttag));
 			conn_set_versionid(c, bn_int_get(packet->u.client_progident.versionid));
+
+			eventlog(eventlog_level_debug, __FUNCTION__, "[{}] CLIENT_PROGIDENT archtag=0x{:08x} clienttag=0x{:08x} versionid=0x{:08x} unknown1=0x{:08x}", conn_get_socket(c), bn_int_get(packet->u.client_progident.archtag), bn_int_get(packet->u.client_progident.clienttag), bn_int_get(packet->u.client_progident.versionid), bn_int_get(packet->u.client_progident.unknown1));
 
 			if ((rpacket = packet_create(packet_class_bnet)))
 			{
@@ -1074,13 +1074,13 @@ namespace pvpgn
 
 			std::string version_string = vernum_to_verstr(bn_int_get(packet->u.client_authreq1.gameversion));
 			conn_set_clientver(c, version_string.c_str());
-			eventlog(eventlog_level_info, __FUNCTION__, "[{}] CLIENT_AUTHREQ1 archtag=0x{:08x} clienttag=0x{:08x} verstr={} exeinfo=\"{}\" versionid=0x{:08x} gameversion=0x{:08x} checksum=0x{:08x}", conn_get_socket(c), bn_int_get(packet->u.client_authreq1.archtag), bn_int_get(packet->u.client_authreq1.clienttag), version_string, exeinfo, conn_get_versionid(c), conn_get_gameversion(c), conn_get_checksum(c));
 
 			conn_set_versionid(c, bn_int_get(packet->u.client_authreq1.versionid));
 			conn_set_checksum(c, bn_int_get(packet->u.client_authreq1.checksum));
 			conn_set_gameversion(c, bn_int_get(packet->u.client_authreq1.gameversion));
 
-			
+			eventlog(eventlog_level_info, __FUNCTION__, "[{}] CLIENT_AUTHREQ1 archtag=0x{:08x} clienttag=0x{:08x} verstr={} exeinfo=\"{}\" versionid=0x{:08x} gameversion=0x{:08x} checksum=0x{:08x}", conn_get_socket(c), bn_int_get(packet->u.client_authreq1.archtag), bn_int_get(packet->u.client_authreq1.clienttag), version_string, exeinfo, conn_get_versionid(c), conn_get_gameversion(c), conn_get_checksum(c));
+
 			const VersionCheck* vc = select_versioncheck(conn_get_archtag(c), conn_get_clienttag(c), conn_get_versionid(c), conn_get_gameversion(c), conn_get_checksum(c));
 			if (vc)
 			{
