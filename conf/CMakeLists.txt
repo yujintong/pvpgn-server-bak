@@ -10,6 +10,14 @@ foreach(CONF ${OUTPUT_CONFS})
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/${CONF}.in ${CMAKE_CURRENT_BINARY_DIR}/${CONF} @ONLY)
 endforeach(CONF)
 
+if(WIN32)
+	# generate the configs with proper line endings
+	set(OUTPUT_CONFS d2gs.reg d2gs.script d2server.ini d2warden.ini ItemConfig.dat)
+	foreach(CONF ${OUTPUT_CONFS})
+	  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/${CONF}.in ${CMAKE_CURRENT_BINARY_DIR}/${CONF} @ONLY NEWLINE_STYLE WIN32)
+	endforeach(CONF)
+endif(WIN32)
+
 # generate the config files replacing the path variables
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/bnetd.conf.in ${CMAKE_CURRENT_BINARY_DIR}/bnetd.conf)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/d2cs.conf.in ${CMAKE_CURRENT_BINARY_DIR}/d2cs.conf)
@@ -33,8 +41,16 @@ if(WITH_D2DBS)
   set(D2DBS_CONFS d2dbs.conf)
 endif(WITH_D2DBS)
 
+if(WITH_D2GS)
+  set(D2GS_CONFS d2gs.reg d2gs.script d2server.ini d2warden.ini ItemConfig.dat)
+endif(WITH_D2GS)
+
 foreach(CONF_FILE ${BNETD_CONFS} ${D2CS_CONFS} ${D2DBS_CONFS})
   install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${CONF_FILE} DESTINATION ${SYSCONFDIR})
+endforeach(CONF_FILE)
+
+foreach(CONF_FILE ${D2GS_CONFS})
+  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${CONF_FILE} DESTINATION ${SBIN_INSTALL_DIR})
 endforeach(CONF_FILE)
 
 add_subdirectory(i18n)
