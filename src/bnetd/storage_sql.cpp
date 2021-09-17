@@ -128,7 +128,7 @@ namespace pvpgn
 
 			if (!sql)
 			{
-				eventlog(eventlog_level_error, __FUNCTION__, "sql layer not initilized");
+				eventlog(eventlog_level_error, __FUNCTION__, "sql layer not initialized");
 				return NULL;
 			}
 
@@ -152,7 +152,7 @@ namespace pvpgn
 				sql->free_result(result);
 				if (num > 0)
 				{
-					eventlog(eventlog_level_error, __FUNCTION__, "got existant username");
+					eventlog(eventlog_level_error, __FUNCTION__, "got existent username");
 					goto err_dup;
 				}
 			}
@@ -230,7 +230,7 @@ namespace pvpgn
 
 			if (!sql)
 			{
-				eventlog(eventlog_level_error, __FUNCTION__, "sql layer not initilized");
+				eventlog(eventlog_level_error, __FUNCTION__, "sql layer not initialized");
 				return -1;
 			}
 
@@ -317,7 +317,7 @@ namespace pvpgn
 
 			if (!sql)
 			{
-				eventlog(eventlog_level_error, __FUNCTION__, "sql layer not initilized");
+				eventlog(eventlog_level_error, __FUNCTION__, "sql layer not initialized");
 				return NULL;
 			}
 
@@ -348,7 +348,7 @@ namespace pvpgn
 
 			if (sql->num_rows(result) != 1)
 			{
-				//      eventlog(eventlog_level_debug, __FUNCTION__, "wrong numer of rows from query ({})", query);
+				//      eventlog(eventlog_level_debug, __FUNCTION__, "wrong number of rows from query ({})", query);
 				sql->free_result(result);
 				return NULL;
 			}
@@ -398,7 +398,7 @@ namespace pvpgn
 
 			if (!sql)
 			{
-				eventlog(eventlog_level_error, __FUNCTION__, "sql layer not initilized");
+				eventlog(eventlog_level_error, __FUNCTION__, "sql layer not initialized");
 				return -1;
 			}
 
@@ -501,7 +501,7 @@ namespace pvpgn
 			for (std::map<std::string, std::string>::iterator q = queries.begin(); q != queries.end(); ++q)
 			{
 				query_s = "UPDATE " + std::string(tab_prefix) + q->first + " SET ";
-				query_s += q->second.substr(0, q->second.size() - 2); // remove last reduntant comma at the end of the string with parameters
+				query_s += q->second.substr(0, q->second.size() - 2); // remove last redundant comma at the end of the string with parameters
 				query_s += " WHERE " SQL_UID_FIELD " = '" + std_to_string(uid) + "'";
 
 				if (!sql->query(query_s.c_str()))
@@ -526,7 +526,7 @@ namespace pvpgn
 
 			if (!sql)
 			{
-				eventlog(eventlog_level_error, __FUNCTION__, "sql layer not initilized");
+				eventlog(eventlog_level_error, __FUNCTION__, "sql layer not initialized");
 				return NULL;
 			}
 

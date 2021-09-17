@@ -81,7 +81,7 @@ namespace pvpgn
 				std::string raw_message{ std::istreambuf_iterator<char>(infile), std::istreambuf_iterator<char>() };
 				message = fmt::format(raw_message, fmt::arg("pvpgn_server_name", prefs_servername));
 
-				eventlog(eventlog_level_info, __FUNCTION__, "Succesfully loaded email verification message ({} bytes)", message.length());
+				eventlog(eventlog_level_info, __FUNCTION__, "Successfully loaded email verification message ({} bytes)", message.length());
 			}
 			catch (const std::exception& e)
 			{
@@ -149,7 +149,7 @@ namespace pvpgn
 			account_set_emailverification_code(account, "");
 			account_set_emailverification_expiration(account, 0);
 
-			eventlog(eventlog_level_info, __FUNCTION__, "Succesfully verified email address ({}) account uid {}", account_get_email(account), account_get_uid(account));
+			eventlog(eventlog_level_info, __FUNCTION__, "Successfully verified email address ({}) account uid {}", account_get_email(account), account_get_uid(account));
 
 			return AccountVerifyEmailStatus::Success;
 		}
