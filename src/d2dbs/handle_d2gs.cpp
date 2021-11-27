@@ -699,8 +699,43 @@ namespace pvpgn
 				{
 					if (datatype == D2GS_DATA_CHARSAVE)
 					{
-						bn_short_set(&rpacket->u.d2dbs_d2gs_get_data_reply.datalen, charsave.value().size());
-						packet_append_data(rpacket, charsave.value().data(), charsave.value().size());
+						if ((charsave.value().size() + packet_get_size(rpacket)) > MAX_PACKET_SIZE)
+						{
+							// Adding a charsave to the packet may cause the packet size to exceed MAX_PACKET_SIZE
+							// In that case, set the values of everything in the packet except the 'data' (charsave) and send that out first
+							// then create enough raw packets to send the charsave
+							bn_short_set(&rpacket->u.d2dbs_d2gs_get_data_reply.datalen, charsave.value().size());
+							conn_push_outqueue(c, rpacket);
+							packet_del_ref(rpacket);
+							rpacket = nullptr;
+
+							std::size_t num_bytes_already_sent = 0;
+							while (num_bytes_already_sent < charsave.value().size())
+							{
+								t_packet* rpacket = packet_create(packet_class_raw);
+								if (!rpacket)
+								{
+									return -1;
+								}
+
+								std::size_t num_bytes_remaining = charsave.value().size() - num_bytes_already_sent;
+								std::size_t num_bytes_to_send = num_bytes_remaining > MAX_PACKET_SIZE ? MAX_PACKET_SIZE : num_bytes_remaining;
+								std::memcpy(packet_get_raw_data_build(rpacket, 0), charsave.value().data() + num_bytes_already_sent, num_bytes_to_send);
+								packet_set_size(rpacket, num_bytes_to_send);
+								conn_push_outqueue(c, rpacket);
+								packet_del_ref(rpacket);
+								rpacket = nullptr;
+
+								num_bytes_already_sent += num_bytes_to_send;
+							}
+
+							return 0;
+						}
+						else
+						{
+							bn_short_set(&rpacket->u.d2dbs_d2gs_get_data_reply.datalen, charsave.value().size());
+							packet_append_data(rpacket, charsave.value().data(), charsave.value().size());
+						}
 					}
 					else
 					{
