@@ -1277,6 +1277,8 @@ namespace pvpgn
 						params += fmt::format("{}{}{}", is_first_user ? "" : " ", flg, name);
 					}
 
+					is_first_user = false;
+
 					conn_unget_chatname(m, name);
 				}
 			}
