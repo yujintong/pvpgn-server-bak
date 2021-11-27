@@ -1321,6 +1321,15 @@ namespace pvpgn
 
 				game_set_status(game, game_status_started);
 
+				if (conn_get_clienttag(conn) == CLIENTTAG_RENEGADE_UINT || conn_get_clienttag(conn) == CLIENTTAG_RENGDFDS_UINT)
+				{
+					game_set_status(game, game_status_open);
+				}
+				else
+				{
+					game_set_status(game, game_status_started);
+				}
+
 				std::snprintf(_temp_a, sizeof(_temp_a), "%u %" PRId64, game_get_id(game), static_cast<std::int64_t>(game_get_start_time(game)));
 				std::strcat(temp, _temp_a);
 
@@ -1707,7 +1716,7 @@ namespace pvpgn
 								std::strcat(data, temp);
 							}
 							else
-								std::strcat(data, "NOTFOUND\r\n");
+								std::strcat(data, "NOTFOUND\r");
 						}
 					}
 					irc_unget_ladderelems(e);
