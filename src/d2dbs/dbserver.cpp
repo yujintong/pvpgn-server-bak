@@ -289,7 +289,6 @@ namespace pvpgn
 				packet_del_ref(packet);
 				if (ret < 0)
 				{
-					packet_del_ref(packet);
 					conn_close_read(c);
 					return -2;
 				}
