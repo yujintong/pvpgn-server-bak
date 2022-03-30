@@ -1319,8 +1319,6 @@ namespace pvpgn
 					std::strcat(temp, ":");
 				}
 
-				game_set_status(game, game_status_started);
-
 				if (conn_get_clienttag(conn) == CLIENTTAG_RENEGADE_UINT || conn_get_clienttag(conn) == CLIENTTAG_RENGDFDS_UINT)
 				{
 					game_set_status(game, game_status_open);
