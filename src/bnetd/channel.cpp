@@ -883,6 +883,17 @@ namespace pvpgn
 		}
 
 
+		extern t_connection * channel_get_first_no_advance(t_channel const * channel)
+		{
+			t_channelmember * first = channel->memberlist;
+			if (first)
+			{
+				return first->connection;
+			}
+			return NULL;
+		}
+
+
 		extern t_connection * channel_get_first(t_channel const * channel)
 		{
 			if (!channel)
