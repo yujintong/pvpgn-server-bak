@@ -755,7 +755,19 @@ namespace pvpgn
 							clanid = clan_get_clanid(clan);
 						}
 
-						std::string temp = fmt::format(":{},{}", clanid, conn_get_addr(me));
+						std::string temp;
+						if (conn_get_clienttag(me) == CLIENTTAG_CDRAL2_UINT) {
+							// Replaces IP with ping and adds operator status
+							t_account * acc = conn_get_account(me);
+							const char * ircname = channel_get_name(channel);
+							bool is_operator = (channel_conn_is_tmpOP(channel, me) == 1) ||
+								(account_get_auth_admin(acc, NULL) == 1) || (account_get_auth_admin(acc, ircname) == 1) ||
+								(account_get_auth_operator(acc, NULL) == 1) || (account_get_auth_operator(acc, ircname) == 1);
+							temp = fmt::format(":{},{},{}", clanid, conn_get_latency(me), is_operator ? 1 : 0);
+						}
+						else {
+							temp = fmt::format(":{},{}", clanid, conn_get_addr(me));
+						}
 						msg = irc_message_preformat(&from, "JOIN", temp.c_str(), irc_convert_channel(channel, dst));
 					}
 					else
