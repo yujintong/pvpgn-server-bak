@@ -1193,7 +1193,9 @@ namespace pvpgn
 				// the channel is #Lob_38_0, #Lob_39_0, or #Lob_40_0.
 				if (conn_get_wol(c) == 1 && ((std::strcmp(channel_irc_name, "#Lob_38_0") == 0) ||
 					(std::strcmp(channel_irc_name, "#Lob_39_0") == 0) ||
-					(std::strcmp(channel_irc_name, "#Lob_40_0") == 0)))
+					(std::strcmp(channel_irc_name, "#Lob_40_0") == 0) ||
+					(std::strcmp(channel_irc_name, "#Lob_50_0") == 0) ||
+					(std::strcmp(channel_irc_name, "#Lob_51_0") == 0)))
 				{
 					// FIXME: shouldn't we check if the t_connection pointed to by 'c' is a WOLv2 client or not
 					params += "@matchbot,0,0";
