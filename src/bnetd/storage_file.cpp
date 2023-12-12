@@ -82,6 +82,7 @@ namespace pvpgn
 		/* storage struct populated with the functions above */
 
 		t_storage storage_file = {
+			storage_info_type_string,
 			file_init,
 			file_close,
 			file_read_maxuserid,
