@@ -1265,7 +1265,13 @@ namespace pvpgn
 							is_first_user = true;
 						}
 
-						params += fmt::format("{}{}{},{},{}", is_first_user ? "" : " ", flg, name, clanid, conn_get_addr(m));
+						if (conn_get_clienttag(c) == CLIENTTAG_CDRAL2_UINT) {
+							// Print ping instead of IP
+							params += fmt::format("{}{}{},{},{}", is_first_user ? "" : " ", flg, name, clanid, conn_get_latency(m));
+						}
+						else {
+							params += fmt::format("{}{}{},{},{}", is_first_user ? "" : " ", flg, name, clanid, conn_get_addr(m));
+						}
 					}
 					else
 					{
