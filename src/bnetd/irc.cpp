@@ -354,6 +354,9 @@ namespace pvpgn
 			else
 				bname = channel_get_name(channel);
 
+			if (!bname)
+				return NULL;
+
 			for (i = 0; bname[i] != '\0'; i++) {
 				if (bname[i] == ' ') {
 					out[outpos++] = '_';
