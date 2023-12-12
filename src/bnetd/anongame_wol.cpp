@@ -329,6 +329,8 @@ namespace pvpgn
 				nick = "UserName";
 
 			std::string data = fmt::format(":matchbot!u@h {} {} {}", command, nick, text);
+			if (data.length() > MAX_IRC_MESSAGE_LEN)
+				data.erase(MAX_IRC_MESSAGE_LEN, std::string::npos);
 
 			DEBUG2("[{}] sent \"{}\"", conn_get_socket(conn), data);
 			data.append("\r\n");
