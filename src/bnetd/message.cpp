@@ -1564,7 +1564,7 @@ namespace pvpgn
 
 		extern int message_send(t_message * message, t_connection * dst)
 		{
-			t_packet *   packet;
+			t_packet *   packet = nullptr;
 			unsigned int dstflags;
 
 			if (!message)
@@ -1617,8 +1617,8 @@ namespace pvpgn
 
 		extern int message_send_all(t_message * message)
 		{
-			t_connection * c;
-			t_elem const * curr;
+			t_connection * c = nullptr;
+			t_elem const * curr = nullptr;
 			int            rez;
 
 			if (!message)
@@ -1665,8 +1665,8 @@ namespace pvpgn
 
 		extern int message_send_admins(t_connection * src, t_message_type type, char const * text)
 		{
-			t_elem	const * curr;
-			t_connection *	tc;
+			t_elem	const * curr = nullptr;
+			t_connection *	tc = nullptr;
 			int			counter = 0;
 
 			LIST_TRAVERSE_CONST(connlist(), curr)
@@ -1687,7 +1687,7 @@ namespace pvpgn
 
 		extern int message_send_formatted(t_connection * dst, char const * text)
 		{
-			char * line;
+			char * line = nullptr;
 
 			if (!dst)
 			{
@@ -1742,7 +1742,7 @@ namespace pvpgn
 
 		extern int message_send_file(t_connection * dst, std::FILE * fd)
 		{
-			char * buff;
+			char * buff = nullptr;
 
 			if (!dst)
 			{
@@ -1767,7 +1767,7 @@ namespace pvpgn
 		/* Show message box on a client side (https://github.com/pvpgn/pvpgn-server/issues/15) */
 		extern int messagebox_show(t_connection * dst, char const * text, char const * caption, int type)
 		{
-			t_packet *rpacket;
+			t_packet *rpacket = nullptr;
 
 			std::string newtext = str_replace_nl(text);
 

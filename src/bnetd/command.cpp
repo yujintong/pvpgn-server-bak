@@ -4791,7 +4791,9 @@ namespace pvpgn
 			if (strcasecmp(value, "null") == 0)
 				value = NULL;
 
-			std::snprintf(msgtemp0, sizeof(msgtemp0), " \"%.64s\" (%.128s = \"%.128s\")", account_get_name(account), key, value);
+			//std::snprintf(msgtemp0, sizeof(msgtemp0), " \"%.64s\" (%.128s = \"%.128s\")", account_get_name(account), key, value);
+			//std::sprintf(msgtemp0, " \"%.64s\" (%.128s = \"%.128s\")", account_get_name(account), key, value); //old c method, vulnerabil for buffer-overflow
+			std::snprintf(msgtemp0, sizeof(msgtemp0), " \"%.64s\" (%s = \"%s\")", account_get_name(account), key, value); // maximum number of characters
 
 			if (account_set_strattr(account, key, value) < 0)
 			{
