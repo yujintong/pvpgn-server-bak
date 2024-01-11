@@ -31,6 +31,7 @@
 #include <fstream>
 #include <limits>
 #include <sstream>
+#include <random>
 #include <string>
 #include <tuple>
 
@@ -54,6 +55,7 @@
 #include "common/xstring.h"
 
 #include "account_email_verification.h"
+#include "account_email_resetpasswd.h"
 #include "handlers.h"
 #include "connection.h"
 #include "prefs.h"
@@ -5564,6 +5566,29 @@ namespace pvpgn
 				eventlog(eventlog_level_error, __FUNCTION__, "[{}] account \"{}\" email mismatch, ignore get password", conn_get_socket(c), account_get_name(account));
 				return 0;
 			}
+
+			t_hash sc_hash;
+			static std::random_device rdevice;
+			static std::default_random_engine rengine(rdevice());
+			static std::uniform_int_distribution<unsigned int> uniform_dist(100000, 999999);
+
+			std::string plainpass = fmt::to_string(uniform_dist(rengine));
+
+			const char *lpass = NULL;
+			lpass = plainpass.c_str();
+			//strcpy(lpass, plainpass.data());
+
+			//set password hash for sc etc.
+			bnet_hash(&sc_hash, std::strlen(lpass), lpass);
+
+			// Update account password
+			account_set_pass(account, hash_get_str(sc_hash));
+
+			eventlog(eventlog_level_info, __FUNCTION__, "[{}] Set the password for \"{}\" to \"{}\" successful", conn_get_socket(c), account_get_name(account), plainpass);
+
+			// Send reset password email
+			account_email_resetpasswd_sendemail(account, plainpass);
+
 			/* TODO: send mail to user with the real password or changed password!?
 			 * (as we cannot get the real password back, we should only change the password)     --Soar */
 			eventlog(eventlog_level_info, __FUNCTION__, "[{}] get password for account \"{}\" to email \"{}\"", conn_get_socket(c), account_get_name(account), email);

@@ -1,5 +1,6 @@
 set(BNETD_SOURCES
-	account.cpp account.h account_email_verification.cpp account_email_verification.h
+	account.cpp account.h account_email_resetpasswd.cpp account_email_resetpasswd.h
+	account_email_verification.cpp account_email_verification.h
 	account_wrap.cpp account_wrap.h adbanner.cpp
 	adbanner.h alias_command.cpp alias_command.h anongame.cpp
 	anongame_gameresult.cpp anongame_gameresult.h anongame.h 

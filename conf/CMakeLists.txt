@@ -5,7 +5,7 @@ set(OUTPUT_CONFS ad.json anongame_infos.conf address_translation.conf
   bnxplevel.conf channel.conf command_groups.conf realm.conf 
   sql_DB_layout.conf supportfile.conf topics.json 
   tournament.conf versioncheck.json icons.conf
-  email_verification.conf cacert.pem)
+  email_verification.conf email_resetpasswd.conf cacert.pem)
 foreach(CONF ${OUTPUT_CONFS})
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/${CONF}.in ${CMAKE_CURRENT_BINARY_DIR}/${CONF} @ONLY)
 endforeach(CONF)
@@ -30,7 +30,7 @@ if(WITH_BNETD)
   bnxpcalc.conf bnxplevel.conf channel.conf command_groups.conf  
   realm.conf sql_DB_layout.conf supportfile.conf topics.json 
   tournament.conf versioncheck.json icons.conf
-  email_verification.conf cacert.pem)
+  email_verification.conf email_resetpasswd.conf cacert.pem)
 endif(WITH_BNETD)
 
 if(WITH_D2CS)

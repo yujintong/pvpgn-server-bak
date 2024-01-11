@@ -1,0 +1,10 @@
+Hello {{account_name}},
+
+You or someone else applied to reset your account password.
+
+Your Temporary password: {{account_passwd}}.
+
+If not done by myself, please ignore this email.
+
+
+{pvpgn_server_name} Team

@@ -89,6 +89,7 @@
 #include "i18n.h"
 #include "smtp.h"
 #include "account_email_verification.h"
+#include "account_email_resetpasswd.h"
 
 #ifdef HAVE_ARPA_INET_H
 # include <arpa/inet.h>
@@ -1525,22 +1526,22 @@ namespace pvpgn
 					}
 #endif
 
+					if (do_restart == restart_mode_all || do_restart == restart_mode_smtp)
+					{
+						if (smtp_reconfig(prefs_get_smtp_ca_cert_store_file(), prefs_get_smtp_server_url(), prefs_get_smtp_port(), prefs_get_smtp_secure(), prefs_get_smtp_username(), prefs_get_smtp_password()))
+						{
+							eventlog(eventlog_level_info, __FUNCTION__, "Successfully reconfigured SMTP client");
+						}
+						else
+						{
+							eventlog(eventlog_level_error, __FUNCTION__, "Failed to reconfigure SMTP client");
+							eventlog(eventlog_level_error, __FUNCTION__, "Disabling account email verification");
+							prefs_set_verify_account_email(false);
+						}
+					}
+
 					if (prefs_get_verify_account_email() == 1)
 					{
-						if (do_restart == restart_mode_all || do_restart == restart_mode_smtp)
-						{
-							if (smtp_reconfig(prefs_get_smtp_ca_cert_store_file(), prefs_get_smtp_server_url(), prefs_get_smtp_port(), prefs_get_smtp_username(), prefs_get_smtp_password()))
-							{
-								eventlog(eventlog_level_info, __FUNCTION__, "Successfully reconfigured SMTP client");
-							}
-							else
-							{
-								eventlog(eventlog_level_error, __FUNCTION__, "Failed to reconfigure SMTP client");
-								eventlog(eventlog_level_error, __FUNCTION__, "Disabling account email verification");
-								prefs_set_verify_account_email(false);
-							}
-						}
-
 						if (do_restart == restart_mode_all || do_restart == restart_mode_accountemailverification)
 						{
 							account_email_verification_unload();
@@ -1549,6 +1550,20 @@ namespace pvpgn
 								eventlog(eventlog_level_error, __FUNCTION__, "Failed to load email verification message");
 								eventlog(eventlog_level_error, __FUNCTION__, "Disabling account email verification");
 								prefs_set_verify_account_email(false);
+							}
+						}
+					}
+
+					if (prefs_get_resetpasswd_account_email() == 1)
+					{
+						if (do_restart == restart_mode_all || do_restart == restart_mode_accountemailresetpasswd)
+						{
+							account_email_resetpasswd_unload();
+							if (!account_email_resetpasswd_load(prefs_get_email_resetpasswd_file(), prefs_get_servername(), prefs_get_resetpasswd_account_email_from_address(), prefs_get_resetpasswd_account_email_from_name()))
+							{
+								eventlog(eventlog_level_error, __FUNCTION__, "Failed to load email reset password message");
+								eventlog(eventlog_level_error, __FUNCTION__, "Disabling account email reset password");
+								prefs_set_resetpasswd_account_email(false);
 							}
 						}
 					}

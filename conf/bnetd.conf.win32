@@ -82,6 +82,7 @@ DBlayoutfile = conf\sql_DB_layout.conf
 supportfile = conf\supportfile.conf
 customicons_file = conf\icons.conf
 email_verification_file = "conf\email_verification.conf"
+email_resetpasswd_file = "conf\email_resetpasswd.conf"
 # Path to a CA certificate store file in PEM format, relative to ${SYSCONFDIR}, 
 # containing X.509 certificates of public certificate authorities.
 # See https://curl.haxx.se/docs/caextract.html
@@ -375,6 +376,17 @@ verify_account_email_expiration = 10
 verify_account_email_from_address = ""
 
 verify_account_email_from_name = ""
+
+# reset account password email address
+# After resetting the account password, send an email to the user containing a
+# temporary password for account login.
+# Set smtp_server_url, smtp_port, smtp_username, and smtp_password before enabling.
+resetpasswd_account_email = false
+
+# Email address to use for the 'From' field in email verification emails.
+resetpasswd_account_email_from_address = ""
+
+resetpasswd_account_email_from_name = ""
 
 #                                                                            #
 ##############################################################################
@@ -678,6 +690,9 @@ smtp_ca_cert_store_fetch_interval = 30
 
 # smtp_server_url = "smtp.gmail.com"
 smtp_server_url = ""
+
+# ENCRYPTION_SMTPS none tls ssl
+smtp_secure = "none"
 
 smtp_port = 587
 

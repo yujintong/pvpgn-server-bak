@@ -3983,6 +3983,8 @@ namespace pvpgn
 				mode = restart_mode_smtp;
 			else if (mode_str == "accountemailverification")
 				mode = restart_mode_accountemailverification;
+			else if (mode_str == "accountemailresetpasswd")
+				mode = restart_mode_accountemailresetpasswd;
 			else
 			{
 				message_send_text(c, message_type_info, c, localize(c, "Invalid mode."));

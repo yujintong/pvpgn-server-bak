@@ -58,6 +58,7 @@ namespace pvpgn
 		static std::string smtp_ca_cert_store;
 		static std::string smtp_server_url;
 		static long smtp_port;
+		static std::string smtp_secure = "none";
 		static std::string smtp_username;
 		static std::string smtp_password;
 
@@ -196,7 +197,7 @@ namespace pvpgn
 		* Initializes smtp_server_url, smtp_port, smtp_username, and smtp_password from the four function parameters.
 		* Will return false if prefs_smtp_port is greater than 65535.
 		*/
-		static bool smtp_config(const char* prefs_smtp_ca_cert_store, const char* prefs_smtp_server_url, unsigned int prefs_smtp_port, const char* prefs_smtp_username, const char* prefs_smtp_password)
+		static bool smtp_config(const char* prefs_smtp_ca_cert_store, const char* prefs_smtp_server_url, unsigned int prefs_smtp_port, const char* prefs_smtp_secure, const char* prefs_smtp_username, const char* prefs_smtp_password)
 		{
 			if (prefs_smtp_ca_cert_store == nullptr)
 			{
@@ -217,6 +218,12 @@ namespace pvpgn
 				return false;
 			}
 
+			if (prefs_smtp_secure == nullptr)
+			{
+				eventlog(eventlog_level_error, __FUNCTION__, "Received NULL prefs_smtp_secure");
+				return false;
+			}
+
 			if (prefs_smtp_username == nullptr)
 			{
 				eventlog(eventlog_level_error, __FUNCTION__, "Received NULL prefs_smtp_username");
@@ -232,8 +239,13 @@ namespace pvpgn
 			smtp_ca_cert_store = prefs_smtp_ca_cert_store;
 			smtp_server_url = fmt::format("smtp://{}", prefs_smtp_server_url);
 			smtp_port = prefs_smtp_port;
+			smtp_secure = prefs_smtp_secure;
 			smtp_username = prefs_smtp_username;
 			smtp_password = prefs_smtp_password;
+
+			if (smtp_secure == "ssl") {
+				smtp_server_url = fmt::format("smtps://{}", prefs_smtp_server_url);
+			}
 
 			return true;
 		}
@@ -245,7 +257,7 @@ namespace pvpgn
 		* On success, returns true.
 		* On failure, returns false. Will fail if libcurl couldn't initialize global context.
 		*/
-		bool smtp_init(const char* prefs_smtp_ca_cert_store, const char* prefs_smtp_server_url, unsigned int prefs_smtp_port, const char* prefs_smtp_username, const char* prefs_smtp_password)
+		bool smtp_init(const char* prefs_smtp_ca_cert_store, const char* prefs_smtp_server_url, unsigned int prefs_smtp_port, const char* prefs_smtp_secure, const char* prefs_smtp_username, const char* prefs_smtp_password)
 		{
 			if (is_curl_initialized)
 			{
@@ -253,7 +265,7 @@ namespace pvpgn
 				return false;
 			}
 
-			if (smtp_config(prefs_smtp_ca_cert_store, prefs_smtp_server_url, prefs_smtp_port, prefs_smtp_username, prefs_smtp_password) == false)
+			if (smtp_config(prefs_smtp_ca_cert_store, prefs_smtp_server_url, prefs_smtp_port, prefs_smtp_secure, prefs_smtp_username, prefs_smtp_password) == false)
 			{
 				eventlog(eventlog_level_error, __FUNCTION__, "Failed to set SMTP data");
 				return false;
@@ -283,9 +295,9 @@ namespace pvpgn
 			return true;
 		}
 
-		bool smtp_reconfig(const char* prefs_smtp_ca_cert_store, const char* prefs_smtp_server_url, unsigned int prefs_smtp_port, const char* prefs_smtp_username, const char* prefs_smtp_password)
+		bool smtp_reconfig(const char* prefs_smtp_ca_cert_store, const char* prefs_smtp_server_url, unsigned int prefs_smtp_port, const char* prefs_smtp_secure, const char* prefs_smtp_username, const char* prefs_smtp_password)
 		{
-			return smtp_config(prefs_smtp_ca_cert_store, prefs_smtp_server_url, prefs_smtp_port, prefs_smtp_username, prefs_smtp_password);
+			return smtp_config(prefs_smtp_ca_cert_store, prefs_smtp_server_url, prefs_smtp_port, prefs_smtp_secure, prefs_smtp_username, prefs_smtp_password);
 		}
 
 		void smtp_cleanup()
@@ -317,6 +329,8 @@ namespace pvpgn
 				return;
 			}
 
+			curl_global_init(CURL_GLOBAL_DEFAULT);
+
 			CURL* curl = curl_easy_init();
 			if (curl == nullptr)
 			{
@@ -325,8 +339,15 @@ namespace pvpgn
 			}
 
 			// direct curl to use TLS
-			curl_easy_setopt(curl, CURLOPT_USE_SSL, static_cast<long>(CURLUSESSL_ALL));
-			curl_easy_setopt(curl, CURLOPT_CAINFO, smtp_ca_cert_store.c_str());
+			if (smtp_secure == "none") {
+			} else if (smtp_secure == "tls") {
+				curl_easy_setopt(curl, CURLOPT_USE_SSL, static_cast<long>(CURLUSESSL_ALL));
+				curl_easy_setopt(curl, CURLOPT_CAINFO, smtp_ca_cert_store.c_str());
+			} else if (smtp_secure == "ssl") {
+				curl_easy_setopt(curl, CURLOPT_USE_SSL, static_cast<long>(CURLUSESSL_ALL));
+				curl_easy_setopt(curl, CURLOPT_CAINFO, smtp_ca_cert_store.c_str());
+			} else {
+			}
 
 			// set smtp server connection information
 			curl_easy_setopt(curl, CURLOPT_URL, smtp_server_url.c_str());
@@ -376,8 +397,10 @@ namespace pvpgn
 			curl_easy_setopt(curl, CURLOPT_READDATA, static_cast<void*>(rcbmessage));
 
 			curl_easy_setopt(curl, CURLOPT_UPLOAD, 1L);
+			//curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
 
 			// lock an available mutex and then add the curl easy handle to the associated curl multi handle
+			int running_handles = 1;
 			while (true)
 			{
 				for (auto& tuple : handles_and_mutexes)
@@ -390,6 +413,8 @@ namespace pvpgn
 					}
 
 					CURLM* curl_multi_handle = std::get<0>(tuple);
+
+					/* Tell the multi stack about our easy handle */
 					CURLMcode code = curl_multi_add_handle(curl_multi_handle, curl);
 					if (code == CURLM_OK)
 					{
@@ -400,12 +425,21 @@ namespace pvpgn
 						eventlog(eventlog_level_error, __FUNCTION__, "Failed to add handle to CURL multi handle (CURLMcode: {})", code);
 					}
 
+					do
+					{
+						CURLMcode mc = curl_multi_perform(curl_multi_handle, &running_handles);
+						if(running_handles)
+							/* wait for activity, timeout or "nothing" */
+							mc = curl_multi_poll(curl_multi_handle, NULL, 0, 1000, NULL);
+						if(mc)
+							break;
+					} while(running_handles);
+
 					curl_multi_handle_mutex.unlock();
 
 					return;
 				}
 			}
-
 		}
 
 		// The actual logic is in smtp_consumer()

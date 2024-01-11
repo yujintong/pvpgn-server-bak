@@ -146,6 +146,7 @@ namespace pvpgn
 			char const * tournament_file;
 			char const * customicons_file;
 			char const * email_verification_file;
+			char const * email_resetpasswd_file;
 			char const * scriptdir;
 			char const * aliasfile;
 			char const * anongame_infos_file;
@@ -162,6 +163,9 @@ namespace pvpgn
 			unsigned int verify_account_email_expiration;
 			char const* verify_account_email_from_address;
 			char const * verify_account_email_from_name;
+			unsigned int resetpasswd_account_email;
+			char const* resetpasswd_account_email_from_address;
+			char const * resetpasswd_account_email_from_name;
 			char const * supportfile;
 			char const * allowed_clients;
 			char const * ladder_games;
@@ -179,6 +183,7 @@ namespace pvpgn
 			unsigned int smtp_ca_cert_store_fetch_interval;
 			char const * smtp_server_url;
 			unsigned int smtp_port;
+			char const * smtp_secure;
 			char const * smtp_username;
 			char const * smtp_password;
 
@@ -612,6 +617,10 @@ namespace pvpgn
 		static const char* conf_get_email_verification_file(void);
 		static int conf_setdef_email_verification_file(void);
 
+		static int conf_set_email_resetpasswd_file(const char* valstr);
+		static const char* conf_get_email_resetpasswd_file(void);
+		static int conf_setdef_email_resetpasswd_file(void);
+
 		static int conf_set_scriptdir(const char *valstr);
 		static const char *conf_get_scriptdir(void);
 		static int conf_setdef_scriptdir(void);
@@ -676,6 +685,18 @@ namespace pvpgn
 		static const char* conf_get_verify_account_email_from_name(void);
 		static int conf_setdef_verify_account_email_from_name(void);
 
+		static int conf_set_resetpasswd_account_email(const char* valstr);
+		static const char* conf_get_resetpasswd_account_email(void);
+		static int conf_setdef_resetpasswd_account_email(void);
+
+		static int conf_set_resetpasswd_account_email_from_address(const char* valstr);
+		static const char* conf_get_resetpasswd_account_email_from_address(void);
+		static int conf_setdef_resetpasswd_account_email_from_address(void);
+
+		static int conf_set_resetpasswd_account_email_from_name(const char* valstr);
+		static const char* conf_get_resetpasswd_account_email_from_name(void);
+		static int conf_setdef_resetpasswd_account_email_from_name(void);
+
 		static int conf_set_allowed_clients(const char *valstr);
 		static const char *conf_get_allowed_clients(void);
 		static int conf_setdef_allowed_clients(void);
@@ -739,6 +760,10 @@ namespace pvpgn
 		static int conf_set_smtp_port(const char* valstr);
 		static const char* conf_get_smtp_port(void);
 		static int conf_setdef_smtp_port(void);
+
+		static int conf_set_smtp_secure(const char* valstr);
+		static const char* conf_get_smtp_secure(void);
+		static int conf_setdef_smtp_secure(void);
 
 		static int conf_set_smtp_username(const char* valstr);
 		static const char* conf_get_smtp_username(void);
@@ -904,6 +929,7 @@ namespace pvpgn
 			{ "tournament_file", conf_set_tournament_file, conf_get_tournament_file, conf_setdef_tournament_file },
 			{ "customicons_file", conf_set_customicons_file, conf_get_customicons_file, conf_setdef_customicons_file },
 			{ "email_verification_file", conf_set_email_verification_file, conf_get_email_verification_file, conf_setdef_email_verification_file },
+			{ "email_resetpasswd_file", conf_set_email_resetpasswd_file, conf_get_email_resetpasswd_file, conf_setdef_email_resetpasswd_file },
 			{ "scriptdir", conf_set_scriptdir, conf_get_scriptdir, conf_setdef_scriptdir },
 			{ "aliasfile", conf_set_aliasfile, conf_get_aliasfile, conf_setdef_aliasfile },
 			{ "anongame_infos_file", conf_set_anongame_infos_file, conf_get_anongame_infos_file, conf_setdef_anongame_infos_file },
@@ -920,6 +946,9 @@ namespace pvpgn
 			{ "verify_account_email_expiration", conf_set_verify_account_email_expiration, conf_get_verify_account_email_expiration, conf_setdef_verify_account_email_expiration },
 			{ "verify_account_email_from_address", conf_set_verify_account_email_from_address, conf_get_verify_account_email_from_address, conf_setdef_verify_account_email_from_address },
 			{ "verify_account_email_from_name", conf_set_verify_account_email_from_name, conf_get_verify_account_email_from_name, conf_setdef_verify_account_email_from_name },
+			{ "resetpasswd_account_email", conf_set_resetpasswd_account_email, conf_get_resetpasswd_account_email, conf_setdef_resetpasswd_account_email },
+			{ "resetpasswd_account_email_from_address", conf_set_resetpasswd_account_email_from_address, conf_get_resetpasswd_account_email_from_address, conf_setdef_resetpasswd_account_email_from_address },
+			{ "resetpasswd_account_email_from_name", conf_set_resetpasswd_account_email_from_name, conf_get_resetpasswd_account_email_from_name, conf_setdef_resetpasswd_account_email_from_name },
 			{ "allowed_clients", conf_set_allowed_clients, conf_get_allowed_clients, conf_setdef_allowed_clients },
 			{ "ladder_games", conf_set_ladder_games, conf_get_ladder_games, conf_setdef_ladder_games },
 			{ "max_connections", conf_set_max_connections, conf_get_max_connections, conf_setdef_max_connections },
@@ -936,6 +965,7 @@ namespace pvpgn
 			{ "smtp_ca_cert_store_fetch_interval", conf_set_smtp_ca_cert_store_fetch_interval, conf_get_smtp_ca_cert_store_fetch_interval, conf_setdef_smtp_ca_cert_store_fetch_interval },
 			{ "smtp_server_url", conf_set_smtp_server_url, conf_get_smtp_server_url, conf_setdef_smtp_server_url, },
 			{ "smtp_port", conf_set_smtp_port, conf_get_smtp_port, conf_setdef_smtp_port },
+			{ "smtp_secure", conf_set_smtp_secure, conf_get_smtp_secure, conf_setdef_smtp_secure },
 			{ "smtp_username", conf_set_smtp_username, conf_get_smtp_username, conf_setdef_smtp_username },
 			{ "smtp_password", conf_set_smtp_password, conf_get_smtp_password, conf_setdef_smtp_password },
 
@@ -3183,6 +3213,27 @@ namespace pvpgn
 		}
 
 
+		extern char const* prefs_get_email_resetpasswd_file(void)
+		{
+			return prefs_runtime_config.email_resetpasswd_file;
+		}
+
+		static int conf_set_email_resetpasswd_file(const char* valstr)
+		{
+			return conf_set_str(&prefs_runtime_config.email_resetpasswd_file, valstr, NULL);
+		}
+
+		static const char* conf_get_email_resetpasswd_file(void)
+		{
+			return prefs_runtime_config.email_resetpasswd_file;
+		}
+
+		static int conf_setdef_email_resetpasswd_file(void)
+		{
+			return conf_set_str(&prefs_runtime_config.email_resetpasswd_file, NULL, BNETD_EMAIL_RESETPASSWD_FILE);
+		}
+
+
 		extern char const * prefs_get_scriptdir(void)
 		{
 			return prefs_runtime_config.scriptdir;
@@ -3531,6 +3582,74 @@ namespace pvpgn
 		static int conf_setdef_verify_account_email_from_name(void)
 		{
 			return conf_set_str(&prefs_runtime_config.verify_account_email_from_name, NULL, NULL);
+		}
+
+
+		extern unsigned int prefs_get_resetpasswd_account_email(void)
+		{
+			return prefs_runtime_config.resetpasswd_account_email;
+		}
+
+		extern void prefs_set_resetpasswd_account_email(bool enable)
+		{
+			prefs_runtime_config.resetpasswd_account_email = enable ? 1 : 0;
+		}
+
+		static int conf_set_resetpasswd_account_email(const char* valstr)
+		{
+			return conf_set_bool(&prefs_runtime_config.resetpasswd_account_email, valstr, 0);
+		}
+
+		static const char* conf_get_resetpasswd_account_email(void)
+		{
+			return conf_get_bool(prefs_runtime_config.resetpasswd_account_email);
+		}
+
+		static int conf_setdef_resetpasswd_account_email(void)
+		{
+			return conf_set_bool(&prefs_runtime_config.resetpasswd_account_email, nullptr, 0);
+		}
+
+
+		extern char const* prefs_get_resetpasswd_account_email_from_address(void)
+		{
+			return prefs_runtime_config.resetpasswd_account_email_from_address;
+		}
+
+		static int conf_set_resetpasswd_account_email_from_address(const char* valstr)
+		{
+			return conf_set_str(&prefs_runtime_config.resetpasswd_account_email_from_address, valstr, NULL);
+		}
+
+		static const char* conf_get_resetpasswd_account_email_from_address(void)
+		{
+			return prefs_runtime_config.resetpasswd_account_email_from_address;
+		}
+
+		static int conf_setdef_resetpasswd_account_email_from_address(void)
+		{
+			return conf_set_str(&prefs_runtime_config.resetpasswd_account_email_from_address, NULL, NULL);
+		}
+
+
+		extern char const* prefs_get_resetpasswd_account_email_from_name(void)
+		{
+			return prefs_runtime_config.resetpasswd_account_email_from_name;
+		}
+
+		static int conf_set_resetpasswd_account_email_from_name(const char* valstr)
+		{
+			return conf_set_str(&prefs_runtime_config.resetpasswd_account_email_from_name, valstr, NULL);
+		}
+
+		static const char* conf_get_resetpasswd_account_email_from_name(void)
+		{
+			return prefs_runtime_config.resetpasswd_account_email_from_name;
+		}
+
+		static int conf_setdef_resetpasswd_account_email_from_name(void)
+		{
+			return conf_set_str(&prefs_runtime_config.resetpasswd_account_email_from_name, NULL, NULL);
 		}
 
 
@@ -3887,6 +4006,27 @@ namespace pvpgn
 		static int conf_setdef_smtp_port(void)
 		{
 			return conf_set_int(&prefs_runtime_config.smtp_port, NULL, BNETD_SMTP_PORT);
+		}
+
+
+		extern char const * prefs_get_smtp_secure(void)
+		{
+			return prefs_runtime_config.smtp_secure;
+		}
+
+		static int conf_set_smtp_secure(const char* valstr)
+		{
+			return conf_set_str(&prefs_runtime_config.smtp_secure, valstr, NULL);
+		}
+
+		static const char* conf_get_smtp_secure(void)
+		{
+			return prefs_runtime_config.smtp_secure;
+		}
+
+		static int conf_setdef_smtp_secure(void)
+		{
+			return conf_set_str(&prefs_runtime_config.smtp_secure, NULL, NULL);
 		}
 
 

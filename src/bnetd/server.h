@@ -94,7 +94,8 @@ namespace pvpgn
 			restart_mode_anongame,
 			restart_mode_lua,
 			restart_mode_smtp,
-			restart_mode_accountemailverification
+			restart_mode_accountemailverification,
+			restart_mode_accountemailresetpasswd
 		};
 
 		extern unsigned int server_get_uptime(void);
