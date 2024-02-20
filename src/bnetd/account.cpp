@@ -141,6 +141,12 @@ namespace pvpgn
 					goto err;
 				}
 
+				if ((strncasecmp(username, "matchbot", strlen("matchbot")) == 0) && (strncasecmp(username, prefs_get_servername(), 8) == 0) && (strncasecmp(username, prefs_get_servername(), strlen(prefs_get_servername()) == 0)) && (strncasecmp(username, prefs_get_hostname(), 8) == 0) && (strncasecmp(username, prefs_get_hostname(), strlen(prefs_get_hostname()) == 0))
+				   ) {
+					eventlog(eventlog_level_debug, __FUNCTION__, "user \"{}\" matches protected username account creation failed", username);
+					goto err;
+				}
+
 				account->attrgroup = attrgroup_create_newuser(username);
 				if (!account->attrgroup) {
 					eventlog(eventlog_level_error, __FUNCTION__, "failed to add user");
